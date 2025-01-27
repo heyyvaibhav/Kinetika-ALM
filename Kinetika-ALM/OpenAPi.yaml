@@ -1,0 +1,290 @@
+openapi: 3.0.0
+info:
+  title: JIRA-like ALM API
+  description: API documentation for a JIRA-like ALM system.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local server
+paths:
+  /api/users:
+    get:
+      summary: Retrieve all users
+      tags:
+        - Users
+      responses:
+        '200':
+          description: List of users retrieved successfully
+    post:
+      summary: Create a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+    put:
+      summary: Update an existing user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated successfully
+    delete:
+      summary: Delete a user
+      tags:
+        - Users
+      responses:
+        '204':
+          description: User deleted successfully
+  /api/projects:
+    get:
+      summary: Retrieve all projects
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: List of projects retrieved successfully
+    post:
+      summary: Create a new project
+      tags:
+        - Projects
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '201':
+          description: Project created successfully
+    put:
+      summary: Update an existing project
+      tags:
+        - Projects
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: Project updated successfully
+    delete:
+      summary: Delete a project
+      tags:
+        - Projects
+      responses:
+        '204':
+          description: Project deleted successfully
+  /api/issuetypes:
+    get:
+      summary: Retrieve all issue types
+      tags:
+        - Issue Types
+      responses:
+        '200':
+          description: List of issue types retrieved successfully
+    post:
+      summary: Create a new issue type
+      tags:
+        - Issue Types
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueType'
+      responses:
+        '201':
+          description: Issue type created successfully
+  /api/issues:
+    get:
+      summary: Retrieve all issues
+      tags:
+        - Issues
+      responses:
+        '200':
+          description: List of issues retrieved successfully
+    post:
+      summary: Create a new issue
+      tags:
+        - Issues
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Issue'
+      responses:
+        '201':
+          description: Issue created successfully
+    put:
+      summary: Update an existing issue
+      tags:
+        - Issues
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Issue'
+      responses:
+        '200':
+          description: Issue updated successfully
+    delete:
+      summary: Delete an issue
+      tags:
+        - Issues
+      responses:
+        '204':
+          description: Issue deleted successfully
+  /api/issues/{id}/comments:
+    get:
+      summary: Retrieve comments for an issue
+      tags:
+        - Comments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of comments retrieved successfully
+    post:
+      summary: Add a comment to an issue
+      tags:
+        - Comments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '201':
+          description: Comment added successfully
+  /api/workflows:
+    get:
+      summary: Retrieve all workflows
+      tags:
+        - Workflows
+      responses:
+        '200':
+          description: List of workflows retrieved successfully
+    post:
+      summary: Create a new workflow
+      tags:
+        - Workflows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+      responses:
+        '201':
+          description: Workflow created successfully
+    put:
+      summary: Update an existing workflow
+      tags:
+        - Workflows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+      responses:
+        '200':
+          description: Workflow updated successfully
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        full_name:
+          type: string
+        role:
+          type: string
+    Project:
+      type: object
+      properties:
+        project_key:
+          type: string
+        project_name:
+          type: string
+        project_description:
+          type: string
+        lead_id:
+          type: integer
+    IssueType:
+      type: object
+      properties:
+        issue_type_name:
+          type: string
+        description:
+          type: string
+    Issue:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        issue_key:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        issue_type_id:
+          type: integer
+        status:
+          type: string
+        priority:
+          type: string
+        reporter_id:
+          type: integer
+        assignee_id:
+          type: integer
+    Comment:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        comment_text:
+          type: string
+    Workflow:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        status_from:
+          type: string
+        status_to:
+          type: string
