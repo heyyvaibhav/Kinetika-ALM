@@ -56,7 +56,7 @@ function Board() {
       },
     ]);
   
-    alert(`Column "${newColumnTitle}" added successfully!`); // Success alert
+    // alert(`Column "${newColumnTitle}" added successfully!`); // Success alert
     setNewColumnTitle(""); // Clear the input field
     setIsAddingColumn(false); // Close the input field
   };
@@ -113,8 +113,16 @@ function Board() {
                       ? "#E9EEFF" // Lavender for "in-progress"
                       : column.id === "done"
                       ? "#E9FAF2" // Light green for "done"
-                      : "#FEF8E6", // Default light gray
+                      : "#FFF7E9", // Default light gray
                   borderRadius: "10px",
+                  border: 
+                  column.id === "todo"
+                  ? "1px solid #E36A7A" 
+                  : column.id === "inProgress"
+                  ? "1px solid #6976C9" 
+                  : column.id === "done"
+                  ? "1px solid #5DCE9F" 
+                  : "1px solid #E4B54F",
                   padding: "4px 8px",
                 }}
               >
@@ -126,13 +134,22 @@ function Board() {
                       ? "./inProgress.svg"
                       : column.id === "done"
                       ? "./done.svg"
-                      : "./default-icon.svg" // Fallback icon
+                      : "./fire.svg" // Fallback icon
                   }
                   alt={`${column.id} Icon`}
                   height="20"
                   width="20"
                 />
-                <span style={{ marginLeft: "8px", fontWeight: "bold" }}>
+                <span style={{ marginLeft: "8px", fontWeight: "bold",
+                  color:
+                  column.id === "todo"
+                  ? "#E36A7A" 
+                  : column.id === "inProgress"
+                  ? "#6976C9" 
+                  : column.id === "done"
+                  ? "#5DCE9F" 
+                  : "#E4B54F",
+                 }}>
                   10 {/* Number of tickets */}
                 </span>
               </div>
