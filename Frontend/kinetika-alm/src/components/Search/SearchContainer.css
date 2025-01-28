@@ -1,0 +1,85 @@
+.controls {
+    display: flex;
+    border-radius: 8px;
+    padding: 8px 16px;
+    background-color: white;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    /* border-bottom: 1px solid #ddd; */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-container{
+    position: relative;
+  }
+  
+  .search-input {
+    padding: 8px 32px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 20em;
+    height: 36px;
+    justify-items: absolute;
+  }
+  
+  .search_icon{
+    position: absolute;
+    top:14%;
+    left: 0.65%;
+    width: 24px;
+    height: 24px;
+    
+    
+  }
+  .control-buttons {
+    justify-content: space-between; 
+    display: flex;
+    gap: 1rem;
+    margin-right: 1em;
+  }
+
+  .control-btn {
+    align-items: center; /* Vertically centers items */
+    justify-content: center;
+    padding: 4px 6px;
+    border-radius: 8px;
+    width: 100px;
+    height: 36px;
+    background: transparent !important;
+    cursor: pointer;
+    border: 1px solid #ddd;
+  }
+  
+  .btn-text {
+    display: flex;
+    align-items: center; /* Vertically centers the image and text */
+    gap: 0.5em; /* Ensures spacing between image and text */
+    font-size: 1rem; /* Adjust font size if necessary */
+    justify-content: center;
+    color: #A6A4B2;
+  }
+
+  .user-profile-images {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%; /* Makes the images circular */
+    object-fit: cover; /* Ensures the images maintain aspect ratio */
+    border: 2px solid #fff; /* Optional: Adds a border around the images */
+    margin-left: -6px; /* Creates a small overlapping effect */
+    z-index: 1; /* Ensures proper stacking */
+  }
+  
+  .profile-img:nth-child(2) {
+    z-index: 2; /* Ensures the second image appears on top of the first */
+  }
+  
+  .profile-img:nth-child(3) {
+    z-index: 3; /* Ensures the third image appears on top of the others */
+  }
