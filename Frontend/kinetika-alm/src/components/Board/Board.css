@@ -4,6 +4,7 @@
   background: #ffffff;
   border-radius: 8px;
   padding: 20px;
+  overflow: hidden;
 }
 
 .board-header {
@@ -11,7 +12,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  /* padding: 10px 0; */
 }
 
 .board-header h2 {
@@ -163,21 +164,16 @@ button:hover {
 }
 
 .delete-column {
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 8px;
 }
 
 .delete-column:hover {
-  background-color: #ff7875;
+  background-color: #ddd;
 }
 

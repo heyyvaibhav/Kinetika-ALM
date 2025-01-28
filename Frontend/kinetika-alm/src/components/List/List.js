@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './List.css';
+import SearchContainer from '../Search/Search';
 
 function List() {
   const [tickets, setTickets] = useState([]);
@@ -51,6 +52,8 @@ function List() {
       <div className="list-header">
         <h2>Project List</h2>
       </div>
+
+      <SearchContainer />
       
       <table>
         <thead>

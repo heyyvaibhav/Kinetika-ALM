@@ -102,8 +102,8 @@ function Board() {
                   <div className="column-header">
                     <div style={{ display: "flex" }}>
                       <img src="./plus-icon.svg" alt="Plus Icon" height="24" width="24" />
-                      <h3 style={{ margin: "0" }}>{column.title}</h3>
                     </div>
+                    <h3 style={{ margin: "0" }}>{column.title}</h3>
                     <div
                       style={{
                         display: "flex",
@@ -156,12 +156,12 @@ function Board() {
                                   : "#E4B54F",
                         }}
                       >
-                        {column.items.length}
+                        {column.items.length} 
                       </span>
                     </div>
                     {column.id !== "todo" && column.id !== "inProgress" && column.id !== "done" && (
                       <button onClick={() => deleteColumn(column.id)} className="delete-column">
-                        X
+                        <img src="/delete.svg" style={{width:"24px", height:"24px"}}/>
                       </button>
                     )}
                   </div>
@@ -174,7 +174,7 @@ function Board() {
                       </div>
                     ))}
                   </div>
-                  <AddTicket onAddTicket={(newTicket) => addNewTicket(column.id, newTicket)} />
+
                   <button className="create-issue" onClick={handleAddTicket}>
                     <u>Create Issue</u>
                   </button>

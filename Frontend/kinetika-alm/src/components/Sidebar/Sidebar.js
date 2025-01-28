@@ -10,10 +10,12 @@ function Sidebar() {
         <h2>Kinetika ALM</h2>
       </div>
       <nav>
-        <NavLink to="/board" className={({ isActive }) => isActive ? 'active' : ''}>
+        <NavLink to="/board" style={{display:"flex", alignItems:"center"}} className={({ isActive }) => isActive ? 'active' : ''}>
+          <img src='/board.svg' style={{width: "24px", height:"24px", marginRight:"1em"}} />
           Board
         </NavLink>
-        <NavLink to="/list" className={({ isActive }) => isActive ? 'active' : ''}>
+        <NavLink to="/list" style={{display:"flex", alignItems:"center"}} className={({ isActive }) => isActive ? 'active' : ''}>
+          <img src='/list.svg' style={{width: "24px", height:"24px", marginRight:"1em"}} />
           List
         </NavLink>
       </nav>
