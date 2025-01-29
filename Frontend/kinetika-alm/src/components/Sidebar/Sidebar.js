@@ -6,7 +6,7 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div className="logo">
-        <img src="./image.png" alt="Logo" width="100" style={{borderRadius:"10px"}}/>
+        <img src="./kinetikalogo.png" alt="Logo" width="100" style={{borderRadius:"10px"}}/>
         <h2>Kinetika ALM</h2>
       </div>
       <nav>

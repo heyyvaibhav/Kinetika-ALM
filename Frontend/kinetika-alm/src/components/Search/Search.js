@@ -48,7 +48,7 @@ const SearchContainer = () => {
                 </div>
             </div>
             <div className="user-profile-images">
-                <img src="/image.png" className="profile-img" alt="User 1" />
+                <img src="/kinetikalogo.png" className="profile-img" alt="User 1" />
                 <img src="/image-modified.png" className="profile-img" alt="User 2" />
                 {/* <img src="/user3.jpg" className="profile-img" alt="User 3" /> */}
             </div>
