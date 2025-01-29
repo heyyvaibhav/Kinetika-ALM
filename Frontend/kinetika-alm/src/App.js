@@ -4,6 +4,7 @@ import './App.css';
 import Sidebar from './components/Sidebar/Sidebar.js';
 import Board from './components/Board/Board.js';
 import List from './components/List/List.js';
+import Project from './components/Project/Project.js';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route path="/board" element={<Board />} />
             <Route path="/list" element={<List />} />
             <Route path="/" element={<Board />} />
+            <Route path="/project" element={<Project />} />
           </Routes>
         </div>
       </div>

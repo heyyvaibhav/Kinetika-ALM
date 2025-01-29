@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react"
+import axios from "axios"
 import "./AddTicketModal.css"
 
 export function AddTicketModal({ onclose }) {
@@ -27,10 +28,63 @@ export function AddTicketModal({ onclose }) {
     fileInputRef.current.click()
   }
 
-  const handleSave = () => {
-    // Implement save functionality here
-    console.log("Saving ticket...")
-    onclose()
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("upload_preset", "your_cloudinary_upload_preset") // Replace with your Cloudinary upload preset
+
+    const response = await fetch("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", {
+      method: "POST",
+      body: formData,
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to upload file to Cloudinary")
+    }
+
+    return response.json()
+  }
+
+  const handleSave = async () => {
+    try {
+      // Upload files to Cloudinary
+      const uploadedFiles = await Promise.all(files.map((file) => uploadToCloudinary(file)))
+
+      // Prepare ticket data
+      const ticketData = {
+        project: document.querySelector('select[name="project"]').value,
+        issueType: document.querySelector('select[name="issueType"]').value,
+        priority: document.querySelector('select[name="priority"]').value,
+        status: document.querySelector('select[name="status"]').value,
+        summary: document.querySelector('input[name="summary"]').value,
+        description: document.querySelector(".editor-content").value,
+        assignee: document.querySelector('select[name="assignee"]').value,
+        team: document.querySelector('select[name="team"]').value,
+        reporter: document.querySelector('select[name="reporter"]').value,
+        flagged: flagged,
+        attachments: uploadedFiles.map((file) => file.secure_url),
+      }
+
+      // Send ticket data to API
+      const response = await axios("http://localhost:5000/api/issues", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(ticketData),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create ticket")
+      }
+
+      const result = await response.json()
+      console.log("Ticket created:", result)
+      onclose()
+    } catch (error) {
+      console.error("Error creating ticket:", error)
+      // Handle error (e.g., show error message to user)
+    }
   }
 
   return (
@@ -52,7 +106,7 @@ export function AddTicketModal({ onclose }) {
             <label>
               Project<span className="required">*</span>
             </label>
-            <select className="select-input">
+            <select className="select-input" name="project">
               <option disabled>Select a Project</option>
             </select>
           </div>
@@ -61,7 +115,7 @@ export function AddTicketModal({ onclose }) {
             <label>
               Issue Type<span className="required">*</span>
             </label>
-            <select className="select-input">
+            <select className="select-input" name="issueType">
               <option>Task</option>
             </select>
           </div>
@@ -70,7 +124,7 @@ export function AddTicketModal({ onclose }) {
             <label>
               Priority<span className="required">*</span>
             </label>
-            <select className="select-input">
+            <select className="select-input" name="priority">
               <option>Low</option>
               <option>Mid</option>
               <option>High</option>
@@ -79,7 +133,7 @@ export function AddTicketModal({ onclose }) {
 
           <div className="form-group">
             <label>Status</label>
-            <select className="select-input" defaultValue="todo">
+            <select className="select-input" defaultValue="todo" name="status">
               <option value="todo">To Do</option>
               <option value="in-progress">In Progress</option>
               <option value="done">Done</option>
@@ -91,7 +145,7 @@ export function AddTicketModal({ onclose }) {
             <label>
               Summary<span className="required">*</span>
             </label>
-            <input type="text" className="text-input" placeholder="Enter summary" />
+            <input type="text" className="text-input" placeholder="Enter summary" name="summary" />
           </div>
 
           <div className="form-group">
@@ -103,7 +157,7 @@ export function AddTicketModal({ onclose }) {
 
           <div className="form-group">
             <label>Assignee</label>
-            <select className="select-input">
+            <select className="select-input" name="assignee">
               <option value="">Select assignee</option>
               <option value="unassigned">Unassigned</option>
               <option value="current-user">Current User</option>
@@ -113,7 +167,7 @@ export function AddTicketModal({ onclose }) {
 
           <div className="form-group">
             <label>Team</label>
-            <select className="select-input">
+            <select className="select-input" name="team">
               <option value="" disabled>
                 Select Team
               </option>
@@ -122,7 +176,7 @@ export function AddTicketModal({ onclose }) {
 
           <div className="form-group">
             <label>Reporter</label>
-            <select className="select-input">
+            <select className="select-input" name="reporter">
               <option value="">Select reporter</option>
               <option value="current-user">Current User</option>
               <option value="other">Other</option>
