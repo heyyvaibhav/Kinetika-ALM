@@ -21,7 +21,7 @@ const ProjectsModel = {
       INSERT INTO projects (project_key, project_name, project_description, lead_id)
       VALUES (?, ?, ?, ?)
     `;
-    const [result] = await db.query(query, [
+    const result = await db.query(query, [
       projectData.project_key,
       projectData.project_name,
       projectData.project_description,

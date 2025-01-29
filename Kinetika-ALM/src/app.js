@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 // Register routes
 app.use('/api/users', userRoutes);
-app.use('/api/projects', projectRoutes);
+app.use('/api', projectRoutes);
 app.use('/api/issues', issueRoutes);
 app.use('/api/issues/comments', commentRoutes);
 app.use('/api/issues/attachments', attachmentRoutes);
@@ -27,7 +27,7 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-const PORT = 3000;
+const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

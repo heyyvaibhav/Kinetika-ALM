@@ -71,7 +71,7 @@ const IssuesModel = {
       ON DUPLICATE KEY UPDATE current_number = current_number + 1
     `;
 
-    const [[keyRow]] = await db.query(selectQuery, [projectId, prefix]);
+    const [keyRow] = await db.query(selectQuery, [projectId, prefix]);
     if (!keyRow) {
       await db.query(insertQuery, [projectId, prefix]);
       return `${prefix}-1`;
