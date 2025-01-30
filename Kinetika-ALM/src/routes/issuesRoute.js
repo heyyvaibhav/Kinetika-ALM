@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/', IssuesController.createIssue);
 
 // Route to get all issues by project ID
-router.get('/project/:project_id', IssuesController.getIssuesByProject);
+router.get('/projects', IssuesController.getIssuesByProject);
 
 // Route to get an issue by its ID
 router.get('/:issue_id', IssuesController.getIssueById);
