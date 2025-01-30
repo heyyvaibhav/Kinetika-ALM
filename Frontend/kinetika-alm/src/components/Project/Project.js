@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import axios from "axios"
 import "./Project.css"
+import { createProject } from "../../Service"
 
 export default function ProjectForm() {
   const [formData, setFormData] = useState({
@@ -24,16 +24,17 @@ export default function ProjectForm() {
     setIsLoading(true)
     setError(null)
 
-    console.log("Submitting form data:", formData) // Log the form data
+    console.log("Submitting form data:", formData)
+
+    const data = {
+      project_name : formData.name,
+      project_key : formData.key,
+      project_description : formData.description,
+      lead_id :35
+    }
 
     try {
-      const response = await axios("http://localhost:5000/api/projects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
+      const response = await createProject("/projects", data)
 
       console.log("Response status:", response.status) // Log the response status
 
@@ -123,7 +124,7 @@ export default function ProjectForm() {
           </div>
         </div>
 
-        {/* {error && <p className="error-message">{error}</p>} */}
+        {error && <p className="error-message">{error}</p>}
 
         <div className="footer">
           <button type="submit" disabled={isLoading}>

@@ -4,7 +4,7 @@ const ProjectsModel = {
   // Retrieve all projects
   getAllProjects: async () => {
     const query = 'SELECT * FROM projects';
-    const [results] = await db.query(query);
+    const results = await db.query(query);
     return results;
   },
 

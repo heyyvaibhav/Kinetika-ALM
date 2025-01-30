@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 // Import routes
 const userRoutes = require('./routes/userRoutes');
@@ -11,6 +12,7 @@ const workflowRoutes = require('./routes/workflowRoutes');
 const issueHistoryRoutes = require('./routes/issueHistoryRoutes');
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 // Register routes

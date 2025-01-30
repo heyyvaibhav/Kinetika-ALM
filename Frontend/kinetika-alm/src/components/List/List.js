@@ -50,7 +50,7 @@ function List() {
   return (
     <div className="list">
       <div className="list-header">
-        <h2>Project List</h2>
+        <h2>Issue List</h2>
       </div>
 
       <SearchContainer />

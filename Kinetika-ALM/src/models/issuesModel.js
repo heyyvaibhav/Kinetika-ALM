@@ -21,12 +21,14 @@ const IssuesModel = {
     return db.query(query, values);
   },
 
-  getIssuesByProject: async (projectId) => {
-    const query = `
-      SELECT * FROM issues WHERE project_id = ?
-    `;
-    return db.query(query, [projectId]);
+  getIssuesByProject: async (projectIds) => {
+    const placeholders = projectIds.map(() => "?").join(", "); // Create ?,?,? for IN clause
+    const query = `SELECT * FROM issues WHERE project_id IN (${placeholders})`;
+    
+    return db.query(query, projectIds);
   },
+  
+  
 
   getIssueById: async (issueId) => {
     const query = `
