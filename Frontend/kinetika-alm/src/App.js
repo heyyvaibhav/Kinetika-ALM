@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar/Sidebar.js';
 import Board from './components/Board/Board.js';
 import List from './components/List/List.js';
 import Project from './components/Project/Project.js';
+import ProjectList from './components/ProjectList/ProjectList.js';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/list" element={<List />} />
             <Route path="/" element={<Board />} />
             <Route path="/project" element={<Project />} />
+            <Route path="/project-list" element={<ProjectList />} />
           </Routes>
         </div>
       </div>

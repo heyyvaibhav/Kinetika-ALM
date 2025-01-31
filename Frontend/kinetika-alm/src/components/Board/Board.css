@@ -4,7 +4,10 @@
   background: #ffffff;
   border-radius: 8px;
   padding: 20px;
-  overflow: hidden;
+  overflow: auto;
+}
+.board::-webkit-scrollbar{
+  display: none;
 }
 
 .board-header {
@@ -13,6 +16,7 @@
   justify-content: space-between;
   align-items: center;
   /* padding: 10px 0; */
+  z-index: 10;
 }
 
 .board-header h2 {
@@ -36,7 +40,7 @@
   max-height: 700px;
   padding: 16px;
   height: fit-content;
-  overflow-y: auto;
+  overflow: hidden auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   margin-bottom: 16px;
 }

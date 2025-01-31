@@ -22,6 +22,10 @@ function Sidebar() {
           <img src='/project.svg' style={{width: "24px", height:"24px", marginRight:"1em"}} />
           Project
         </NavLink>
+        <NavLink to="/project-list" style={{display:"flex", alignItems:"center"}} className={({ isActive }) => isActive ? 'active' : ''}>
+          <img src='/projectlist.svg' style={{width: "24px", height:"24px", marginRight:"1em"}} />
+          Project List
+        </NavLink>
       </nav>
     </div>
   );

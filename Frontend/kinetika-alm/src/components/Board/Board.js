@@ -1,11 +1,14 @@
 import React, { useState } from "react"
 import "./Board.css"
-import AddTicket from "../AddTicket/AddTicket.js"
 import { AddTicketModal } from "../AddTicket/AddTicketModal.js"
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { SortableItem } from "../Search/SortableItem.js"
+import { SortableTicket } from "../Templates/SortableTicket.js"
 import SearchContainer from "../Search/Search.js"
+import { getProject, getIssuesByProjectID } from "../../Service.js"
+import Select from "react-select"
+import Loading from "../Templates/Loading.js"
 
 function Board() {
   const [columns, setColumns] = useState([
@@ -17,22 +20,52 @@ function Board() {
   const [newColumnTitle, setNewColumnTitle] = useState("")
   const [ticketModal, setTicketModal] = useState(false)
   const [isAddingColumn, setIsAddingColumn] = useState(false)
+  const [projectList, setProjectList] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   )
 
   const handleDragEnd = (event) => {
     const { active, over } = event
 
-    if (active.id !== over.id) {
+    if (!over) return
+
+    const activeId = active.id
+    const overId = over.id
+
+    // Find the source and destination columns
+    const sourceColumn = columns.find(col => col.items.some(item => item.id === activeId))
+    const destColumn = columns.find(col => col.id === overId)
+
+    if (sourceColumn && destColumn) {
+      setColumns(prevColumns => {
+        const newColumns = prevColumns.map(col => {
+          if (col.id === sourceColumn.id) {
+            return {
+              ...col,
+              items: col.items.filter(item => item.id !== activeId)
+            }
+          }
+          if (col.id === destColumn.id) {
+            return {
+              ...col,
+              items: [...col.items, sourceColumn.items.find(item => item.id === activeId)]
+            }
+          }
+          return col
+        })
+        return newColumns
+      })
+    } else if (active.id !== over.id) {
+      // Handle column reordering
       setColumns((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id)
         const newIndex = items.findIndex((item) => item.id === over.id)
-
         return arrayMove(items, oldIndex, newIndex)
       })
     }
@@ -63,6 +96,83 @@ function Board() {
     setIsAddingColumn(false)
   }
 
+  const fetchProjects = async () => {
+    setIsLoading(true)
+    try {
+      const response = await getProject("/projects")
+      if (response) {
+        const projectOptions = response.map((project) => ({
+          value: project.project_id,
+          label: project.project_name,
+        }))
+        setProjectList(projectOptions)
+      }
+    } catch (error) {
+      console.error("Failed to fetch projects:", error)
+      setProjectList([])
+    }
+    setIsLoading(false)
+  }
+
+  const handleSelect = async (selectedOption) => {
+    console.log("Selected Project:", selectedOption);
+    setIsLoading(true);
+  
+    try {
+      const projectIds = Array.isArray(selectedOption)
+        ? selectedOption.map(opt => opt.value).join(",")
+        : selectedOption.value;
+  
+      const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds}`);
+      console.log("Project Issues:", response.issues);
+  
+      const newColumns = [
+        { id: "todo", title: "TO DO", items: [] },
+        { id: "inProgress", title: "IN PROGRESS", items: [] },
+        { id: "done", title: "DONE", items: [] },
+      ];
+  
+      response.issues.forEach((issue) => {
+        const issueId = issue.issue_id;
+        if (!issueId) {
+          console.warn("Skipping issue with no ID:", issue);
+          return;
+        }
+  
+        const issueItem = { ...issue, id: issueId }; // Ensure `id` exists
+  
+        switch (issue.status?.toLowerCase().trim()) {
+          case "todo":
+            newColumns[0].items.push(issueItem);
+            break;
+          case "in progress":
+            newColumns[1].items.push(issueItem);
+            break;
+          case "done":
+            newColumns[2].items.push(issueItem);
+            break;
+          default:
+            newColumns[0].items.push(issueItem); // Default to 'TO DO'
+        }
+      });
+
+      newColumns.forEach(column => {
+        column.items.sort((a, b) => {
+          const priorityOrder = { high: 1, medium: 2, low: 3 };
+          return (priorityOrder[a.priority.toLowerCase()] || 4) - (priorityOrder[b.priority.toLowerCase()] || 4);
+        });
+      });
+  
+      console.log("New Columns State:", newColumns);
+      setColumns(newColumns);
+    } catch (error) {
+      console.error("Failed to fetch project issues:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
   const addNewTicket = (columnId, newTicket) => {
     setColumns((prev) =>
       prev.map((col) => {
@@ -73,7 +183,7 @@ function Board() {
           }
         }
         return col
-      }),
+      })
     )
   }
 
@@ -84,16 +194,74 @@ function Board() {
     setTicketModal(false)
   }
 
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      width: "80%",
+      borderRadius: "8px",
+      backgroundColor: state.isFocused ? "#f0f0f0" : "white",
+      borderColor: state.isFocused ? "#4a90e2" : "#ccc",
+      boxShadow: state.isFocused ? "0 0 5px rgba(74, 144, 226, 0.5)" : "none",
+      "&:hover": {
+        borderColor: "#4a90e2",
+      },
+      marginBottom: "20px",
+    }),
+    menu: (provided) => ({
+      ...provided,
+      width: "80%", // Ensure dropdown menu width matches
+      borderRadius: "8px",
+      backgroundColor: "white",
+      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      width: provided,
+      backgroundColor: state.isSelected ? "#4a90e2" : state.isFocused ? "#e6f0ff" : "white",
+      color: state.isSelected ? "white" : "black",
+      padding: "10px 15px",
+      "&:hover": {
+        backgroundColor: "#e6f0ff",
+      },
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: "#333",
+      fontWeight: "500",
+    }),
+  }
+
+  function formatDate(isoString) {
+    const date = new Date(isoString);
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+    
+    return `${month} ${day}, ${year}`;
+  }
+
   return (
     <div className="board">
       <div className="board-header">
-        <h2>Project Board</h2>
+        <h2>Issue Board</h2>
         <button onClick={handleAddTicket}>Create</button>
       </div>
 
       <SearchContainer />
+      <Select
+        isMulti
+        options={projectList}
+        styles={customStyles}
+        onMenuOpen={fetchProjects}
+        onChange={handleSelect}
+        isLoading={isLoading}
+        noOptionsMessage={() => (isLoading ? "Loading..." : "No projects found")}
+        placeholder="Select a project"
+      />
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <div className="board-columns">
           <SortableContext items={columns.map((col) => col.id)} strategy={verticalListSortingStrategy}>
             {columns.map((column) => (
@@ -156,23 +324,43 @@ function Board() {
                                   : "#E4B54F",
                         }}
                       >
-                        {column.items.length} 
+                        {column.items.length}
                       </span>
                     </div>
                     {column.id !== "todo" && column.id !== "inProgress" && column.id !== "done" && (
                       <button onClick={() => deleteColumn(column.id)} className="delete-column">
-                        <img src="/delete.svg" style={{width:"24px", height:"24px"}}/>
+                        <img src="/delete.svg" style={{ width: "24px", height: "24px" }} alt="delete" />
                       </button>
                     )}
                   </div>
 
                   <div className="tickets">
-                    {column.items.map((item) => (
-                      <div key={item.id} className="ticket">
-                        <h4>{item.title}</h4>
-                        <p>{item.description}</p>
-                      </div>
-                    ))}
+                    <SortableContext items={column.items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                      {column.items.map((item) => (
+                        <SortableTicket key={item.issue_id} id={item.issue_id}>
+                          <div className="ticket">
+                            <div style={{borderBottom:"1px solid #ddd", marginBottom:"10px"}}>
+                              <p style={{marginBottom : "8px"}}> <img src="/selected_date.svg" style={{height:"14px", marginBottom:"-2px"}}/> {formatDate(item.updated_at)}</p>
+                              <p>{item.description || "No description"}</p>
+                              <h5 style={{marginBottom:"4px"}}>{item.issue_key || "Untitled Issue"}</h5>
+                            </div>
+                            <div style={{display:"flex", justifyContent:"space-between"}}>
+                              <div style={{display:"flex", justifyContent:"space-between", gap: "4px"}}>
+                                <div style={{display: "flex", borderRadius:"8px", border:"1px solid #ddd", padding:"4px 8px 6px", alignItems:"center", gap:"3px"}}>
+                                  <img src="/comment.svg" style={{height:"24px", marginBottom:"-2.5px"}}/>
+                                  <span>3</span>
+                                </div>
+                                <div style={{display: "flex", borderRadius:"8px", border:"1px solid #ddd", padding:"4px 8px 6px", alignItems:"center", gap:"5px"}}>
+                                  <img src="/attachment.svg" style={{height:"20px", marginBottom:"-2.5px"}}/>
+                                  <span>3</span>
+                                </div>
+                              </div>
+                              <div></div>
+                            </div>
+                          </div>
+                        </SortableTicket>
+                      ))}
+                    </SortableContext>
                   </div>
 
                   <button className="create-issue" onClick={handleAddTicket}>
@@ -205,9 +393,10 @@ function Board() {
       </DndContext>
 
       {ticketModal && <AddTicketModal onclose={handleCloseTicket} />}
+
+      {isLoading && <Loading show={isLoading} />}
     </div>
   )
 }
 
 export default Board
-
