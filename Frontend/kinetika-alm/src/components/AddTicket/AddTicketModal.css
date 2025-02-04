@@ -10,7 +10,7 @@
   }
   
   .modal-container {
-    width: 800px;
+    width: 800px !important;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -135,11 +135,10 @@
     margin-top: 0.25rem;
   }
   
-  .rich-editor {
-    border: 1px solid #ddd;
-    border-radius: 4px;
+  .form-group select {
+    border-radius: 8px;
+    padding: 8px;
   }
-  
   .editor-toolbar {
     display: flex;
     align-items: center;
@@ -169,8 +168,8 @@
   }
   
   .editor-content {
-    width: 100%;
-    min-height: 150px;
+    width: 100% !important;
+    min-height: 100px;
     padding: 0.75rem;
     border: none;
     resize: none;

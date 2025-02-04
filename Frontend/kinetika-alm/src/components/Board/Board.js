@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import "./Board.css"
 import { AddTicketModal } from "../AddTicket/AddTicketModal.js"
 import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
@@ -9,6 +9,7 @@ import SearchContainer from "../Search/Search.js"
 import { getProject, getIssuesByProjectID } from "../../Service.js"
 import Select from "react-select"
 import Loading from "../Templates/Loading.js"
+import IssueDetails from "../IssueDetails/IssueDetails.js"
 
 function Board() {
   const [columns, setColumns] = useState([
@@ -16,12 +17,14 @@ function Board() {
     { id: "inProgress", title: "IN PROGRESS", items: [] },
     { id: "done", title: "DONE", items: [] },
   ])
-
+  const [selectedProjects, setSelectedProjects] = useState([]);
   const [newColumnTitle, setNewColumnTitle] = useState("")
   const [ticketModal, setTicketModal] = useState(false)
   const [isAddingColumn, setIsAddingColumn] = useState(false)
+  const [issueDetail, setIssueDetail] = useState(false);
   const [projectList, setProjectList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [selectedIssue, setSelectedIssue] = useState(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -114,84 +117,99 @@ function Board() {
     setIsLoading(false)
   }
 
+  useEffect(() => {
+    const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
+    if (storedProjectIds.length > 0) {
+        setSelectedProjects(storedProjectIds);
+        fetchIssues(storedProjectIds);
+    }
+  }, []);
+
+  const fetchIssues = async (projectIds) => {
+    setIsLoading(true);
+    try {
+        const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}`);
+        console.log("Project Issues:", response.issues);
+
+        const newColumns = [
+            { id: "todo", title: "TO DO", items: [] },
+            { id: "inProgress", title: "IN PROGRESS", items: [] },
+            { id: "done", title: "DONE", items: [] },
+        ];
+
+        response.issues.forEach((issue) => {
+            const issueId = issue.issue_id;
+            if (!issueId) return;
+
+            const issueItem = { ...issue, id: issueId };
+
+            switch (issue.status?.toLowerCase().trim()) {
+                case "todo":
+                    newColumns[0].items.push(issueItem);
+                    break;
+                case "in progress":
+                    newColumns[1].items.push(issueItem);
+                    break;
+                case "done":
+                    newColumns[2].items.push(issueItem);
+                    break;
+                default:
+                    newColumns[0].items.push(issueItem);
+            }
+        });
+
+        // Sort by priority
+        newColumns.forEach(column => {
+            column.items.sort((a, b) => {
+                const priorityOrder = { high: 1, medium: 2, low: 3 };
+                return (priorityOrder[a.priority.toLowerCase()] || 4) - (priorityOrder[b.priority.toLowerCase()] || 4);
+            });
+        });
+
+        setColumns(newColumns);
+    } catch (error) {
+        console.error("Failed to fetch project issues:", error);
+    } finally {
+        setIsLoading(false);
+    }
+};
+
   const handleSelect = async (selectedOption) => {
     console.log("Selected Project:", selectedOption);
     setIsLoading(true);
-  
+
     try {
-      const projectIds = Array.isArray(selectedOption)
-        ? selectedOption.map(opt => opt.value).join(",")
-        : selectedOption.value;
-  
-      const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds}`);
-      console.log("Project Issues:", response.issues);
-  
-      const newColumns = [
-        { id: "todo", title: "TO DO", items: [] },
-        { id: "inProgress", title: "IN PROGRESS", items: [] },
-        { id: "done", title: "DONE", items: [] },
-      ];
-  
-      response.issues.forEach((issue) => {
-        const issueId = issue.issue_id;
-        if (!issueId) {
-          console.warn("Skipping issue with no ID:", issue);
-          return;
-        }
-  
-        const issueItem = { ...issue, id: issueId }; // Ensure `id` exists
-  
-        switch (issue.status?.toLowerCase().trim()) {
-          case "todo":
-            newColumns[0].items.push(issueItem);
-            break;
-          case "in progress":
-            newColumns[1].items.push(issueItem);
-            break;
-          case "done":
-            newColumns[2].items.push(issueItem);
-            break;
-          default:
-            newColumns[0].items.push(issueItem); // Default to 'TO DO'
-        }
-      });
+        // Extract project IDs
+        const projectIds = Array.isArray(selectedOption)
+            ? selectedOption.map(opt => opt.value)
+            : [selectedOption.value];
 
-      newColumns.forEach(column => {
-        column.items.sort((a, b) => {
-          const priorityOrder = { high: 1, medium: 2, low: 3 };
-          return (priorityOrder[a.priority.toLowerCase()] || 4) - (priorityOrder[b.priority.toLowerCase()] || 4);
-        });
-      });
-  
-      console.log("New Columns State:", newColumns);
-      setColumns(newColumns);
+        // Save to local storage
+        localStorage.setItem("selectedProjectIds", JSON.stringify(projectIds));
+
+        // Update state to persist selection
+        setSelectedProjects(projectIds);
+
+        // Fetch issues
+        fetchIssues(projectIds);
     } catch (error) {
-      console.error("Failed to fetch project issues:", error);
+        console.error("Failed to fetch project issues:", error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
-  
-
-  const addNewTicket = (columnId, newTicket) => {
-    setColumns((prev) =>
-      prev.map((col) => {
-        if (col.id === columnId) {
-          return {
-            ...col,
-            items: [...col.items, newTicket],
-          }
-        }
-        return col
-      })
-    )
-  }
+};
 
   const handleAddTicket = () => {
     setTicketModal(true)
   }
   const handleCloseTicket = () => {
+    setIssueDetail(false)
     setTicketModal(false)
+    setSelectedIssue(null)
+  }
+  const handleTicketDetail = (issue) => {
+    setSelectedIssue(issue)
+    setIssueDetail(true)
   }
 
   const customStyles = {
@@ -252,6 +270,9 @@ function Board() {
       <SearchContainer />
       <Select
         isMulti
+        value={projectList.length > 0 
+          ? projectList.filter(opt => selectedProjects.includes(opt.value)) 
+          : []} 
         options={projectList}
         styles={customStyles}
         onMenuOpen={fetchProjects}
@@ -338,10 +359,10 @@ function Board() {
                     <SortableContext items={column.items.map(item => item.id)} strategy={verticalListSortingStrategy}>
                       {column.items.map((item) => (
                         <SortableTicket key={item.issue_id} id={item.issue_id}>
-                          <div className="ticket">
+                          <div className="ticket" onClick={() => handleTicketDetail(item)}>
                             <div style={{borderBottom:"1px solid #ddd", marginBottom:"10px"}}>
                               <p style={{marginBottom : "8px"}}> <img src="/selected_date.svg" style={{height:"14px", marginBottom:"-2px"}}/> {formatDate(item.updated_at)}</p>
-                              <p>{item.description || "No description"}</p>
+                              <p>{item.summary || "No description"}</p>
                               <h5 style={{marginBottom:"4px"}}>{item.issue_key || "Untitled Issue"}</h5>
                             </div>
                             <div style={{display:"flex", justifyContent:"space-between"}}>
@@ -393,7 +414,7 @@ function Board() {
       </DndContext>
 
       {ticketModal && <AddTicketModal onclose={handleCloseTicket} />}
-
+      {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />}
       {isLoading && <Loading show={isLoading} />}
     </div>
   )

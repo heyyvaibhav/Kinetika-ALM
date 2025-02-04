@@ -1,10 +1,14 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import axios from "axios"
 import "./AddTicketModal.css"
+import { getProject } from "../../Service"
+import { issue_type } from "../DropdownOptions"
 
 export function AddTicketModal({ onclose }) {
   const [files, setFiles] = useState([])
   const [flagged, setFlagged] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [projectList, setProjectList] = useState([])
   const fileInputRef = useRef(null)
 
   const handleFileChange = (event) => {
@@ -27,6 +31,31 @@ export function AddTicketModal({ onclose }) {
   const handleBrowseClick = () => {
     fileInputRef.current.click()
   }
+
+  const fetchProjects = async () => {
+    setIsLoading(true);
+    try {
+        const response = await getProject("/projects"); // Assuming the response is an array directly
+
+        if (Array.isArray(response)) {
+            const projectOptions = response.map((project) => ({
+                value: project.project_id,
+                label: project.project_name,
+            }));
+            setProjectList(projectOptions);
+        } else {
+            setProjectList([]); // Reset if the response is not an array
+        }
+    } catch (error) {
+        console.error("Failed to fetch projects:", error);
+        setProjectList([]); // Reset in case of error
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const uploadToCloudinary = async (file) => {
     const formData = new FormData()
@@ -103,12 +132,25 @@ export function AddTicketModal({ onclose }) {
         {/* Form Content */}
         <div className="modal-content">
           <div className="form-group">
-            <label>
-              Project<span className="required">*</span>
-            </label>
-            <select className="select-input" name="project">
-              <option disabled>Select a Project</option>
-            </select>
+              <label>
+                  Project<span className="required">*</span>
+              </label>
+              <select className="select-input" name="project" defaultValue="">
+                  <option value="" disabled>Select a Project</option>
+                  {isLoading ? (
+                      <option>Loading...</option>
+                  ) : (
+                      projectList.length > 0 ? (
+                          projectList.map((project) => (
+                              <option key={project.value} value={project.value}>
+                                  {project.label}
+                              </option>
+                          ))
+                      ) : (
+                          <option>No projects available</option>
+                      )
+                  )}
+              </select>
           </div>
 
           <div className="form-group">
@@ -116,7 +158,12 @@ export function AddTicketModal({ onclose }) {
               Issue Type<span className="required">*</span>
             </label>
             <select className="select-input" name="issueType">
-              <option>Task</option>
+            <option value="" disabled>Select an Issue Type</option>
+            {issue_type.map((type) => (
+              <option key={type.issue_type_id} value={type.issue_type_id}>
+                {type.issue_type_name}
+              </option>
+            ))}
             </select>
           </div>
 
@@ -145,14 +192,14 @@ export function AddTicketModal({ onclose }) {
             <label>
               Summary<span className="required">*</span>
             </label>
-            <input type="text" className="text-input" placeholder="Enter summary" name="summary" />
+            <input type="text" maxLength={255} className="text-input" placeholder="Enter summary" name="summary" style={{width:"100%"}} />
           </div>
 
           <div className="form-group">
             <label>Description</label>
-            <div className="rich-editor">
-              <textarea className="editor-content" placeholder="Enter the Description" />
-            </div>
+            
+              <textarea className="editor-content" maxLength={500} placeholder="Enter the Description" />
+            
           </div>
 
           <div className="form-group">
@@ -205,7 +252,7 @@ export function AddTicketModal({ onclose }) {
 
           <div className="form-group">
             <label>Flagged</label>
-            <input type="checkbox" className="checkbox-input" checked={flagged} onChange={handleFlaggedChange} />
+            <input type="checkbox" className="checkbox-input" checked={flagged} onChange={handleFlaggedChange} style={{width:"20px", height:"14px", }} />
             Impediment
           </div>
         </div>

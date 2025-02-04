@@ -1,0 +1,217 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding:0;
+  }
+  
+  .modal-container {
+    top:10;
+    background-color: white;
+    color: black;
+    width: 90%;
+    height: 90vh;
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e1e4e8;
+  }
+  
+  .header-left,
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .icon-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: black;
+  }
+  
+  .icon-button:hover {
+    background-color: #f4f5f7;
+  }
+  
+  .issue-tag {
+    background-color: #f4f5f7;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .modal-title {
+    font-size: 20px;
+    margin: 0;
+  }
+  
+  .modal-contentt {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    color: black;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+    height: calc(90vh - 100px);
+  }
+  
+  .video-section {
+    height: 100%;
+  }
+  
+  .video-container {
+    background-color: black;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .play-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 48px;
+    cursor: pointer;
+  }
+  
+  .details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .details-card {
+
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .details-card h3 {
+    margin: 0 0 8px 0;
+  }
+  
+  .details-card p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b778c;
+  }
+  
+  .details-collapsible {
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+  }
+  
+  .collapsible-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    background-color: #6b778c;
+  }
+  
+  .collapsible-header h3 {
+    margin: 0;
+  }
+  
+  .collapsible-header i.rotate {
+    transform: rotate(180deg);
+  }
+  
+  .collapsible-content {
+    padding: 16px;
+  }
+  
+  .detail-item {
+    margin-bottom: 16px;
+  }
+  
+  .detail-item label {
+    display: block;
+    font-size: 14px;
+    color: #6b778c;
+    margin-bottom: 4px;
+  }
+
+  .tab {
+    border-radius: 10px;
+    background: transparent;
+  }
+
+  .tab:hover{
+    background-color: #eee;
+  }
+
+  .tab.active {
+    background-color: #fff !important;
+    border-radius: 10px;
+    box-shadow: 0px 2px 6px #D7DBDF;
+    font-weight: 700;
+  }
+
+  .description-text{
+    font-size: 14px;
+    resize: none;
+    width: 90%;
+    padding: 10px;
+  }
+  
+  .detail-button {
+    width: 100%;
+    text-align: left;
+    padding: 8px;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: black;
+  }
+  
+  .detail-button:hover {
+    background-color: #f4f5f7;
+  }
+  
+  .reporter-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .avatar {
+    width: 24px;
+    height: 24px;
+    background-color: #0052cc;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  
+  
