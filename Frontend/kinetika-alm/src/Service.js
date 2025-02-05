@@ -4,6 +4,9 @@ import { toast } from "react-toastify";
 // Base URL for the API
 const API_BASE_URL = "http://localhost:5000/api/";
 
+//ADD staging url here
+// const API_BASE_URL = "";
+
 export let UserDataFromToken;
 
 // let token;
@@ -93,6 +96,30 @@ export const createIssue = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
+
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
+export const addComment = async (endpoint, data) => {
+  try {
+  //   getToken();
+    const response = await apiClient.post(endpoint, data);
+
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
+export const getComments = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.get(endpoint);
 
     // console.log("Response is: ", response);
     return response.data;

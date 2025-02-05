@@ -83,6 +83,10 @@
     justify-content: center;
     align-items: center;
   }
+
+  .comments-section {
+    text-align: start;
+  }
   
   .play-button {
     background: none;

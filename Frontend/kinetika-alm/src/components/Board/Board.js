@@ -206,6 +206,7 @@ function Board() {
     setIssueDetail(false)
     setTicketModal(false)
     setSelectedIssue(null)
+    fetchIssues();
   }
   const handleTicketDetail = (issue) => {
     setSelectedIssue(issue)
