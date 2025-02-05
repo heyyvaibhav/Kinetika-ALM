@@ -88,3 +88,15 @@ export const updateIssueStatus = async (endpoint, data) => {
       errorHandle(error);
     }
 };
+
+export const createIssue = async (endpoint, data) => {
+  try {
+  //   getToken();
+    const response = await apiClient.post(endpoint, data);
+
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};

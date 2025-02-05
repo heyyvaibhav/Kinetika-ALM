@@ -8,7 +8,7 @@ function List() {
   const [tickets, setTickets] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedProjects, setSelectedProjects] = useState(null);
+  const [selectedProjects, setSelectedProjects] = useState([]);
 
   useEffect(() => {
       const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
@@ -138,8 +138,8 @@ function List() {
       <Select
         isMulti
         value={projectList.length > 0 
-          ? projectList.filter(opt => selectedProjects.includes(opt.value)) 
-          : []} 
+          ? projectList.filter(opt => selectedProjects?.includes(opt.value)) 
+          : []}
         options={projectList}
         styles={customStyles}
         onMenuOpen={fetchProjects}

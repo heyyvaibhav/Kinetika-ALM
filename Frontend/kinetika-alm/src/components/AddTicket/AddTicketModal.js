@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react"
-import axios from "axios"
 import "./AddTicketModal.css"
-import { getProject } from "../../Service"
+import { getProject, createIssue } from "../../Service"
 import { issue_type } from "../DropdownOptions"
 
 export function AddTicketModal({ onclose }) {
@@ -57,61 +56,54 @@ export function AddTicketModal({ onclose }) {
     fetchProjects();
   }, []);
 
-  const uploadToCloudinary = async (file) => {
-    const formData = new FormData()
-    formData.append("file", file)
-    formData.append("upload_preset", "your_cloudinary_upload_preset") // Replace with your Cloudinary upload preset
+  // const uploadToCloudinary = async (file) => {
+  //   const formData = new FormData()
+  //   formData.append("file", file)
+  //   formData.append("upload_preset", "your_cloudinary_upload_preset") // Replace with your Cloudinary upload preset
 
-    const response = await fetch("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", {
-      method: "POST",
-      body: formData,
-    })
+  //   const response = await fetch("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", {
+  //     method: "POST",
+  //     body: formData,
+  //   })
 
-    if (!response.ok) {
-      throw new Error("Failed to upload file to Cloudinary")
-    }
+  //   if (!response.ok) {
+  //     throw new Error("Failed to upload file to Cloudinary")
+  //   }
 
-    return response.json()
-  }
+  //   return response.json()
+  // }
 
   const handleSave = async () => {
     try {
-      // Upload files to Cloudinary
-      const uploadedFiles = await Promise.all(files.map((file) => uploadToCloudinary(file)))
+      setIsLoading(true)
+      const formData = new FormData()
 
-      // Prepare ticket data
-      const ticketData = {
-        project: document.querySelector('select[name="project"]').value,
-        issueType: document.querySelector('select[name="issueType"]').value,
-        priority: document.querySelector('select[name="priority"]').value,
-        status: document.querySelector('select[name="status"]').value,
-        summary: document.querySelector('input[name="summary"]').value,
-        description: document.querySelector(".editor-content").value,
-        assignee: document.querySelector('select[name="assignee"]').value,
-        team: document.querySelector('select[name="team"]').value,
-        reporter: document.querySelector('select[name="reporter"]').value,
-        flagged: flagged,
-        attachments: uploadedFiles.map((file) => file.secure_url),
-      }
+      // Append ticket data to formData
+      formData.append("project_id", document.querySelector('select[name="project"]').value)
+      formData.append("issue_type_id", document.querySelector('select[name="issueType"]').value)
+      formData.append("priority", document.querySelector('select[name="priority"]').value)
+      formData.append("status", document.querySelector('select[name="status"]').value)
+      formData.append("summary", document.querySelector('input[name="summary"]').value)
+      formData.append("description", document.querySelector(".editor-content").value)
+      formData.append("assignee", document.querySelector('select[name="assignee"]').value)
+      formData.append("team", document.querySelector('select[name="team"]').value)
+      formData.append("reporter", document.querySelector('select[name="reporter"]').value)
+      formData.append("flagged", flagged)
 
-      // Send ticket data to API
-      const response = await axios("http://localhost:5000/api/issues", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ticketData),
+      // Append files to formData
+      files.forEach((file) => {
+        formData.append("attachments", file)
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to create ticket")
-      }
+      // Call the createTicket function from your Service.js
+      const response = await createIssue("/issues", formData)
 
-      const result = await response.json()
-      console.log("Ticket created:", result)
+      console.log("Ticket created:", response)
+      setIsLoading(false)
       onclose()
     } catch (error) {
       console.error("Error creating ticket:", error)
+      setIsLoading(false)
       // Handle error (e.g., show error message to user)
     }
   }
@@ -147,7 +139,7 @@ export function AddTicketModal({ onclose }) {
                               </option>
                           ))
                       ) : (
-                          <option>No projects available</option>
+                          <option disabled>No projects available</option>
                       )
                   )}
               </select>

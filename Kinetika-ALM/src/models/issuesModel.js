@@ -3,15 +3,20 @@ const db = require('../config/dbConfig'); // Assume this is your DB connection f
 // Issues Model
 const IssuesModel = {
   createIssue: async (issueData) => {
+    console.log("Flagged before query:", issueData.flagged);
+
+    
     const query = `
-      INSERT INTO issues (project_id, issue_key, summary, description, issue_type_id, status, priority, reporter_id, assignee_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO issues (project_id, issue_key, summary, description, attachment, flagged, issue_type_id, status, priority, reporter_id, assignee_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const values = [
       issueData.project_id,
       issueData.issue_key,
       issueData.summary,
       issueData.description,
+      issueData.attachment,
+      issueData.flagged,
       issueData.issue_type_id,
       issueData.status || 'To Do',
       issueData.priority || 'Medium',
