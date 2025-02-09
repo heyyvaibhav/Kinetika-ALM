@@ -12,8 +12,8 @@ const Loading = ({ show }) => {
         left: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.1)", // White with opacity
-        backdropFilter: "blur(2px)", // Apply blur effect to the background
+        backgroundColor: "rgba(0, 0, 0, 0.2)", // White with opacity
+        // backdropFilter: "blur(2px)", // Apply blur effect to the background
         display: "flex", // Center the spinner
         justifyContent: "center",
         alignItems: "center",
@@ -23,44 +23,19 @@ const Loading = ({ show }) => {
     <div className="loader">
       <style jsx>{`
         .loader {
-          --s: 20px;
-          --_d: calc(0.353 * var(--s));
-          width: calc(var(--s) + var(--_d));
+          width: 50px;
           aspect-ratio: 1;
-          display: grid;
-          justify-items: center;
-          align-items: center;
-          min-height: 100vh;
-          background-color: #f3f4f6; /* Light grey background */
+          border-radius: 50%;
+          background: 
+            radial-gradient(farthest-side,rgb(111, 170, 234) 94%, #0000) top/8px 8px no-repeat,
+            conic-gradient(#0000 30%, rgb(111, 170, 234));
+          -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+          animation: l13 1s infinite linear;
         }
-
-        .loader:before,
-        .loader:after {
-          content: "";
-          grid-area: 1/1;
-          clip-path: polygon(
-            var(--_d) 0,
-            100% 0,
-            100% calc(100% - var(--_d)),
-            calc(100% - var(--_d)) 100%,
-            0 100%,
-            0 var(--_d)
-          );
-          animation: l6 2s infinite;
-        }
-
-        .loader:after {
-          animation-delay: -1s;
-        }
-
-        @keyframes l6 {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
+        
+        @keyframes l13 { 
+          100% { transform: rotate(1turn); }
+        }          
       `}</style>
     </div>
     </div>
