@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 // Import routes
+const loginRoute = require('./routes/login');
 const userRoutes = require('./routes/userRoutes');
 const projectRoutes = require('./routes/projectsRoutes');
 const issueRoutes = require('./routes/issuesRoute');
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Register routes
+app.use('/api', loginRoute);
 app.use('/api/users', userRoutes);
 app.use('/api', projectRoutes);
 app.use('/api/issues', issueRoutes);

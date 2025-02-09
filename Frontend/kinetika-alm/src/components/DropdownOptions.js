@@ -1,3 +1,9 @@
+export const UserType = [
+    { type: "Super Admin", value: 1 },
+    { type: "Admin", value: 2 },
+    { type: "User", value: 3 },
+];
+
 export const issue_type = [
     { 
         issue_type_id: 1, 

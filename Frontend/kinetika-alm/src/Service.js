@@ -1,8 +1,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-// import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 // Base URL for the API
-const API_BASE_URL = "http://localhost:5000/api/";
+export const API_BASE_URL = "http://localhost:5000/api/";
 
 //ADD staging url here
 // const API_BASE_URL = "";
@@ -19,6 +19,33 @@ apiClient = axios.create({
     // Authorization: `Bearer ${token}`,
   },
 });
+
+export const getUserType = () => {
+  getUserDetails();
+  if (UserDataFromToken) {
+    // console.log("UserData: ", UserDataFromToken);
+
+    return UserDataFromToken.type;
+  }
+};
+
+export const getUserDetails = () => {
+  const token = JSON.parse(localStorage.getItem("token"));
+  if (token) {
+    UserDataFromToken = jwtDecode(token);
+    // console.log("User Data: ", UserDataFromToken);
+  }
+
+  return UserDataFromToken;
+};
+
+export const logout = async () => {
+  localStorage.clear();
+  toast.success("Logged out successfully!!");
+  setTimeout(() => {
+    window.location.href = "/";
+  }, 500);
+};
 
 const errorHandle = (error) => {
     if (error.response && error.response.data && error.response.data.message) {

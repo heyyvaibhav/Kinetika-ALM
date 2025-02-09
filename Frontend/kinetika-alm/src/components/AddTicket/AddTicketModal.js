@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react"
 import "./AddTicketModal.css"
 import { getProject, createIssue } from "../../Service"
 import { issue_type } from "../DropdownOptions"
+import Loading from "../Templates/Loading"
 
 export function AddTicketModal({ onclose }) {
   const [files, setFiles] = useState([])
@@ -261,6 +262,8 @@ export function AddTicketModal({ onclose }) {
           </div>
         </div>
       </div>
+
+      {isLoading && <Loading show={isLoading} />}
     </div>
   )
 }
