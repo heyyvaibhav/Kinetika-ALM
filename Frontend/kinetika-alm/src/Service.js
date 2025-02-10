@@ -9,16 +9,30 @@ export const API_BASE_URL = "http://localhost:5000/api/";
 
 export let UserDataFromToken;
 
-// let token;
+let token;
 let apiClient;
 
 apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    // Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
   },
 });
+
+export const getToken = () => {
+  token = JSON.parse(localStorage.getItem("token"));
+  // console.log("token after reload: ", token);
+
+  apiClient = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 
 export const getUserType = () => {
   getUserDetails();
@@ -144,6 +158,18 @@ export const addComment = async (endpoint, data) => {
 };
 
 export const getComments = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.get(endpoint);
+
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
+export const getUserList = async (endpoint) => {
   try {
   //   getToken();
     const response = await apiClient.get(endpoint);

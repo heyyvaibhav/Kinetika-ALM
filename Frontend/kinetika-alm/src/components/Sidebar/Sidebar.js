@@ -5,7 +5,9 @@ import './Sidebar.css';
 
 function Sidebar({ open, closeMenu }) {
 
-  // const usertype = localStorage.getItem(usertype);
+  const userType = localStorage.getItem("UserType");
+
+  console.log(userType);
   return (
     <div className="sidebar">
       <div className="logo">
@@ -21,12 +23,12 @@ function Sidebar({ open, closeMenu }) {
           <img src='/list.svg' style={{width: "24px", height:"24px", marginRight:"1em"}} />
           List
         </NavLink>
-        {/* {usertype === "1" || usertype === "2" && (
+        {(userType == "1" || userType == "2") && (
           <NavLink to={"users"} style={{display:"flex", alignItems:"center"}} className={({ isActive }) => isActive ? 'active' : ''}>
           <img src='/users.svg' style={{width: "24px", height:"24px", marginRight:"1em"}} />
           Users
         </NavLink>
-        )} */}
+        )}
         <NavLink to={"project"} style={{display:"flex", alignItems:"center"}} className={({ isActive }) => isActive ? 'active' : ''}>
           <img src='/project.svg' style={{width: "24px", height:"24px", marginRight:"1em"}} />
           Project

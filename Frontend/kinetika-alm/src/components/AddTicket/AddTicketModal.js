@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react"
 import "./AddTicketModal.css"
-import { getProject, createIssue } from "../../Service"
+import { getProject, createIssue, getUserList } from "../../Service"
 import { issue_type } from "../DropdownOptions"
 import Loading from "../Templates/Loading"
 
@@ -9,6 +9,8 @@ export function AddTicketModal({ onclose }) {
   const [flagged, setFlagged] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [projectList, setProjectList] = useState([])
+  const [users, setUsers] = useState([])
+  const [error, setError] = useState(null)
   const fileInputRef = useRef(null)
 
   const handleFileChange = (event) => {
@@ -55,8 +57,20 @@ export function AddTicketModal({ onclose }) {
 
   useEffect(() => {
     fetchProjects();
+    fetchUsers();
   }, []);
 
+  const fetchUsers = async () => {
+    try {
+      const response = await getUserList("/users")
+      const usersArray = Array.isArray(response.data) ? response.data : [response.data]
+      setUsers(usersArray)
+      setIsLoading(false)
+    } catch (error) {
+      setError(error.message)
+      setIsLoading(false)
+    }
+  }
   // const uploadToCloudinary = async (file) => {
   //   const formData = new FormData()
   //   formData.append("file", file)
@@ -199,8 +213,11 @@ export function AddTicketModal({ onclose }) {
             <label>Assignee</label>
             <select className="select-input" name="assignee">
               <option value="">Select assignee</option>
-              <option value="unassigned">Unassigned</option>
-              <option value="current-user">Current User</option>
+              {users.map(user => (
+                <option key={user.user_id} value={user.user_id}>
+                  {user.full_name}
+                </option>
+              ))}
             </select>
             <span>Assign to me</span>
           </div>
@@ -218,8 +235,11 @@ export function AddTicketModal({ onclose }) {
             <label>Reporter</label>
             <select className="select-input" name="reporter">
               <option value="">Select reporter</option>
-              <option value="current-user">Current User</option>
-              <option value="other">Other</option>
+              {users.map(user => (
+                <option key={user.user_id} value={user.user_id}>
+                  {user.full_name}
+                </option>
+              ))}
             </select>
           </div>
 

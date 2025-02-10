@@ -4,6 +4,7 @@ import { RoleProvider } from "./components/RoleContext.js";
 import './App.css';
 import Board from './components/Board/Board.js';
 import List from './components/List/List.js';
+import Users from './components/Users/users.js';
 import Project from './components/Project/Project.js';
 import ProjectList from './components/ProjectList/ProjectList.js';
 import Login from "./components/Login/Login.js";
@@ -51,6 +52,19 @@ function App() {
                  />
 
                 <Route path="list" element={<List />} />
+                <Route 
+                  path="users" 
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={[
+                        "Super Admin",
+                        "Admin",
+                      ]}
+                    >
+                      <Users />
+                    </ProtectedRoute>
+                  }
+                 />
                 <Route path="project" element={<Project />} />
                 <Route path="project-list" element={<ProjectList />} />
               </Route>

@@ -68,7 +68,7 @@ const ProjectList = () => {
                 <td>{project.project_name}</td>
                 <td>{project.project_key}</td>
                 <td>{project.project_description}</td>
-                <td>{project.lead_id}</td>
+                <td>{project.lead_name}</td>
                 <td>{formatDate(project.created_at)}</td>
               </tr>
             ))}

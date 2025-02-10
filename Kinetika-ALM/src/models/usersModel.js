@@ -2,7 +2,7 @@ const db = require('../config/dbConfig');
 
 class UsersModel {
   static async getAllUsers() {
-    const [rows] = await db.query('SELECT * FROM Users');
+    const [rows] = await db.query('SELECT user_id, full_name, email, FailedLoginAttempts, Status, role, created_at FROM Users');
     return rows;
   }
 

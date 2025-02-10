@@ -3,7 +3,7 @@ const db = require('../config/dbConfig');  // Assuming you have a configured dat
 const ProjectsModel = {
   // Retrieve all projects
   getAllProjects: async () => {
-    const query = 'SELECT * FROM projects';
+    const query = 'SELECT p.*, u.full_name AS lead_name FROM projects p JOIN users u ON p.lead_id = u.user_id';
     const results = await db.query(query);
     return results;
   },

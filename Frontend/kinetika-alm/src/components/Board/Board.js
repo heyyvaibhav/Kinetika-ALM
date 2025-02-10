@@ -416,7 +416,7 @@ function Board() {
 
       {ticketModal && <AddTicketModal onclose={handleCloseTicket} />}
       {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />}
-      {isLoading && <Loading show={isLoading} />}
+      {/* {isLoading && <Loading show={isLoading} />} */}
     </div>
   )
 }

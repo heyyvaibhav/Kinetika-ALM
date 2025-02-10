@@ -11,6 +11,8 @@ export default function ProjectForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  const userId = localStorage.getItem("userId");
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prevData) => ({
@@ -30,7 +32,7 @@ export default function ProjectForm() {
       project_name : formData.name,
       project_key : formData.key,
       project_description : formData.description,
-      lead_id :35
+      lead_id : userId,
     }
 
     try {
