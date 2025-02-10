@@ -31,8 +31,8 @@ router.post("/login", async (req, res) => {
     // console.log(rows);
 // 
     // Check if user is found
-    if (rows) {
-      const user = rows; // Access the first user object from the array
+    if (rows.length > 0) {
+      const user = rows[0]; // Access the first user object from the array
 
       console.log('Inside if');
       

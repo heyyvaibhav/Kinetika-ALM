@@ -4,8 +4,7 @@
     background-color: #F4F5F7;
     color: black;
     padding: 20px;
-    height: 100vh;
-    overflow-y: auto;
+    padding-left: 0px;
     box-shadow: 12px rgba(0, 0, 0, 0.9);
   }
   

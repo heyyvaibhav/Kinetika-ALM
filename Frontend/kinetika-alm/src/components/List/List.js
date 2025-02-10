@@ -3,6 +3,7 @@ import './List.css';
 import SearchContainer from '../Search/Search';
 import Select from "react-select"
 import { getProject, getIssuesByProjectID } from '../../Service';
+import Loading from "../Templates/Loading"
 
 function List() {
   const [tickets, setTickets] = useState([]);
@@ -207,6 +208,8 @@ function List() {
           )}
         </tbody>
       </table>
+
+      {isLoading && <Loading show={isLoading} />}
     </div>
   );
 }

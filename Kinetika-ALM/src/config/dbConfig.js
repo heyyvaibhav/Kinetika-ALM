@@ -1,10 +1,13 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
   database: 'alm',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 // Wrap the pool query in a Promise to allow async/await usage
@@ -22,4 +25,5 @@ const query = (sql, values) => {
 
 module.exports = {
   query,
+  pool, // Export the pool if needed elsewhere
 };

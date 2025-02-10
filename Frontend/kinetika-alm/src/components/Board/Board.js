@@ -291,7 +291,7 @@ function Board() {
                 <div className="column">
                   <div className="column-header">
                     <div style={{ display: "flex" }}>
-                      <img src="./plus-icon.svg" alt="Plus Icon" height="24" width="24" />
+                      <img src="/plus-icon.svg" alt="Plus Icon" height="24" width="24" />
                     </div>
                     <h3 style={{ margin: "0" }}>{column.title}</h3>
                     <div
@@ -321,12 +321,12 @@ function Board() {
                       <img
                         src={
                           column.id === "todo"
-                            ? "./todo.svg"
+                            ? "/todo.svg"
                             : column.id === "inProgress"
-                              ? "./inProgress.svg"
+                              ? "/inProgress.svg"
                               : column.id === "done"
-                                ? "./done.svg"
-                                : "./fire.svg"
+                                ? "/done.svg"
+                                : "/fire.svg"
                         }
                         alt={`${column.id} Icon`}
                         height="20"
@@ -408,7 +408,7 @@ function Board() {
             </div>
           ) : (
             <button className="addColumnbtn" onClick={() => setIsAddingColumn(true)} disabled={columns.length >= 10}>
-              <img src="./plus-icon.svg" alt="Plus Icon" height="36" width="36" />
+              <img src="/plus-icon.svg" alt="Plus Icon" height="36" width="36" />
             </button>
           )}
         </div>
