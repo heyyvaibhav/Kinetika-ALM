@@ -18,24 +18,14 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-
-    console.log(email_id);
-
     // Await the result of the query execution
     const [rows] =   await db.query("SELECT * FROM users WHERE email = ?", [
       email_id,
     ]);
-
-    // console.log(JSON.stringify(rows, null, 2));
-    console.log(rows);
-    // console.log(rows);
-// 
+ 
     // Check if user is found
-    if (rows.length > 0) {
-      const user = rows[0]; // Access the first user object from the array
-
-      console.log('Inside if');
-      
+    if (rows) {
+      const user = rows; // Access the first user object from the array
 
       // Check if the account is active
       if (user.Status !== "Active") {
