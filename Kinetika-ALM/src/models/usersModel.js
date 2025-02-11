@@ -2,7 +2,7 @@ const db = require('../config/dbConfig');
 
 class UsersModel {
   static async getAllUsers() {
-    const [rows] = await db.query('SELECT user_id, full_name, email, FailedLoginAttempts, Status, role, created_at FROM Users');
+    const rows = await db.query('SELECT user_id, full_name, email, FailedLoginAttempts, Status, role, created_at FROM Users');
     return rows;
   }
 
@@ -13,7 +13,7 @@ class UsersModel {
 
   static async createUser(data) {
     const { username, email, password_hash, full_name, role } = data;
-    const [result] = await db.query(
+    const result = await db.query(
       'INSERT INTO Users (username, email, password_hash, full_name, role) VALUES (?, ?, ?, ?, ?)',
       [username, email, password_hash, full_name, role]
     );
