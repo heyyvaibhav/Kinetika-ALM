@@ -7,7 +7,6 @@ function Sidebar({ open, closeMenu }) {
 
   const userType = localStorage.getItem("UserType");
 
-  console.log(userType);
   return (
     <div className="sidebar">
       <div className="logo">
