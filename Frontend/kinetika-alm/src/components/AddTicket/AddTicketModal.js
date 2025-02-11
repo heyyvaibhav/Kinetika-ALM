@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from "react"
 import "./AddTicketModal.css"
 import { getProject, createIssue, getUserList } from "../../Service"
+import { toast } from "react-toastify"
 import { issue_type } from "../DropdownOptions"
 import Loading from "../Templates/Loading"
+import { NewRelicConfig } from "../../environment"
 
-export function AddTicketModal({ onclose }) {
+export function AddTicketModal({ onclose , initialStatus }) {
+  const [file, setFile] = useState([])
   const [files, setFiles] = useState([])
   const [flagged, setFlagged] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -71,22 +74,61 @@ export function AddTicketModal({ onclose }) {
       setIsLoading(false)
     }
   }
-  // const uploadToCloudinary = async (file) => {
-  //   const formData = new FormData()
-  //   formData.append("file", file)
-  //   formData.append("upload_preset", "your_cloudinary_upload_preset") // Replace with your Cloudinary upload preset
+  
+  const widgetsRef = useRef();
 
-  //   const response = await fetch("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", {
-  //     method: "POST",
-  //     body: formData,
-  //   })
+  const initializeCloudinaryWidget = () => {
+    if (!window.cloudinary) {
+      console.error("Cloudinary library is not loaded.");
+      return;
+    }
 
-  //   if (!response.ok) {
-  //     throw new Error("Failed to upload file to Cloudinary")
-  //   }
+    if (!widgetsRef.current) {
+      // Initialize the Cloudinary widget only once
+      widgetsRef.current = window.cloudinary.createUploadWidget(
+        {
+          cloudName: NewRelicConfig.cloudName,
+          uploadPreset: NewRelicConfig.uploadPreset,
+          multiple: true, // Single upload only
+          clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"], // Acceptable formats
+          maxFileSize: 5 * 1024 * 1024, // 5 MB
+        },
+        (error, result) => {
+          if (!error && result && result.event === "success") {
+            const url = result.info.secure_url; // Extract the secure URL of the uploaded image
+            setFile(url);
 
-  //   return response.json()
-  // }
+            widgetsRef.current.close(); // Close the widget after successful upload
+            toast.success("Photo uploaded successfully!!", {
+              zIndex: 5000, // Correct syntax for custom zIndex
+            });
+            setIsLoading(false);
+          } else if (error) {
+            if (
+              error?.status?.includes("exceeds maximum allowed (5 MB)") &&
+              error?.statusText?.includes("File size")
+            ) {
+              toast.error(
+                "File size exceeds 5 MB. Please upload a smaller file."
+              );
+
+              widgetsRef.current.close();
+            } else if (
+              error?.status === "File format not allowed" &&
+              error?.statusText?.includes("File format not allowed")
+            ) {
+              toast.error("File format not allowed");
+
+              widgetsRef.current.close();
+            }
+            setIsLoading(false);
+          }
+        }
+      );
+    }
+    setIsLoading(true);
+    widgetsRef.current.open();
+  };
 
   const handleSave = async () => {
     try {
@@ -246,10 +288,10 @@ export function AddTicketModal({ onclose }) {
           <div className="form-group">
             <label>Attachment</label>
             <div className="file-drop-zone" onDragOver={handleDragOver} onDrop={handleDrop}>
-              <input type="file" multiple className="file-input" onChange={handleFileChange} ref={fileInputRef} />
+              <input type="file" multiple className="file-input" />
               <p>
                 <b>Drag and Drop</b> files here or{" "}
-                <button type="button" onClick={handleBrowseClick}>
+                <button type="button" onClick={initializeCloudinaryWidget}>
                   Browse
                 </button>
               </p>

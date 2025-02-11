@@ -40,10 +40,6 @@ export default function ProjectForm() {
 
       console.log("Response status:", response.status) // Log the response status
 
-      if (!response.ok) {
-        throw new Error("Failed to create project")
-      }
-
       const result = await response.json()
       console.log("Project created:", result)
       // Reset form or redirect user
@@ -129,8 +125,6 @@ export default function ProjectForm() {
 
           <img src="/projectpage.svg" width="200"/>
         </div>
-
-        {error && <p className="error-message">{error}</p>}
 
         <div className="footer">
           <button type="submit" disabled={isLoading}>

@@ -83,11 +83,23 @@ const errorHandle = (error) => {
     // throw error;
 };
 
+export const addStatus = async (endpoint, data) => {
+  try {
+  //   getToken();
+    const response = await apiClient.post(endpoint, data);
+    toast.success(response.data.message);
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
 export const createProject = async (endpoint, data) => {
     try {
     //   getToken();
       const response = await apiClient.post(endpoint, data);
-      toast.success(response.message);
+      toast.success(response.data.message);
       // console.log("Response is: ", response);
       return response.data;
     } catch (error) {
@@ -123,7 +135,7 @@ export const updateIssueStatus = async (endpoint, data) => {
     try {
     //   getToken();
       const response = await apiClient.put(endpoint, data);
-      toast.success(response.message);
+      toast.success(response.data.message);
       // console.log("Response is: ", response);
       return response.data;
     } catch (error) {
@@ -135,7 +147,7 @@ export const createIssue = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
-    toast.success(response.message);
+    toast.success("Issue created successfully");
     // console.log("Response is: ", response);
     return response.data;
   } catch (error) {
@@ -147,7 +159,7 @@ export const addComment = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
-    toast.success(response.message);
+    toast.success(response.data.message);
     // console.log("Response is: ", response);
     return response.data;
   } catch (error) {
@@ -183,7 +195,7 @@ export const CloudinaryImage = async (endpoint, data) => {
   try {
     // getToken();
     const response = await apiClient.put(endpoint, data);
-    toast.success(response.message);
+    toast.success(response.data.message);
     return response.data;
   } catch (error) {
     errorHandle(error);
@@ -195,7 +207,7 @@ export const addUser = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
-    toast.success(response.message);
+    toast.success(response.data.message);
     // console.log("Response is: ", response);
     return response.data;
   } catch (error) {

@@ -11,6 +11,7 @@ const commentRoutes = require('./routes/commentRoutes');
 const attachmentRoutes = require('./routes/attachmentRoutes');
 const workflowRoutes = require('./routes/workflowRoutes');
 const issueHistoryRoutes = require('./routes/issueHistoryRoutes');
+const statusRoutes = require('./routes/statusRoute');
 
 const app = express();
 app.use(cors());
@@ -25,6 +26,7 @@ app.use('/api/issues/comments', commentRoutes);
 app.use('/api/issues/attachments', attachmentRoutes);
 app.use('/api/workflows', workflowRoutes);
 app.use('/api/issues/history', issueHistoryRoutes);
+app.use('/api/status', statusRoutes)
 
 // Default 404 handler
 app.use((req, res) => {
