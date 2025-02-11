@@ -83,10 +83,34 @@ const errorHandle = (error) => {
     // throw error;
 };
 
+export const getStatus = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.get(endpoint);
+    toast.success(response.data.message);
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
 export const addStatus = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
+    toast.success(response.data.message);
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
+export const deleteStatus = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.delete(endpoint);
     toast.success(response.data.message);
     // console.log("Response is: ", response);
     return response.data;
