@@ -1,0 +1,47 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    padding-top: 7rem;
+    z-index: 1000;
+  }
+  
+  .modal {
+    width: 500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow-y: auto;
+  }
+  .modal::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    position: sticky;
+    background-color: white;
+    top: 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .modal-footer {
+    background-color: white;
+    padding: 16px 24px;    
+    position: sticky;
+    text-align: right;
+    bottom: 0;
+    border-top: 1px solid #ddd;
+  }

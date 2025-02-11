@@ -73,57 +73,61 @@ export default function ProjectForm() {
           </p>
         </div>
 
-        <div className="form-section">
-          <div className="form-group">
-            <label htmlFor="name" className="form-label">
-              Name<span className="required-field">*</span>
-            </label>
-            <input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Try a team name, project goal, milestone..."
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="key" className="form-label">
-              Key
-              <img
-                alt="info"
-                src="/info.svg"
-                style={{ height: "15px", marginLeft: "1px", marginBottom: "-2px" }}
-                title="Learn more about project keys"
+        <div style={{display:"flex", alignItems:"center", justifyContent:"space-evenly"}}>
+          <div className="form-section" style={{ width: "350px"}}>
+            <div className="form-group">
+              <label htmlFor="name" className="form-label">
+                Name<span className="required-field">*</span>
+              </label>
+              <input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Try a team name, project goal, milestone..."
+                required
               />
-              <span className="required-field">*</span>
-            </label>
-            <input
-              id="key"
-              name="key"
-              value={formData.key}
-              onChange={handleChange}
-              placeholder="Enter a project key"
-              required
-            />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="key" className="form-label">
+                Key
+                <img
+                  alt="info"
+                  src="/info.svg"
+                  style={{ height: "15px", marginLeft: "1px", marginBottom: "-2px" }}
+                  title="Learn more about project keys"
+                />
+                <span className="required-field">*</span>
+              </label>
+              <input
+                id="key"
+                name="key"
+                value={formData.key}
+                onChange={handleChange}
+                placeholder="Enter a project key"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="description" className="form-label">
+                Description
+                <span className="required-field">*</span>
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="3"
+                placeholder="Enter the description"
+                required
+              ></textarea>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="description" className="form-label">
-              Description
-              <span className="required-field">*</span>
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="3"
-              placeholder="Enter the description"
-              required
-            ></textarea>
-          </div>
+          <img src="/projectpage.svg" width="200"/>
         </div>
 
         {error && <p className="error-message">{error}</p>}

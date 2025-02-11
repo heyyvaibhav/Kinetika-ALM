@@ -1,11 +1,9 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+import Environment from "./environment";
 // Base URL for the API
-export const API_BASE_URL = "http://localhost:5000/api/";
-
-//ADD staging url here
-// const API_BASE_URL = "";
+export const API_BASE_URL = Environment.server_url;
 
 export let UserDataFromToken;
 
@@ -89,7 +87,7 @@ export const createProject = async (endpoint, data) => {
     try {
     //   getToken();
       const response = await apiClient.post(endpoint, data);
-  
+      toast.success(response.message);
       // console.log("Response is: ", response);
       return response.data;
     } catch (error) {
@@ -125,7 +123,7 @@ export const updateIssueStatus = async (endpoint, data) => {
     try {
     //   getToken();
       const response = await apiClient.put(endpoint, data);
-  
+      toast.success(response.message);
       // console.log("Response is: ", response);
       return response.data;
     } catch (error) {
@@ -137,7 +135,7 @@ export const createIssue = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
-
+    toast.success(response.message);
     // console.log("Response is: ", response);
     return response.data;
   } catch (error) {
@@ -149,7 +147,7 @@ export const addComment = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
-
+    toast.success(response.message);
     // console.log("Response is: ", response);
     return response.data;
   } catch (error) {
@@ -174,6 +172,30 @@ export const getUserList = async (endpoint) => {
   //   getToken();
     const response = await apiClient.get(endpoint);
 
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
+export const CloudinaryImage = async (endpoint, data) => {
+  try {
+    // getToken();
+    const response = await apiClient.put(endpoint, data);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};
+
+export const addUser = async (endpoint, data) => {
+  try {
+  //   getToken();
+    const response = await apiClient.post(endpoint, data);
+    toast.success(response.message);
     // console.log("Response is: ", response);
     return response.data;
   } catch (error) {

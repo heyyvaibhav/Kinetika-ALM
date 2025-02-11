@@ -4,11 +4,13 @@ import Loading from "../Templates/Loading"
 import { getUserList } from "../../Service"
 import { UserType } from "../DropdownOptions"
 import SearchContainer from "../Search/Search"
+import AddUser from "../AddUser/AddUser"
 
 const Users = () => {
   const [users, setUsers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -43,8 +45,12 @@ const Users = () => {
   }
 
   const handleAddUser = () => {
-    // Implement add user functionality here
-    alert("Add user functionality to be implemented")
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    fetchUsers();
   }
 
   return (
@@ -75,7 +81,12 @@ const Users = () => {
                         className="avatar"
                         style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold" }}
                     > 
-                        {user.full_name.split(" ").map(word => word[0]).join("").toUpperCase()} 
+                        {user.full_name && typeof user.full_name === "string"
+                        ? user.full_name
+                            .split(" ")
+                            .map(word => word.charAt(0).toUpperCase()) // Extracts and capitalizes initials
+                            .join("")
+                        : ""}
                     </div>
                     <div style={{display:"column"}}>
                         <span>{user.full_name}</span>
@@ -113,6 +124,8 @@ const Users = () => {
       </table>
 
       {isLoading && <Loading show={isLoading} /> }
+
+      {isModalOpen && <AddUser isOpen={isModalOpen} onClose={handleCloseModal} />}
     </div>
 
    
