@@ -3,7 +3,7 @@ const IssuesModel = require('../models/issuesModel');
 const IssuesController = {
   createIssue: async (req, res) => {
     try {
-      const { project_id, summary, description, issue_type_id, priority, reporter_id, assignee_id } = req.body;
+      const { project_id, summary, description, flagged, issue_type_id, priority, status, reporter_id, assignee_id } = req.body;
       const prefix = `PROJ${project_id}`; // Customize prefix logic as needed
       const issue_key = await IssuesModel.generateIssueKey(project_id, prefix);
 
@@ -12,8 +12,10 @@ const IssuesController = {
         issue_key,
         summary,
         description,
+        flagged,
         issue_type_id,
         priority,
+        status,
         reporter_id,
         assignee_id,
       };

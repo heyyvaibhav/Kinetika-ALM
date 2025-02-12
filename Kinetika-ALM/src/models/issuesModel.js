@@ -7,18 +7,17 @@ const IssuesModel = {
 
     
     const query = `
-      INSERT INTO issues (project_id, issue_key, summary, description, attachment, flagged, issue_type_id, status, priority, reporter_id, assignee_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO issues (project_id, issue_key, summary, description, flagged, issue_type_id, status, priority, reporter_id, assignee_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const values = [
       issueData.project_id,
       issueData.issue_key,
       issueData.summary,
       issueData.description,
-      issueData.attachment,
       issueData.flagged,
       issueData.issue_type_id,
-      issueData.status || 'To Do',
+      issueData.status || '1',
       issueData.priority || 'Medium',
       issueData.reporter_id,
       issueData.assignee_id,
