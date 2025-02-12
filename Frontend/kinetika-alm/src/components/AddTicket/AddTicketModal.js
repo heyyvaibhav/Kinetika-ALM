@@ -6,7 +6,7 @@ import { issue_type } from "../DropdownOptions"
 import Loading from "../Templates/Loading"
 import { NewRelicConfig } from "../../environment"
 
-export function AddTicketModal({ onclose , initialStatus }) {
+export function AddTicketModal({ onclose , statusList }) {
   const [file, setFile] = useState([])
   const [files, setFiles] = useState([])
   const [flagged, setFlagged] = useState(false)
@@ -142,10 +142,10 @@ export function AddTicketModal({ onclose , initialStatus }) {
       formData.append("status", document.querySelector('select[name="status"]').value)
       formData.append("summary", document.querySelector('input[name="summary"]').value)
       formData.append("description", document.querySelector(".editor-content").value)
-      formData.append("assignee", document.querySelector('select[name="assignee"]').value)
+      formData.append("assignee_id", document.querySelector('select[name="assignee"]').value)
       formData.append("team", document.querySelector('select[name="team"]').value)
-      formData.append("reporter", document.querySelector('select[name="reporter"]').value)
-      formData.append("flagged", flagged)
+      formData.append("reporter_id", document.querySelector('select[name="reporter"]').value)
+      formData.append("flagged", flagged ? 1 : 0)
 
       // Append files to formData
       files.forEach((file) => {
@@ -229,11 +229,13 @@ export function AddTicketModal({ onclose , initialStatus }) {
 
           <div className="form-group">
             <label>Status</label>
-            <select className="select-input" defaultValue="todo" name="status">
-              <option value="todo">To Do</option>
-              <option value="in-progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
+            <select className="select-input" defaultValue="1" name="status">
+            {statusList.map((status) => (
+              <option key={status.ID} value={status.ID}>
+                {status.Name}
+              </option>
+            ))}
+          </select>
             <p className="help-text">This is the initial status upon creation</p>
           </div>
 
