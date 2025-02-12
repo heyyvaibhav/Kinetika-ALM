@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import "./Board.css"
 import { AddTicketModal } from "../AddTicket/AddTicketModal.js"
 import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
@@ -6,31 +6,29 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { SortableItem } from "../Search/SortableItem.js"
 import { SortableTicket } from "../Templates/SortableTicket.js"
 import SearchContainer from "../Search/Search.js"
-import { getProject, getIssuesByProjectID } from "../../Service.js"
+import { getProject, getIssuesByProjectID, getStatus, addStatus, deleteStatus } from "../../Service.js"
 import Select from "react-select"
-import Loading from "../Templates/Loading.js"
 import IssueDetails from "../IssueDetails/IssueDetails.js"
+import Loading from "../Templates/Loading.js"
 
 function Board() {
-  const [columns, setColumns] = useState([
-    { id: "todo", title: "TO DO", items: [] },
-    { id: "inProgress", title: "IN PROGRESS", items: [] },
-    { id: "done", title: "DONE", items: [] },
-  ])
-  const [selectedProjects, setSelectedProjects] = useState([]);
+  const [columns, setColumns] = useState([])
+  const [selectedProjects, setSelectedProjects] = useState([])
   const [newColumnTitle, setNewColumnTitle] = useState("")
   const [ticketModal, setTicketModal] = useState(false)
   const [isAddingColumn, setIsAddingColumn] = useState(false)
-  const [issueDetail, setIssueDetail] = useState(false);
+  const [issueDetail, setIssueDetail] = useState(false)
   const [projectList, setProjectList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedIssue, setSelectedIssue] = useState(null)
+  const [initialStatus, setInitialStatus] = useState("") // Added new state variable
+  const [statusList, setStatusList] = useState([])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   )
 
   const handleDragEnd = (event) => {
@@ -42,22 +40,22 @@ function Board() {
     const overId = over.id
 
     // Find the source and destination columns
-    const sourceColumn = columns.find(col => col.items.some(item => item.id === activeId))
-    const destColumn = columns.find(col => col.id === overId)
+    const sourceColumn = columns.find((col) => col.items.some((item) => item.id === activeId))
+    const destColumn = columns.find((col) => col.id === overId)
 
     if (sourceColumn && destColumn) {
-      setColumns(prevColumns => {
-        const newColumns = prevColumns.map(col => {
+      setColumns((prevColumns) => {
+        const newColumns = prevColumns.map((col) => {
           if (col.id === sourceColumn.id) {
             return {
               ...col,
-              items: col.items.filter(item => item.id !== activeId)
+              items: col.items.filter((item) => item.id !== activeId),
             }
           }
           if (col.id === destColumn.id) {
             return {
               ...col,
-              items: [...col.items, sourceColumn.items.find(item => item.id === activeId)]
+              items: [...col.items, sourceColumn.items.find((item) => item.id === activeId)],
             }
           }
           return col
@@ -74,11 +72,42 @@ function Board() {
     }
   }
 
-  const deleteColumn = (columnId) => {
-    setColumns(columns.filter((col) => col.id !== columnId))
+  const getColumns = async () => {
+    try {
+      const response = await getStatus(`/status`)
+      // console.log(response)
+
+      const statuses = response.statuses; // Extract array
+      console.log(statuses);
+      setStatusList(statuses);
+      if (!Array.isArray(statuses)) {
+          throw new Error("Invalid response format");
+      }
+
+      const newColumns = statuses.map((status) => ({
+          id: status.ID,
+          title: status.Name,
+          items: [],
+      }));
+
+      setColumns(newColumns)
+    } catch (error) {
+      console.error("Error fetching column statuses.", error)
+    }
   }
 
-  const addNewColumn = () => {
+  const deleteColumn = async (columnId) => {
+    try {
+      const response = await deleteStatus(`/status/delete/${columnId}`)
+
+      // Remove the column from state
+      setColumns((prev) => prev.filter((col) => col.id !== columnId))
+    } catch (error) {
+      console.error("Error deleting column:", error)
+    }
+  }
+
+  const addNewColumn = async () => {
     if (!newColumnTitle.trim()) {
       alert("Column title cannot be empty!")
       return
@@ -87,16 +116,29 @@ function Board() {
       alert("You can't add more than 10 columns!")
       return
     }
-    setColumns((prev) => [
-      ...prev,
-      {
-        id: newColumnTitle.toLowerCase().replace(/\s+/g, "-"),
-        title: newColumnTitle,
-        items: [],
-      },
-    ])
-    setNewColumnTitle("")
-    setIsAddingColumn(false)
+
+    const payload = {
+      name: newColumnTitle,
+    }
+
+    try {
+      const response = await addStatus("/status", payload)
+
+      // Add the column locally on success
+      setColumns((prev) => [
+        ...prev,
+        {
+          id: newColumnTitle.toLowerCase().replace(/\s+/g, "-"),
+          title: newColumnTitle,
+          items: [],
+        },
+      ])
+
+      setNewColumnTitle("")
+      setIsAddingColumn(false)
+    } catch (error) {
+      console.error("Error adding column:", error)
+    }
   }
 
   const fetchProjects = async () => {
@@ -118,24 +160,23 @@ function Board() {
   }
 
   useEffect(() => {
-    const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
+    const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || []
     if (storedProjectIds.length > 0) {
-        setSelectedProjects(storedProjectIds);
-        fetchIssues(storedProjectIds);
+      setSelectedProjects(storedProjectIds)
+      fetchIssues(storedProjectIds)
     }
-  }, []);
+    getColumns()
+  }, [])
 
   const fetchIssues = async (projectIds) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-        const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}`);
-        console.log("Project Issues:", response.issues);
+      const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}`)
+      // console.log("Project Issues:", response.issues)
 
-        const newColumns = [
-            { id: "todo", title: "TO DO", items: [] },
-            { id: "inProgress", title: "IN PROGRESS", items: [] },
-            { id: "done", title: "DONE", items: [] },
-        ];
+      setColumns((prevColumns) => {
+        // ✅ **Ensure we start with empty items to avoid duplication**
+        let newColumns = prevColumns.map((col) => ({ ...col, items: [] }));
 
         response.issues.forEach((issue) => {
             const issueId = issue.issue_id;
@@ -143,70 +184,75 @@ function Board() {
 
             const issueItem = { ...issue, id: issueId };
 
-            switch (issue.status?.toLowerCase().trim()) {
-                case "todo":
-                    newColumns[0].items.push(issueItem);
-                    break;
-                case "in progress":
-                    newColumns[1].items.push(issueItem);
-                    break;
-                case "done":
-                    newColumns[2].items.push(issueItem);
-                    break;
-                default:
-                    newColumns[0].items.push(issueItem);
+            // Find the column for this issue
+            const columnIndex = newColumns.findIndex((col) => col.id === issue.status);
+            if (columnIndex !== -1) {
+                newColumns[columnIndex] = {
+                    ...newColumns[columnIndex], 
+                    items: [...newColumns[columnIndex].items, issueItem]
+                };
+            } else if (newColumns.length > 0) {
+                // If status_id doesn't match, add to the first column
+                newColumns[0] = {
+                    ...newColumns[0], 
+                    items: [...newColumns[0].items, issueItem]
+                };
             }
         });
 
-        // Sort by priority
-        newColumns.forEach(column => {
-            column.items.sort((a, b) => {
-                const priorityOrder = { high: 1, medium: 2, low: 3 };
-                return (priorityOrder[a.priority.toLowerCase()] || 4) - (priorityOrder[b.priority.toLowerCase()] || 4);
-            });
-        });
+        // ✅ **Fix Priority Sorting**
+        const priorityOrder = { high: 1, medium: 2, low: 3 };
 
-        setColumns(newColumns);
+        newColumns = newColumns.map((column) => ({
+            ...column,
+            items: column.items.sort((a, b) => {
+                return (priorityOrder[a.priority?.toLowerCase()] || 4) - (priorityOrder[b.priority?.toLowerCase()] || 4);
+            }),
+        }));
+
+        return newColumns;
+      })
     } catch (error) {
-        console.error("Failed to fetch project issues:", error);
+      console.error("Failed to fetch project issues:", error)
     } finally {
-        setIsLoading(false);
+      setIsLoading(false)
     }
-};
+  }
 
   const handleSelect = async (selectedOption) => {
-    console.log("Selected Project:", selectedOption);
-    setIsLoading(true);
+    // console.log("Selected Project:", selectedOption)
+    setIsLoading(true)
 
     try {
-        // Extract project IDs
-        const projectIds = Array.isArray(selectedOption)
-            ? selectedOption.map(opt => opt.value)
-            : [selectedOption.value];
+      // Extract project IDs
+      const projectIds = Array.isArray(selectedOption) ? selectedOption.map((opt) => opt.value) : [selectedOption.value]
 
-        // Save to local storage
-        localStorage.setItem("selectedProjectIds", JSON.stringify(projectIds));
+      // Save to local storage
+      localStorage.setItem("selectedProjectIds", JSON.stringify(projectIds))
 
-        // Update state to persist selection
-        setSelectedProjects(projectIds);
+      // Update state to persist selection
+      setSelectedProjects(projectIds)
 
-        // Fetch issues
-        fetchIssues(projectIds);
+      // Fetch issues
+      fetchIssues(projectIds)
     } catch (error) {
-        console.error("Failed to fetch project issues:", error);
+      console.error("Failed to fetch project issues:", error)
     } finally {
-        setIsLoading(false);
+      setIsLoading(false)
     }
-};
-
-  const handleAddTicket = () => {
-    setTicketModal(true)
   }
+
+  const handleAddTicket = (columnId) => {
+    // Updated handleAddTicket function
+    setTicketModal(true)
+    setInitialStatus(columnId)
+  }
+
   const handleCloseTicket = () => {
     setIssueDetail(false)
     setTicketModal(false)
     setSelectedIssue(null)
-    fetchIssues();
+    fetchIssues()
   }
   const handleTicketDetail = (issue) => {
     setSelectedIssue(issue)
@@ -251,14 +297,14 @@ function Board() {
   }
 
   function formatDate(isoString) {
-    const date = new Date(isoString);
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    
-    const month = monthNames[date.getMonth()];
-    const day = date.getDate();
-    const year = date.getFullYear();
-    
-    return `${month} ${day}, ${year}`;
+    const date = new Date(isoString)
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    const month = monthNames[date.getMonth()]
+    const day = date.getDate()
+    const year = date.getFullYear()
+
+    return `${month} ${day}, ${year}`
   }
 
   return (
@@ -267,13 +313,10 @@ function Board() {
         <h2>Issue Board</h2>
         <button onClick={handleAddTicket}>Create</button>
       </div>
-
       <SearchContainer />
       <Select
         isMulti
-        value={projectList.length > 0 
-          ? projectList.filter(opt => selectedProjects.includes(opt.value)) 
-          : []} 
+        value={projectList.length > 0 ? projectList.filter((opt) => selectedProjects.includes(opt.value)) : []}
         options={projectList}
         styles={customStyles}
         onMenuOpen={fetchProjects}
@@ -282,7 +325,6 @@ function Board() {
         noOptionsMessage={() => (isLoading ? "Loading..." : "No projects found")}
         placeholder="Select a project"
       />
-
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <div className="board-columns">
           <SortableContext items={columns.map((col) => col.id)} strategy={verticalListSortingStrategy}>
@@ -299,20 +341,20 @@ function Board() {
                         display: "flex",
                         alignItems: "center",
                         backgroundColor:
-                          column.id === "todo"
+                          column.id == "1"
                             ? "#FFEDEC"
-                            : column.id === "inProgress"
+                            : column.id == "2"
                               ? "#E9EEFF"
-                              : column.id === "done"
+                              : column.id == "3"
                                 ? "#E9FAF2"
                                 : "#FFF7E9",
                         borderRadius: "10px",
                         border:
-                          column.id === "todo"
+                          column.id == "1"
                             ? "1px solid #E36A7A"
-                            : column.id === "inProgress"
+                            : column.id == "2"
                               ? "1px solid #6976C9"
-                              : column.id === "done"
+                              : column.id == "3"
                                 ? "1px solid #5DCE9F"
                                 : "1px solid #E4B54F",
                         padding: "4px 8px",
@@ -320,11 +362,11 @@ function Board() {
                     >
                       <img
                         src={
-                          column.id === "todo"
+                          column.id == "1"
                             ? "/todo.svg"
-                            : column.id === "inProgress"
+                            : column.id == "2"
                               ? "/inProgress.svg"
-                              : column.id === "done"
+                              : column.id == "3"
                                 ? "/done.svg"
                                 : "/fire.svg"
                         }
@@ -337,11 +379,11 @@ function Board() {
                           marginLeft: "8px",
                           fontWeight: "bold",
                           color:
-                            column.id === "todo"
+                            column.id == "1"
                               ? "#E36A7A"
-                              : column.id === "inProgress"
+                              : column.id == "2"
                                 ? "#6976C9"
-                                : column.id === "done"
+                                : column.id == "3"
                                   ? "#5DCE9F"
                                   : "#E4B54F",
                         }}
@@ -349,7 +391,7 @@ function Board() {
                         {column.items.length}
                       </span>
                     </div>
-                    {column.id !== "todo" && column.id !== "inProgress" && column.id !== "done" && (
+                    {column.id != "1" && column.id != "2" && column.id != "3" && (
                       <button onClick={() => deleteColumn(column.id)} className="delete-column">
                         <img src="/delete.svg" style={{ width: "24px", height: "24px" }} alt="delete" />
                       </button>
@@ -357,23 +399,45 @@ function Board() {
                   </div>
 
                   <div className="tickets">
-                    <SortableContext items={column.items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                    <SortableContext items={column.items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
                       {column.items.map((item) => (
                         <SortableTicket key={item.issue_id} id={item.issue_id}>
                           <div className="ticket" onClick={() => handleTicketDetail(item)}>
-                            <div style={{borderBottom:"1px solid #ddd", marginBottom:"10px"}}>
-                              <p style={{marginBottom : "8px"}}> <img src="/selected_date.svg" style={{height:"14px", marginBottom:"-2px"}}/> {formatDate(item.updated_at)}</p>
+                            <div style={{ borderBottom: "1px solid #ddd", marginBottom: "10px" }}>
+                              <p style={{ marginBottom: "8px" }}>
+                                {" "}
+                                <img src="/selected_date.svg" style={{ height: "14px", marginBottom: "-2px" }} />{" "}
+                                {formatDate(item.updated_at)}
+                              </p>
                               <p>{item.summary || "No description"}</p>
-                              <h5 style={{marginBottom:"4px"}}>{item.issue_key || "Untitled Issue"}</h5>
+                              <h5 style={{ marginBottom: "4px" }}>{item.issue_key || "Untitled Issue"}</h5>
                             </div>
-                            <div style={{display:"flex", justifyContent:"space-between"}}>
-                              <div style={{display:"flex", justifyContent:"space-between", gap: "4px"}}>
-                                <div style={{display: "flex", borderRadius:"8px", border:"1px solid #ddd", padding:"4px 8px 6px", alignItems:"center", gap:"3px"}}>
-                                  <img src="/comment.svg" style={{height:"24px", marginBottom:"-2.5px"}}/>
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", gap: "4px" }}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    borderRadius: "8px",
+                                    border: "1px solid #ddd",
+                                    padding: "4px 8px 6px",
+                                    alignItems: "center",
+                                    gap: "3px",
+                                  }}
+                                >
+                                  <img src="/comment.svg" style={{ height: "24px", marginBottom: "-2.5px" }} />
                                   <span>3</span>
                                 </div>
-                                <div style={{display: "flex", borderRadius:"8px", border:"1px solid #ddd", padding:"4px 8px 6px", alignItems:"center", gap:"5px"}}>
-                                  <img src="/attachment.svg" style={{height:"20px", marginBottom:"-2.5px"}}/>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    borderRadius: "8px",
+                                    border: "1px solid #ddd",
+                                    padding: "4px 8px 6px",
+                                    alignItems: "center",
+                                    gap: "5px",
+                                  }}
+                                >
+                                  <img src="/attachment.svg" style={{ height: "20px", marginBottom: "-2.5px" }} />
                                   <span>3</span>
                                 </div>
                               </div>
@@ -385,7 +449,9 @@ function Board() {
                     </SortableContext>
                   </div>
 
-                  <button className="create-issue" onClick={handleAddTicket}>
+                  <button className="create-issue" onClick={() => handleAddTicket(column.id)}>
+                    {" "}
+                    {/* Updated Create Issue button */}
                     <u>Create Issue</u>
                   </button>
                 </div>
@@ -402,8 +468,12 @@ function Board() {
                 placeholder="New column title"
               />
               <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                <button onClick={addNewColumn}>Add Column</button>
-                <button onClick={() => setIsAddingColumn(false)}>Cancel</button>
+                <button onClick={addNewColumn}>
+                  <img src="/tick.svg" width="30" />
+                </button>
+                <button onClick={() => setIsAddingColumn(false)}>
+                  <img src="/cross.svg" width="30" />
+                </button>
               </div>
             </div>
           ) : (
@@ -413,10 +483,10 @@ function Board() {
           )}
         </div>
       </DndContext>
-
-      {ticketModal && <AddTicketModal onclose={handleCloseTicket} />}
+      {ticketModal && <AddTicketModal onclose={handleCloseTicket} statusList={statusList} />}{" "}
+      {/* Updated AddTicketModal */}
       {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />}
-      {/* {isLoading && <Loading show={isLoading} />} */}
+      {isLoading && <Loading show={isLoading} />}
     </div>
   )
 }
