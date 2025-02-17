@@ -187,12 +187,12 @@ function List() {
                       minWidth: "80px",
                       textAlign: "center",      
                       fontWeight: "bold",
-                      color: ticket.status === "Done" ? "#1E7E34" : 
-                            ticket.status === "In Progress" ? "#D97706" : 
-                            ticket.status === "To Do" ? "#DC3545" : "black" ,
-                      backgroundColor: ticket.status === "Done" ? "#E6F4EA" : 
-                            ticket.status === "In Progress" ? "#FEF3C7" : 
-                            ticket.status === "To Do" ? "#FDE7E9" : "#ddd" ,
+                      color: ticket.status === "3" ? "#1E7E34" : 
+                            ticket.status === "2" ? "#D97706" : 
+                            ticket.status === "1" ? "#DC3545" : "black" ,
+                      backgroundColor: ticket.status === "3" ? "#E6F4EA" : 
+                            ticket.status === "2" ? "#FEF3C7" : 
+                            ticket.status === "1" ? "#FDE7E9" : "#ddd" ,
                       borderRadius:"10px", 
                     }}
                   >
