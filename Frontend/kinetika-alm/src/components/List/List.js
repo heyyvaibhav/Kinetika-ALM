@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './List.css';
 import SearchContainer from '../Search/Search';
 import Select from "react-select"
-import { getProject, getIssuesByProjectID } from '../../Service';
+import { getProject, getIssuesByProjectID, getStatus } from '../../Service';
 import Loading from "../Templates/Loading"
 
 function List() {
@@ -10,6 +10,7 @@ function List() {
   const [projectList, setProjectList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProjects, setSelectedProjects] = useState([]);
+  const [status, setStatus] = useState([]);
 
   useEffect(() => {
       const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
@@ -18,6 +19,23 @@ function List() {
           fetchIssues(storedProjectIds);
       }
   }, []);
+
+  const getColumns = async () => {
+    try {
+      const response = await getStatus(`/status`)
+      const statuses = response.statuses;
+        
+        const mapping = {};
+        statuses.forEach(status => {
+          mapping[status.ID] = status.Name;
+        });
+        setStatus(mapping);
+    } catch (error) {
+      console.error("Error fetching column statuses.", error)
+    }
+  }
+
+  console.log(status);
 
   const fetchProjects = async () => {
     setIsLoading(true);
@@ -38,6 +56,7 @@ function List() {
   };
 
   const fetchIssues = async (projectIds) => {
+      getColumns();
       setIsLoading(true);
       try {
           const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}`);
@@ -187,16 +206,16 @@ function List() {
                       minWidth: "80px",
                       textAlign: "center",      
                       fontWeight: "bold",
-                      color: ticket.status === "3" ? "#1E7E34" : 
-                            ticket.status === "2" ? "#D97706" : 
-                            ticket.status === "1" ? "#DC3545" : "black" ,
-                      backgroundColor: ticket.status === "3" ? "#E6F4EA" : 
-                            ticket.status === "2" ? "#FEF3C7" : 
-                            ticket.status === "1" ? "#FDE7E9" : "#ddd" ,
+                      color: ticket.status == "3" ? "#1E7E34" : 
+                            ticket.status == "2" ? "#D97706" : 
+                            ticket.status == "1" ? "#DC3545" : "black" ,
+                      backgroundColor: ticket.status == "3" ? "#E6F4EA" : 
+                            ticket.status == "2" ? "#FEF3C7" : 
+                            ticket.status == "1" ? "#FDE7E9" : "#ddd" ,
                       borderRadius:"10px", 
                     }}
                   >
-                    {ticket.status}
+                    {status[ticket.status]}
                   </span>
                 </td>
                 <td>{ticket.assignee_id}</td>

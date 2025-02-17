@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 11, 2025 at 02:29 PM
+-- Generation Time: Feb 17, 2025 at 12:02 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -128,7 +128,7 @@ CREATE TABLE `issues` (
   `description` text DEFAULT NULL,
   `flagged` tinyint(1) DEFAULT NULL,
   `issue_type_id` int(11) DEFAULT NULL,
-  `status` varchar(50) DEFAULT 'To Do',
+  `status` int(11) DEFAULT 1,
   `priority` varchar(20) DEFAULT 'Medium',
   `reporter_id` int(11) DEFAULT NULL,
   `assignee_id` int(11) DEFAULT NULL,
@@ -141,33 +141,33 @@ CREATE TABLE `issues` (
 --
 
 INSERT INTO `issues` (`issue_id`, `project_id`, `issue_key`, `summary`, `description`, `flagged`, `issue_type_id`, `status`, `priority`, `reporter_id`, `assignee_id`, `created_at`, `updated_at`) VALUES
-(1, 7, 'PROJ7-1', '', 'The login button does not respond when clicked.', 0, NULL, 'In Progress', 'High', 101, NULL, '2025-01-29 14:57:47', '2025-02-05 14:08:00'),
-(2, 1, 'ISS-001', 'Login page not loading', 'Users report that the login page fails to load.', 0, 1, 'pending', 'High', 201, 301, '2024-12-01 04:30:00', '2024-12-01 04:30:00'),
-(3, 2, 'ISS-002', '', 'The GET /users API returns a 500 error.', 0, NULL, 'Done', 'High', 202, NULL, '2024-12-02 06:00:00', '2025-02-05 13:53:20'),
-(4, 3, 'ISS-003', 'Update UI components', 'Redesign button styles and improve spacing.', 0, 3, 'Done', 'Low', 203, 303, '2024-12-03 08:30:00', '2024-12-04 04:15:00'),
-(5, 5, 'ISS-004', 'Optimize database queries', 'Slow response time on heavy queries.', 0, 4, 'To Do', 'Medium', 204, NULL, '2024-12-04 10:50:00', '2024-12-04 10:50:00'),
-(6, 5, 'ISS-005', '', 'Implement dark mode for better accessibility. svsv', 0, NULL, 'In Progress', 'high', 205, NULL, '2024-12-05 02:30:00', '2025-02-05 13:47:13'),
-(7, 6, 'ISS-006', 'Fix email notifications', 'Users are not receiving email notifications.', 0, 2, 'To Do', 'High', 206, 306, '2024-12-06 04:00:00', '2024-12-06 04:00:00'),
-(8, 7, 'ISS-007', 'Refactor backend services', 'Improve microservices architecture.', 0, 4, 'Done', 'Medium', 207, NULL, '2024-12-07 07:15:00', '2024-12-08 08:50:00'),
-(9, 8, 'ISS-008', 'Fix logout issue', 'Users remain logged in after logout.', 0, 1, 'In Progress', 'Low', 208, 308, '2024-12-08 09:40:00', '2024-12-09 10:30:00'),
-(10, 2, 'ISS-009', 'Enhance security policies', 'Add stricter validation on input fields.', 0, 3, 'To Do', 'High', 209, NULL, '2024-12-09 12:55:00', '2024-12-09 12:55:00'),
-(11, 5, 'ISS-010', 'Add user analytics', 'Track user interactions on the dashboard.', 0, 5, 'Done', 'Low', 210, 310, '2024-12-10 02:00:00', '2024-12-11 03:15:00'),
-(12, NULL, 'PROJundefined-1', 'xyz', 'wscs', 0, NULL, 'To Do', 'Mid', NULL, NULL, '2025-02-05 06:59:36', '2025-02-05 06:59:36'),
-(14, 3, 'PROJ3-1', 'bhrfsbrs', 'ettjn', 0, NULL, 'To Do', 'Low', NULL, NULL, '2025-02-05 07:09:55', '2025-02-05 07:09:55'),
-(15, 3, 'PROJ3-2', 'hebn', 'erbrw', 0, 1, 'To Do', 'Low', NULL, NULL, '2025-02-05 07:11:00', '2025-02-05 07:11:00'),
-(16, 8, 'PROJ8-1', '', 'egrryn', 0, 1, 'To Do', 'Low', NULL, NULL, '2025-02-05 07:15:17', '2025-02-05 07:15:17'),
-(17, 6, 'PROJ6-1', '', 'testing', NULL, 7, 'To Do', 'High', NULL, NULL, '2025-02-05 07:16:32', '2025-02-05 07:16:32'),
-(18, 8, 'PROJ8-2', '', '', NULL, 14, 'To Do', 'High', NULL, NULL, '2025-02-05 07:18:33', '2025-02-05 07:18:33'),
-(19, 6, 'PROJ6-2', '', '', NULL, 5, 'To Do', 'Mid', NULL, NULL, '2025-02-05 07:21:25', '2025-02-05 07:21:25'),
-(20, 9, 'PROJ9-1', 'hello', '', NULL, 5, 'To Do', 'Mid', NULL, NULL, '2025-02-05 07:24:31', '2025-02-05 07:24:31'),
-(21, 5, 'PROJ5-1', '', 'why', NULL, 15, 'To Do', 'Low', NULL, NULL, '2025-02-05 07:32:47', '2025-02-05 07:32:47'),
-(22, 8, 'PROJ8-4', '', '', NULL, 1, 'To Do', 'Low', NULL, NULL, '2025-02-05 07:35:41', '2025-02-05 07:35:41'),
-(23, 7, 'PROJ7-2', '', 'ugugguuo', NULL, 7, 'To Do', 'Low', NULL, NULL, '2025-02-05 07:39:46', '2025-02-05 07:39:46'),
-(24, 2, 'PROJ2-1', 'dummy', 'users added', NULL, 7, 'To Do', 'Mid', NULL, NULL, '2025-02-10 14:33:03', '2025-02-10 14:33:03'),
-(25, 0, 'PROJ-1', 'jj', '. j,hm', NULL, 5, 'To Do', 'Low', NULL, NULL, '2025-02-11 13:16:44', '2025-02-11 13:16:44'),
-(26, 3, 'PROJ3-3', 'jeca sj', 'hhkfxxcjkjl;lmk', NULL, 3, 'To Do', 'High', NULL, NULL, '2025-02-11 13:17:15', '2025-02-11 13:17:15'),
-(27, 1, 'PROJ1-1', 'oll,/', 'knvfh', NULL, 4, 'To Do', 'Low', NULL, NULL, '2025-02-11 13:18:48', '2025-02-11 13:18:48'),
-(28, 5, 'PROJ5-2', '', '', NULL, 3, 'To Do', 'Low', NULL, NULL, '2025-02-11 13:19:35', '2025-02-11 13:19:35');
+(1, 7, 'PROJ7-1', '', 'The login button does not respond when clicked.', 0, NULL, 1, 'High', 101, NULL, '2025-01-29 14:57:47', '2025-02-05 14:08:00'),
+(2, 1, 'ISS-001', 'Login page not loading', 'Users report that the login page fails to load.', 0, 1, 1, 'High', 201, 301, '2024-12-01 04:30:00', '2024-12-01 04:30:00'),
+(3, 2, 'ISS-002', '', 'The GET /users API returns a 500 error.', 0, NULL, 0, 'High', 202, NULL, '2024-12-02 06:00:00', '2025-02-05 13:53:20'),
+(4, 3, 'ISS-003', 'Update UI components', 'Redesign button styles and improve spacing.', 0, 3, 0, 'Low', 203, 303, '2024-12-03 08:30:00', '2024-12-04 04:15:00'),
+(5, 5, 'ISS-004', 'Optimize database queries', 'Slow response time on heavy queries.', 0, 4, 0, 'Medium', 204, NULL, '2024-12-04 10:50:00', '2024-12-04 10:50:00'),
+(6, 5, 'ISS-005', '', 'Implement dark mode for better accessibility. svsv', 0, NULL, 0, 'high', 205, NULL, '2024-12-05 02:30:00', '2025-02-05 13:47:13'),
+(7, 6, 'ISS-006', 'Fix email notifications', 'Users are not receiving email notifications.', 0, 2, 0, 'High', 206, 306, '2024-12-06 04:00:00', '2024-12-06 04:00:00'),
+(8, 7, 'ISS-007', 'Refactor backend services', 'Improve microservices architecture.', 0, 4, 0, 'Medium', 207, NULL, '2024-12-07 07:15:00', '2024-12-08 08:50:00'),
+(9, 8, 'ISS-008', 'Fix logout issue', 'Users remain logged in after logout.', 0, 1, 0, 'Low', 208, 308, '2024-12-08 09:40:00', '2024-12-09 10:30:00'),
+(10, 2, 'ISS-009', 'Enhance security policies', 'Add stricter validation on input fields.', 0, 3, 0, 'High', 209, NULL, '2024-12-09 12:55:00', '2024-12-09 12:55:00'),
+(11, 5, 'ISS-010', 'Add user analytics', 'Track user interactions on the dashboard.', 0, 5, 0, 'Low', 210, 310, '2024-12-10 02:00:00', '2024-12-11 03:15:00'),
+(12, NULL, 'PROJundefined-1', 'xyz', 'wscs', 0, NULL, 0, 'Mid', NULL, NULL, '2025-02-05 06:59:36', '2025-02-05 06:59:36'),
+(14, 3, 'PROJ3-1', 'bhrfsbrs', 'ettjn', 0, NULL, 0, 'Low', NULL, NULL, '2025-02-05 07:09:55', '2025-02-05 07:09:55'),
+(15, 3, 'PROJ3-2', 'hebn', 'erbrw', 0, 1, 0, 'Low', NULL, NULL, '2025-02-05 07:11:00', '2025-02-05 07:11:00'),
+(16, 8, 'PROJ8-1', '', 'egrryn', 0, 1, 0, 'Low', NULL, NULL, '2025-02-05 07:15:17', '2025-02-05 07:15:17'),
+(17, 6, 'PROJ6-1', '', 'testing', NULL, 7, 0, 'High', NULL, NULL, '2025-02-05 07:16:32', '2025-02-05 07:16:32'),
+(18, 8, 'PROJ8-2', '', '', NULL, NULL, 0, 'High', NULL, NULL, '2025-02-05 07:18:33', '2025-02-17 10:41:11'),
+(19, 6, 'PROJ6-2', '', '', NULL, 5, 0, 'Mid', NULL, NULL, '2025-02-05 07:21:25', '2025-02-05 07:21:25'),
+(20, 9, 'PROJ9-1', 'hello', '', NULL, 5, 0, 'Mid', NULL, NULL, '2025-02-05 07:24:31', '2025-02-05 07:24:31'),
+(21, 5, 'PROJ5-1', '', 'why', NULL, 15, 0, 'Low', NULL, NULL, '2025-02-05 07:32:47', '2025-02-05 07:32:47'),
+(22, 8, 'PROJ8-4', '', '', NULL, 1, 0, 'Low', NULL, NULL, '2025-02-05 07:35:41', '2025-02-05 07:35:41'),
+(23, 7, 'PROJ7-2', '', 'ugugguuo', NULL, 7, 0, 'Low', NULL, NULL, '2025-02-05 07:39:46', '2025-02-05 07:39:46'),
+(24, 2, 'PROJ2-1', 'dummy', 'users added', NULL, 7, 0, 'Mid', NULL, NULL, '2025-02-10 14:33:03', '2025-02-10 14:33:03'),
+(25, 0, 'PROJ-1', 'jj', '. j,hm', NULL, 5, 0, 'Low', NULL, NULL, '2025-02-11 13:16:44', '2025-02-11 13:16:44'),
+(26, 3, 'PROJ3-3', 'jeca sj', 'hhkfxxcjkjl;lmk', NULL, 3, 0, 'High', NULL, NULL, '2025-02-11 13:17:15', '2025-02-11 13:17:15'),
+(27, 1, 'PROJ1-1', 'oll,/', 'knvfh', NULL, 4, 0, 'Low', NULL, NULL, '2025-02-11 13:18:48', '2025-02-11 13:18:48'),
+(28, 5, 'PROJ5-2', '', '', NULL, 3, 0, 'Low', NULL, NULL, '2025-02-11 13:19:35', '2025-02-11 13:19:35');
 
 -- --------------------------------------------------------
 
@@ -270,9 +270,7 @@ CREATE TABLE `status_list` (
 INSERT INTO `status_list` (`ID`, `Name`, `created_at`, `updated_at`) VALUES
 (1, 'To Do', '2025-02-11 12:13:17', '2025-02-11 12:13:17'),
 (2, 'In Progress', '2025-02-11 12:13:17', '2025-02-11 12:13:17'),
-(3, 'Done', '2025-02-11 12:13:17', '2025-02-11 12:13:17'),
-(10, 'pedinf', '2025-02-11 13:10:06', '2025-02-11 13:10:06'),
-(11, 'hi', '2025-02-11 13:14:32', '2025-02-11 13:14:32');
+(3, 'Done', '2025-02-11 12:13:17', '2025-02-11 12:13:17');
 
 --
 -- Triggers `status_list`
@@ -318,12 +316,9 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `FailedLoginAttempts`, `Status`, `role`, `created_at`) VALUES
 (1, 'Vaibhav', 'vaibhav.a@kinetikalabs.com', '$2a$12$TqGEABdkJPk0hZClmPmoA.mjlvqcEdvst5lNNYA7cW6TSoe0ciq4.', 'Vaibhav Agarwal', 0, 'Active', 1, '2025-02-10 12:51:43'),
 (2, 'Kinetika Labs', 'contact@kinetikalabs.com', '$2a$12$J.x7SRKTuk4FK/b8Qy536.FzJVo66p9H89smrTDxoM0wrZgYT0r5m', 'Kedar Aundhekar', 0, 'Active', 1, '2025-02-11 05:39:28'),
-(3, 'xyz', 'jane@example.com', '.', NULL, 0, '', 2, '2025-02-11 10:41:32'),
-(5, 'xjbj ', 'jane@example.co', '.', NULL, 0, '', 1, '2025-02-11 10:43:45'),
-(6, 'xjjj ', 'jane@example.comnn', '.', NULL, 0, '', 1, '2025-02-11 10:44:41'),
-(7, 'kcsuhuc', 'jbjckvb@njbsc', '.', NULL, 0, '', 3, '2025-02-11 10:51:10'),
-(8, 'ilncs', 'nksns@knkc', '.', 'klnsn kdijn ', 0, '', 3, '2025-02-11 10:53:13'),
-(9, 'gukjn', 'jlnjv@UUKBJ', '.', 'fxrxd iljlojl', 0, '', 3, '2025-02-11 10:54:49');
+(3, 'Venkatesh', 'venkatesh.k@kinetikalabs.com', '$2a$12$9xooQHHwG0UiGLkyfEMGw.yrGG1iU7klyuxqXHKv7sTOZtSLjzCwe', 'Venkatesh Korra', 0, 'Active', 1, '2025-02-11 10:41:32'),
+(5, 'Bharath', 'bharath.t@kinetikalabs.com', '$2a$12$64Y5Ve9X0.tzHaoJl6cnF.oJ1EnLB6EBaDqKCSQoRnpa.En6BgJkm', 'Bharath Thavidishetty', 0, 'Active', 1, '2025-02-11 10:43:45'),
+(6, 'Aparna', 'aparna.k@kinetikalabs.com', '$2a$12$1T6n/hisGNeH8bSf7lF6neYdXnQbnaGe97ELj1Pqer0u1MTellPoK', 'Aparna Kulkarni', 0, 'Active', 1, '2025-02-11 10:44:41');
 
 -- --------------------------------------------------------
 
