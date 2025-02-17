@@ -2,20 +2,42 @@ import { useState } from "react"
 import "./AddUser.css"
 import { UserType } from "../DropdownOptions"
 import { addUser } from "../../Service"
+import bcrypt from "bcryptjs"
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const AddUser = ({ isOpen, onClose }) => {
   const [username, setUsername] = useState("")
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [role, setRole] = useState("")
+  const [showPassword, setShowPassword] = useState(false);
+
+  const hashPassword = async (plainPassword) => {
+    const saltRounds = 12; 
+    try {
+      const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+      return hashedPassword;
+    } catch (error) {
+      console.error("Error hashing password:", error);
+      return null;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const hashedPassword = await hashPassword(password);
+    if (!hashedPassword) {
+      console.error("Failed to hash password");
+      return;
+    }
+
+
     const userData = {
       username,
       full_name: fullName,
-      password_hash: ".",
+      password_hash: hashedPassword,
       email,
       role,
     };
@@ -65,6 +87,35 @@ const AddUser = ({ isOpen, onClose }) => {
             <label htmlFor="email">Email:</label>
             <input type="email" id="email" style={{width:"100%"}} value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Enter email"/>
           </div>
+
+          <div className="form-group" style={{ position: "relative" }}>
+            <label htmlFor="password">Password:</label>
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              style={{ width: "100%", paddingRight: "40px" }}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Enter password"
+            />
+            <span
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "73%",
+                transform: "translateY(-50%)",
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+              }}
+            >
+              {showPassword ? <FiEye size={15} /> : <FiEyeOff size={15} />}
+            </span>
+          </div>
+
           <div className="form-group">
             <label htmlFor="role">Role:</label>
             <select value={role} onChange={(e) => setRole(e.target.value)} style={{width:"100%"}}>
