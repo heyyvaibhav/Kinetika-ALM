@@ -128,7 +128,7 @@ function Board() {
       setColumns((prev) => [
         ...prev,
         {
-          id: newColumnTitle.toLowerCase().replace(/\s+/g, "-"),
+          id: response.id,
           title: newColumnTitle,
           items: [],
         },
