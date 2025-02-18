@@ -99,7 +99,7 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)} // Update state on change
                   required
                 />
-                <span onClick={handleToggle} style={{ cursor: "pointer" }}>
+                <span onClick={handleToggle} style={{ cursor: "pointer", top:"45%" }}>
                   {type === "password" ? (
                     <FiEyeOff size={20} />
                   ) : (
