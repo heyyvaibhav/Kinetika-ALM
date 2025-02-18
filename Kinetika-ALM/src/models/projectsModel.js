@@ -17,11 +17,20 @@ const ProjectsModel = {
 
   // Create a new project
   createProject: async (projectData) => {
-    const query = `
+    // Check if project with the same key already exists
+    const checkQuery = `SELECT COUNT(*) AS count FROM projects WHERE project_key = ?`;
+    const [existing] = await db.query(checkQuery, [projectData.project_key]);
+
+    if (existing.count > 0) {
+        throw new Error("Project with this key already exists");
+    }
+
+    // Insert new project
+    const insertQuery = `
       INSERT INTO projects (project_key, project_name, project_description, lead_id)
       VALUES (?, ?, ?, ?)
     `;
-    const result = await db.query(query, [
+    const result = await db.query(insertQuery, [
       projectData.project_key,
       projectData.project_name,
       projectData.project_description,

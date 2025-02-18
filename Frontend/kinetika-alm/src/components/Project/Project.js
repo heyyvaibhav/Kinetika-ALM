@@ -22,6 +22,7 @@ export default function ProjectForm() {
   }
 
   const handleSubmit = async (e) => {
+    setFormData({ name: "", key: "", description: "" })
     e.preventDefault()
     setIsLoading(true)
     setError(null)
@@ -42,8 +43,6 @@ export default function ProjectForm() {
 
       const result = await response.json()
       console.log("Project created:", result)
-      // Reset form or redirect user
-      setFormData({ name: "", key: "", description: "" })
     } catch (err) {
       console.error("Error submitting form:", err) // Log any errors
       setError(err.message)
@@ -123,7 +122,7 @@ export default function ProjectForm() {
             </div>
           </div>
 
-          <img src="/projectpage.svg" width="200"/>
+          {/* <img src="/projectpage.svg" width="200"/> */}
         </div>
 
         <div className="footer">

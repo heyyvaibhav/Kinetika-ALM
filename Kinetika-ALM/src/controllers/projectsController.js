@@ -48,7 +48,7 @@ const ProjectsController = {
       res.status(201).json({ message: 'Project created successfully', project_id: projectId });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Failed to create the project' });
+      res.status(400).json({ message: error.message || 'Failed to create the project' });
     }
   },
 

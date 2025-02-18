@@ -66,7 +66,7 @@ const errorHandle = (error) => {
   
         toast.error("Error occurred: " + error.response.data.message);
         setTimeout(() => {
-        //   logout();
+        logout();
         }, 1000);
         // Navigate to login page or wherever necessary
       } else {
