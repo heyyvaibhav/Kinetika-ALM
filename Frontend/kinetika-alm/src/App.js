@@ -10,6 +10,7 @@ import ProjectList from './components/ProjectList/ProjectList.js';
 import Login from "./components/Login/Login.js";
 import ProtectedRoute from "./components/ProtectedRoutes.js";
 import MainPage from "./components/MainPage/MainPage.js";
+import Forgot_Password from "./components/Forgot_Password/Forgot_Password.js";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
           <div className="main-content">
             <Routes>
               <Route path="/" element={<Login />} /> 
-
+              <Route path="/forgot-password" element={<Forgot_Password />} />
               <Route
                 path="/main"
                 element={

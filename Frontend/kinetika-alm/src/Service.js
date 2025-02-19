@@ -83,6 +83,36 @@ const errorHandle = (error) => {
     // throw error;
 };
 
+export const forgotPassword = async (endpoint) => {
+  try {
+    const response = await apiClient.put(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error Sending Reset Password: ", error);
+    errorHandle(error);
+  }
+};
+
+export const validateToken = async (endpoint) => {
+  try {
+    const response = await apiClient.get(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error checing token status: ", error);
+    errorHandle(error);
+  }
+};
+
+export const resetPassword = async (endpoint, data) => {
+  try {
+    const response = await apiClient.put(endpoint, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting password: ", error);
+    errorHandle(error);
+  }
+};
+
 export const getStatus = async (endpoint) => {
   try {
   //   getToken();
