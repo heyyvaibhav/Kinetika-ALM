@@ -81,6 +81,7 @@ export default function ProjectForm() {
                 onChange={handleChange}
                 placeholder="Try a team name, project goal, milestone..."
                 required
+                maxLength={100}
               />
             </div>
 
@@ -102,6 +103,7 @@ export default function ProjectForm() {
                 onChange={handleChange}
                 placeholder="Enter a project key"
                 required
+                maxLength={10}
               />
             </div>
 

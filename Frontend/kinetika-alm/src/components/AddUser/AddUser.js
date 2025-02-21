@@ -77,11 +77,11 @@ const AddUser = ({ isOpen, onClose }) => {
         <form onSubmit={handleSubmit} style={{padding:"20px"}}>
           <div className="form-group">
             <label htmlFor="username">Username:</label>
-            <input type="text" id="username" style={{width:"100%"}} value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="Enter a username" />
+            <input type="text" id="username" maxLength={50} style={{width:"100%"}} value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="Enter a username" />
           </div>
           <div className="form-group">
             <label htmlFor="fullName">Full Name:</label>
-            <input type="text" id="fullName" style={{width:"100%"}} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Enter full name"/>
+            <input type="text" id="fullName" maxLength={100} style={{width:"100%"}} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Enter full name"/>
           </div>
           <div className="form-group">
             <label htmlFor="email">Email:</label>
