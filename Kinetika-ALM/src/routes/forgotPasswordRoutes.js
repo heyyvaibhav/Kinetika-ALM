@@ -1,6 +1,7 @@
 const express = require("express");
 const { authenticateToken } = require("../auth"); // Import authenticateToken
-const { db } = require("../config/dbConfig");
+const db = require('../config/dbConfig');
+
 const router = express.Router();
 const { body, param, validationResult } = require("express-validator");
 const axios = require("axios");
@@ -12,27 +13,19 @@ const microserviceUrl = process.env.microservice_url;
 // Function to check if a user exists by email
 const checkIfUserExists = async (email) => {
   const query = `SELECT * FROM users WHERE email = ?`;
-  const [result] = await db.query(query, [email]);
+  const result = await db.query(query, [email]);
   return result.length > 0;
 };
 
 // Route for forgot-password with email validation
 router.put(
   "/forgot-password/:email",
-  [
-    // Validate that the `email` parameter is a valid email
-    param("email")
-      .isEmail()
-      .withMessage("Invalid email format")
-      .normalizeEmail(),
-  ],
   async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
 
     const email = req.params.email;
+
+    console.log(ResetUrlLink);
 
     try {
       const userExists = await checkIfUserExists(email);
@@ -74,8 +67,6 @@ router.put(
         });
       }
     } catch (error) {
-     // console.error("Error handling forgot password:", error);
-      // General error
       return res.status(500).json({
         message: `Internal server error ${error}`,
         error: error.message,

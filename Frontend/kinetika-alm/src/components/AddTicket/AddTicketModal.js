@@ -16,6 +16,8 @@ export function AddTicketModal({ onclose , statusList }) {
   const [error, setError] = useState(null)
   const fileInputRef = useRef(null)
 
+  const userid = localStorage.getItem("userId");
+
   const handleFileChange = (event) => {
     setFiles(Array.from(event.target.files))
   }
@@ -144,7 +146,7 @@ export function AddTicketModal({ onclose , statusList }) {
       formData.append("description", document.querySelector(".editor-content").value)
       formData.append("assignee_id", document.querySelector('select[name="assignee"]').value)
       formData.append("team", document.querySelector('select[name="team"]').value)
-      formData.append("reporter_id", document.querySelector('select[name="reporter"]').value)
+      formData.append("reporter_id", userid)
       formData.append("flagged", flagged ? 1 : 0)
 
       // Append files to formData
@@ -184,8 +186,8 @@ export function AddTicketModal({ onclose , statusList }) {
               <label>
                   Project<span className="required">*</span>
               </label>
-              <select className="select-input" name="project" defaultValue="">
-                  <option value="" disabled>Select a Project</option>
+              <select className="select-input" name="project" defaultValue="" required>
+                  <option disabled>Select a Project</option>
                   {isLoading ? (
                       <option>Loading...</option>
                   ) : (
@@ -206,7 +208,7 @@ export function AddTicketModal({ onclose , statusList }) {
             <label>
               Issue Type<span className="required">*</span>
             </label>
-            <select className="select-input" name="issueType">
+            <select className="select-input" name="issueType" required>
             <option value="" disabled>Select an Issue Type</option>
             {issue_type.map((type) => (
               <option key={type.issue_type_id} value={type.issue_type_id}>
@@ -275,7 +277,7 @@ export function AddTicketModal({ onclose , statusList }) {
             </select>
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>Reporter</label>
             <select className="select-input" name="reporter">
               <option value="">Select reporter</option>
@@ -285,6 +287,11 @@ export function AddTicketModal({ onclose , statusList }) {
                 </option>
               ))}
             </select>
+          </div> */}
+
+          <div className="form-group">
+            <label>Reporter</label>
+            <input className="text-input" style={{width:"100%"}} value={users.find(user => String(user.user_id) === String(userid))?.full_name || "Reporter not found"}  disabled/>
           </div>
 
           <div className="form-group">

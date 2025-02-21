@@ -136,6 +136,7 @@ function Board() {
 
       setNewColumnTitle("")
       setIsAddingColumn(false)
+      getColumns()
     } catch (error) {
       console.error("Error adding column:", error)
     }
