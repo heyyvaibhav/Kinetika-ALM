@@ -4,6 +4,7 @@ import SearchContainer from '../Search/Search';
 import Select from "react-select"
 import { getProject, getIssuesByProjectID, getStatus } from '../../Service';
 import Loading from "../Templates/Loading"
+import { AddTicketModal } from '../AddTicket/AddTicketModal';
 
 function List() {
   const [tickets, setTickets] = useState([]);
@@ -11,9 +12,12 @@ function List() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProjects, setSelectedProjects] = useState([]);
   const [status, setStatus] = useState([]);
+  const [ticketModal, setTicketModal] = useState(false);
+  const [statusList, setStatusList] = useState([]);
 
   useEffect(() => {
       const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
+      getColumns();
       if (storedProjectIds.length > 0) {
           setSelectedProjects(storedProjectIds);
           fetchIssues(storedProjectIds);
@@ -24,6 +28,8 @@ function List() {
     try {
       const response = await getStatus(`/status`)
       const statuses = response.statuses;
+
+        setStatusList(statuses);
         
         const mapping = {};
         statuses.forEach(status => {
@@ -148,10 +154,20 @@ function List() {
     return `${month} ${day}, ${year}`;
   }
 
+  const handleAddTicket = (columnId) => {
+    // Updated handleAddTicket function
+    setTicketModal(true)
+  }
+  const handleCloseTicket = () => {
+    setTicketModal(false)
+    fetchIssues()
+  }
+
   return (
     <div className="list">
       <div className="list-header">
         <h2>Issue List</h2>
+        <button onClick={handleAddTicket}>Create</button>
       </div>
 
       <SearchContainer />
@@ -229,6 +245,7 @@ function List() {
       </table>
 
       {isLoading && <Loading show={isLoading} />}
+      {ticketModal && <AddTicketModal onclose={handleCloseTicket} statusList={statusList} />}{" "}
     </div>
   );
 }
