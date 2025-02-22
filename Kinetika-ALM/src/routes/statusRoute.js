@@ -5,7 +5,7 @@ const db = require('../config/dbConfig');
 
 router.get("/", async (req, res) => {
     try {
-        const statuses = await db.query("SELECT * FROM status_List ORDER BY ID ASC");
+        const statuses = await db.query("SELECT * FROM status_list ORDER BY ID ASC");
 
         res.status(200).json({ statuses });
     } catch (error) {
@@ -23,13 +23,13 @@ router.post("/", async (req, res) => {
         }
 
         // Check if the table already has 10 entries
-        const countResult = await db.query("SELECT COUNT(*) AS count FROM status_List");
+        const countResult = await db.query("SELECT COUNT(*) AS count FROM status_list");
         if (countResult >= 10) {
             return res.status(400).json({ error: "Maximum 10 entries allowed" });
         }
 
         // Insert the new status
-        const result = await db.query("INSERT INTO status_List (Name) VALUES (?)", [name]);
+        const result = await db.query("INSERT INTO status_list (Name) VALUES (?)", [name]);
 
         res.status(201).json({ message: "Status added successfully", id: result.insertId });
     } catch (error) {
@@ -43,13 +43,13 @@ router.delete("/delete/:id", async (req, res) => {
         const { id } = req.params;
 
         // Check if the status exists
-        const status = await db.query("SELECT * FROM status_List WHERE ID = ?", [id]);
+        const status = await db.query("SELECT * FROM status_list WHERE ID = ?", [id]);
         if (status.length === 0) {
             return res.status(404).json({ error: "Status not found!" });
         }
 
         // Delete the status
-        await db.query("DELETE FROM status_List WHERE ID = ?", [id]);
+        await db.query("DELETE FROM status_list WHERE ID = ?", [id]);
 
         res.status(200).json({ message: "Status deleted successfully!" });
     } catch (error) {
