@@ -32,25 +32,37 @@ const ProjectsController = {
   // Create a new project
   createProject: async (req, res) => {
     try {
-      const { project_key, project_name, project_description, lead_id } = req.body;
+        const { project_key, project_name, project_description, lead_id } = req.body;
 
-      if (!project_key || !project_name) {
-        return res.status(400).json({ message: 'Project key and name are required' });
-      }
+        if (!project_key || !project_name) {
+            return res.status(400).json({ message: 'Project key and name are required' });
+        }
 
-      const projectId = await ProjectsModel.createProject({
-        project_key,
-        project_name,
-        project_description,
-        lead_id,
-      });
+        const result = await ProjectsModel.createProject({
+            project_key,
+            project_name,
+            project_description,
+            lead_id,
+        });
 
-      res.status(201).json({ message: 'Project created successfully', project_id: projectId });
+        if (result.exists) {
+            return res.status(200).json({ 
+                message: 'Warning: Project with this key already exists', 
+                warning: true 
+            });
+        }
+
+        res.status(201).json({ 
+            message: 'Project created successfully', 
+            project_id: result.insertId 
+        });
     } catch (error) {
-      console.error(error);
-      res.status(400).json({ message: error.message || 'Failed to create the project' });
+        console.error(error);
+        res.status(500).json({ message: 'Failed to create the project' });
     }
   },
+
+
 
   // Update a project
   updateProject: async (req, res) => {

@@ -23,12 +23,20 @@ class UsersController {
 
   static async createUser(req, res) {
     try {
-      const userId = await UsersModel.createUser(req.body);
-      successResponse(res, { user_id: userId }, 'User created successfully', 201);
+        const result = await UsersModel.createUser(req.body);
+
+        if (result.exists) {
+            return res.status(200).json({
+                message: 'Warning: User with this email already exists',
+                warning: true
+            });
+        }
+
+        successResponse(res, { user_id: result.insertId }, 'User created successfully', 201);
     } catch (error) {
-      errorResponse(res, error.message);
+        errorResponse(res, error.message || 'Failed to create the user');
     }
-  }
+}
 
   static async updateUser(req, res) {
     try {

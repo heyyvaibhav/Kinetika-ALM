@@ -22,7 +22,7 @@ const ProjectsModel = {
     const [existing] = await db.query(checkQuery, [projectData.project_key]);
 
     if (existing.count > 0) {
-        throw new Error("Project with this key already exists");
+        return { exists: true }; // Return an indicator instead of throwing an error
     }
 
     // Insert new project
@@ -31,13 +31,14 @@ const ProjectsModel = {
       VALUES (?, ?, ?, ?)
     `;
     const result = await db.query(insertQuery, [
-      projectData.project_key,
-      projectData.project_name,
-      projectData.project_description,
-      projectData.lead_id,
+        projectData.project_key,
+        projectData.project_name,
+        projectData.project_description,
+        projectData.lead_id,
     ]);
-    return result.insertId; // Return the ID of the newly created project
-  },
+
+    return { exists: false, insertId: result.insertId }; // Return the new project ID
+},
 
   // Update an existing project
   updateProject: async (projectId, projectData) => {

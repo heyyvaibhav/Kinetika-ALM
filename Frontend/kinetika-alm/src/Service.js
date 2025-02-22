@@ -153,12 +153,15 @@ export const createProject = async (endpoint, data) => {
     try {
     //   getToken();
       const response = await apiClient.post(endpoint, data);
-      toast.success(response.data.message);
-      // console.log("Response is: ", response);
+      if (response.data.warning) {
+          toast.warning(response.data.message);
+      } else {
+          toast.success(response.data.message);
+      }
       return response.data;
-    } catch (error) {
-      errorHandle(error);
-    }
+  } catch (error) {
+      errorHandle(error); // Handles any actual errors
+  }
 };
 
 export const getProject = async (endpoint) => {
@@ -261,8 +264,11 @@ export const addUser = async (endpoint, data) => {
   try {
   //   getToken();
     const response = await apiClient.post(endpoint, data);
-    toast.success(response.data.message);
-    // console.log("Response is: ", response);
+    if (response.data.warning) {
+      toast.warning(response.data.message);
+    } else {
+        toast.success(response.data.message);
+    }
     return response.data;
   } catch (error) {
     errorHandle(error);
