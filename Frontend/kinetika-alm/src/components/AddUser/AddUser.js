@@ -2,7 +2,6 @@ import { useState } from "react"
 import "./AddUser.css"
 import { UserType } from "../DropdownOptions"
 import { addUser } from "../../Service"
-import bcrypt from "bcryptjs"
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const AddUser = ({ isOpen, onClose }) => {
@@ -13,31 +12,12 @@ const AddUser = ({ isOpen, onClose }) => {
   const [role, setRole] = useState("")
   const [showPassword, setShowPassword] = useState(false);
 
-  const hashPassword = async (plainPassword) => {
-    const saltRounds = 12; 
-    try {
-      const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
-      return hashedPassword;
-    } catch (error) {
-      console.error("Error hashing password:", error);
-      return null;
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const hashedPassword = await hashPassword(password);
-    if (!hashedPassword) {
-      console.error("Failed to hash password");
-      return;
-    }
-
 
     const userData = {
       username,
       full_name: fullName,
-      password_hash: hashedPassword,
       email,
       role,
     };
@@ -53,7 +33,6 @@ const AddUser = ({ isOpen, onClose }) => {
 
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("Failed to add user. Please try again.");
     }
     onClose();
   };
@@ -88,7 +67,7 @@ const AddUser = ({ isOpen, onClose }) => {
             <input type="email" id="email" style={{width:"100%"}} value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Enter email"/>
           </div>
 
-          <div className="form-group" style={{ position: "relative" }}>
+          {/* <div className="form-group" style={{ position: "relative" }}>
             <label htmlFor="password">Password:</label>
             <input
               type={showPassword ? "text" : "password"}
@@ -114,7 +93,7 @@ const AddUser = ({ isOpen, onClose }) => {
             >
               {showPassword ? <FiEye size={15} /> : <FiEyeOff size={15} />}
             </span>
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label htmlFor="role">Role:</label>

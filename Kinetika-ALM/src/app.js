@@ -13,6 +13,7 @@ const workflowRoutes = require('./routes/workflowRoutes');
 const issueHistoryRoutes = require('./routes/issueHistoryRoutes');
 const statusRoutes = require('./routes/statusRoute');
 const forgotPassword = require("./routes/forgotPasswordRoutes.js");
+const emailRoutes = require('./routes/emailRoutes.js');
 
 const app = express();
 app.use(cors());
@@ -29,6 +30,7 @@ app.use('/api/workflows', workflowRoutes);
 app.use('/api/issues/history', issueHistoryRoutes);
 app.use('/api/status', statusRoutes);
 app.use('/api', forgotPassword);
+app.use('/api/notifications', emailRoutes);
 
 // Default 404 handler
 app.use((req, res) => {
