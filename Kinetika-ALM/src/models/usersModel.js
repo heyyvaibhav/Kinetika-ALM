@@ -37,9 +37,9 @@ class UsersModel {
       console.log(randomPassword);
       console.log(passwordhash);
 
-        // Check if a user with the same email already exists
-        const checkQuery = 'SELECT COUNT(*) AS count FROM users WHERE email = ?';
-        const [existing] = await db.query(checkQuery, [email]);
+        // Check if a user with the same email or username already exists
+        const checkQuery = 'SELECT COUNT(*) AS count FROM users WHERE email = ? OR username = ?';
+        const [existing] = await db.query(checkQuery, [email, username]);
 
         if (existing.count > 0) {
             return { exists: true };

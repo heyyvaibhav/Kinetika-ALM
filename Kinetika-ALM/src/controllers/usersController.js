@@ -27,7 +27,7 @@ class UsersController {
 
       if (result.exists) {
           return res.status(200).json({
-              message: 'Warning: User with this email already exists',
+              message: 'Warning: User with this email or username already exists',
               warning: true
           });
       }

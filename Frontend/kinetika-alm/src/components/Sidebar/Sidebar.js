@@ -29,13 +29,13 @@ function Sidebar({ open, closeMenu }) {
             Users
           </NavLink>
         )}
-        <NavLink to={"project"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
+        {/* <NavLink to={"project"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
           <img src='/project.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
           Project
-        </NavLink>
+        </NavLink> */}
         <NavLink to={"project-list"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
           <img src='/projectlist.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
-          Project List
+          Projects
         </NavLink>
       </nav>
     </div>

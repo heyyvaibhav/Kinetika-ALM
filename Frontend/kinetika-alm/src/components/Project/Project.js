@@ -35,7 +35,7 @@ export default function ProjectForm() {
       project_description : formData.description,
       lead_id : userId,
     }
-
+    window.location.href = '/main/project-list';
     try {
       const response = await createProject("/projects", data)
 

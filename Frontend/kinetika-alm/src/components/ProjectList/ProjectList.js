@@ -33,6 +33,10 @@ const ProjectList = () => {
     return `${month} ${day}, ${year}`;
   }
 
+  const handleCreateProject = () => {
+    window.location.href = '/main/project';
+  }
+
   if (isLoading) {
     return <div className="loading">Loading...</div>;
   }
@@ -43,7 +47,10 @@ const ProjectList = () => {
 
   return (
     <div className="active-projects-table-container">
-      <h2>Active Projects</h2>
+      <div className='list-header'>
+        <h2>Active Projects</h2>
+        <button onClick={handleCreateProject}>Create Project</button>
+      </div>
       
         <table style={{overflowX:"auto !important"}}>
           <thead>
