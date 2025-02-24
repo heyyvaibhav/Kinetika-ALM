@@ -38,9 +38,25 @@ router.post("/", async (req, res) => {
     }
 });
 
+router.get("/check/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const issues = await db.query("SELECT * FROM issues WHERE status = ?", [id]);
+        if (issues.length > 0) {
+            res.json({ issuesPresent: issues.length > 0,  message: "Warning: Issues are present!"});
+        } else {
+            res.json({ issuesPresent: issues.length > 0});
+        }
+    } catch (error) {
+        console.error("Error checking issues:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 router.delete("/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
+        const { fallbackStatusId } = req.body;
 
         // Check if the status exists
         const status = await db.query("SELECT * FROM status_list WHERE ID = ?", [id]);
@@ -48,14 +64,36 @@ router.delete("/delete/:id", async (req, res) => {
             return res.status(404).json({ error: "Status not found!" });
         }
 
-        // Delete the status
-        await db.query("DELETE FROM status_list WHERE ID = ?", [id]);
+        // Check if any issues are assigned to this status
+        const issues = await db.query("SELECT * FROM issues WHERE status = ?", [id]);
 
+        if (issues.length > 0) {
+            // Validate fallbackStatusId only if issues are present
+            if (!fallbackStatusId) {
+                return res.status(400).json({ error: "Fallback status ID is required!" });
+            }
+
+            const fallbackStatus = await db.query("SELECT * FROM status_list WHERE ID = ?", [fallbackStatusId]);
+            if (fallbackStatus.length === 0) {
+                return res.status(404).json({ error: "Fallback status not found!" });
+            }
+
+            // Update issues with the fallback status
+            await db.query("UPDATE issues SET status = ? WHERE status = ?", [fallbackStatusId, id]);
+            await db.query("DELETE FROM status_list WHERE ID = ?", [id]);
+
+            return res.status(200).json({ message: "Status deleted and issues updated successfully!" });
+        }
+
+        // Directly delete the status if no issues are present
+        await db.query("DELETE FROM status_list WHERE ID = ?", [id]);
         res.status(200).json({ message: "Status deleted successfully!" });
+
     } catch (error) {
         console.error("Error deleting status:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
 
 module.exports = router;

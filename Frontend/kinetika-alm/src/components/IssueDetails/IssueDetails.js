@@ -270,7 +270,7 @@ const IssueDetails = ({ onClose, issue }) => {
                     <div className="reporter-info">
                       <div 
                         className="avatar"
-                        style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px"}}
+                        style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
                       > 
                         {issue.reporter_name && typeof issue.reporter_name === "string"
                         ? issue.reporter_name

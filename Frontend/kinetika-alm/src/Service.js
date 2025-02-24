@@ -137,10 +137,10 @@ export const addStatus = async (endpoint, data) => {
   }
 };
 
-export const deleteStatus = async (endpoint) => {
+export const deleteStatus = async (endpoint, data) => {
   try {
   //   getToken();
-    const response = await apiClient.delete(endpoint);
+    const response = await apiClient.delete(endpoint, data);
     toast.success(response.data.message);
     // console.log("Response is: ", response);
     return response.data;
@@ -269,6 +269,17 @@ export const addUser = async (endpoint, data) => {
     } else {
         toast.success(response.data.message);
     }
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
+
+export const checkIssuesForStatus = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.get(endpoint);
+    toast.warning(response.data.message);
     return response.data;
   } catch (error) {
     errorHandle(error);
