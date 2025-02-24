@@ -187,3 +187,40 @@ button:hover {
   background-color: #ddd;
 }
 
+.modals {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modalContent {
+  background: white;
+  padding: 1px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+.modalheader {
+  padding: 6px 10px;
+  text-align: left;
+  top: 0;
+  border-bottom: 1px solid #ddd;
+}
+.modalfooter {
+  padding: 6px 10px;
+  text-align: right;
+  bottom: 0;
+  border-top: 1px solid #ddd;
+}
+
+.cont select {
+  width: 100%;
+}

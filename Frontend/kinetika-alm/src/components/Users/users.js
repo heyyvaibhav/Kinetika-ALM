@@ -79,12 +79,12 @@ const Users = () => {
                 <div className="name-cell">
                     <div 
                         className="avatar"
-                        style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold" }}
+                        style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", fontSize:"12px"}}
                     > 
                         {user.full_name && typeof user.full_name === "string"
                         ? user.full_name
                             .split(" ")
-                            .map(word => word.charAt(0).toUpperCase()) // Extracts and capitalizes initials
+                            .map(word => word.charAt(0).toUpperCase())
                             .join("")
                         : ""}
                     </div>
