@@ -6,7 +6,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { SortableItem } from "../Search/SortableItem.js"
 import { SortableTicket } from "../Templates/SortableTicket.js"
 import SearchContainer from "../Search/Search.js"
-import { getProject, getIssuesByProjectID, getStatus, addStatus, deleteStatus } from "../../Service.js"
+import { getProject, getIssuesByProjectID, getStatus, addStatus, deleteStatus, checkIssuesForStatus } from "../../Service.js"
 import Select from "react-select"
 import IssueDetails from "../IssueDetails/IssueDetails.js"
 import Loading from "../Templates/Loading.js"
@@ -21,8 +21,11 @@ function Board() {
   const [projectList, setProjectList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedIssue, setSelectedIssue] = useState(null)
-  const [initialStatus, setInitialStatus] = useState("") // Added new state variable
+  const [initialStatus, setInitialStatus] = useState("") 
   const [statusList, setStatusList] = useState([])
+  const [showModal, setShowModal] = useState(false)
+  const [fallbackStatusId, setFallbackStatusId] = useState("")
+  const [deletecolumn, setDeleteColumn] = useState("")
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -96,16 +99,46 @@ function Board() {
     }
   }
 
-  const deleteColumn = async (columnId) => {
+  const deleteColumn = async (columnId, fallbackStatusId) => {
     try {
-      const response = await deleteStatus(`/status/delete/${columnId}`)
+        // Send as an object with the required key
+        const response = await deleteStatus(`/status/delete/${columnId}`, {
+            data: { fallbackStatusId: fallbackStatusId }
+        });
 
-      // Remove the column from state
-      setColumns((prev) => prev.filter((col) => col.id !== columnId))
+        console.log("Payload sent:", { fallbackid: fallbackStatusId });
+
+        // Remove the column from state
+        setColumns((prev) => prev.filter((col) => col.id !== columnId));
+
+        fetchIssues();
     } catch (error) {
-      console.error("Error deleting column:", error)
+        console.error("Error deleting column:", error);
     }
-  }
+};
+
+  const handleDeleteClick = async (columnId) => {
+    setDeleteColumn(columnId);
+    setFallbackStatusId("");
+    const response = await checkIssuesForStatus(`/status/check/${columnId}`);
+    
+    if (response.issuesPresent) {
+        setShowModal(true);
+    } else {
+        deleteColumn(columnId, null);
+    }
+  };
+
+  const confirmDelete = (columnId) => {
+    console.log(fallbackStatusId);
+    if (fallbackStatusId) {
+      deleteColumn(columnId, fallbackStatusId);
+      setShowModal(false);
+      setDeleteColumn("");
+    } // else {
+    //   alert("Please select a fallback status!");
+    // }
+  };
 
   const addNewColumn = async () => {
     if (!newColumnTitle.trim()) {
@@ -399,7 +432,7 @@ function Board() {
                       </span>
                     </div>
                     {column.id != "1" && column.id != "2" && column.id != "3" && (
-                      <button onClick={() => deleteColumn(column.id)} className="delete-column">
+                      <button onClick={() => handleDeleteClick(column.id)} className="delete-column">
                         <img src="/delete.svg" style={{ width: "24px", height: "24px" }} alt="delete" />
                       </button>
                     )}
@@ -450,7 +483,7 @@ function Board() {
                               </div>
                               <div 
                                   className="avatar"
-                                  style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px"}}
+                                  style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
                               > 
                                   {item.assignee_name && typeof item.assignee_name === "string"
                                   ? item.assignee_name
@@ -500,6 +533,44 @@ function Board() {
           )}
         </div>
       </DndContext>
+
+      {showModal && (
+        <div className="modals">
+            
+            <div className="modalContent">
+              <div className="modalheader">
+                <h2 style={{margin:"0"}}>Select Status</h2>
+              </div>
+
+              <div className="form-control" style={{padding:"10px 20px", border:"none"}}>
+                <p style={{color:"#A6A4B2", fontSize:"12px", marginBottom:"10px"}}>The column you want to delete contains active issues. Move them to another column.</p>
+                <select
+                  className="select-input"
+                  value={fallbackStatusId}
+                  onChange={(e) => setFallbackStatusId(e.target.value)}
+                >
+                  <option value="">Select Status</option>
+                  {statusList.map((status) =>
+                      String(status.ID) !== String(deletecolumn) ? (
+                          <option key={status.ID} value={status.ID}>
+                              {status.Name}
+                          </option>
+                      ) : null
+                  )}
+                </select>
+              </div>
+
+              <div className="modalfooter">
+                <button style={{margin:"0 3px"}} onClick={() => setShowModal(false)}>Cancel</button>
+                <button style={{margin:"0 3px"}} onClick={() => confirmDelete(deletecolumn)}>Save</button>
+              </div>
+            </div>
+
+            
+
+        </div>
+      )}
+
       {ticketModal && <AddTicketModal onclose={handleCloseTicket} statusList={statusList} />}{" "}
       {/* Updated AddTicketModal */}
       {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />}
