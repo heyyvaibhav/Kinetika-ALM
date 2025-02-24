@@ -24,7 +24,19 @@ const IssuesModel = {
 
   getIssuesByProject: async (projectIds) => {
     const placeholders = projectIds.map(() => "?").join(", "); // Create ?,?,? for IN clause
-    const query = `SELECT * FROM issues WHERE project_id IN (${placeholders})`;
+    const query = `SELECT 
+    i.*,
+    reporter.full_name AS reporter_name,
+    assignee.full_name AS assignee_name
+    FROM 
+        issues i
+    LEFT JOIN 
+        users reporter ON i.reporter_id = reporter.user_id
+    LEFT JOIN 
+        users assignee ON i.assignee_id = assignee.user_id
+    WHERE 
+        i.project_id IN (${placeholders});
+    `;
     
     return db.query(query, projectIds);
   },

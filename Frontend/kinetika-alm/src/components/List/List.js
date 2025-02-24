@@ -234,8 +234,8 @@ function List() {
                     {status[ticket.status]}
                   </span>
                 </td>
-                <td>{ticket.assignee_id}</td>
-                <td>{ticket.reporter_id}</td>
+                <td>{ticket.assignee_name}</td>
+                <td>{ticket.reporter_name}</td>
                 <td>{formatDate(ticket.created_at)}</td>
                 <td>{formatDate(ticket.updated_at)}</td>
               </tr>

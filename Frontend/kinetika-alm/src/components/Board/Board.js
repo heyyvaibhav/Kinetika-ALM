@@ -308,6 +308,12 @@ function Board() {
     return `${month} ${day}, ${year}`
   }
 
+  const getRandomColor = () => {
+    const colors = ["#FF5733", "#3357FF", "#FF33A1", "#FF8C33", "#8C33FF"];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+
   return (
     <div className="board">
       <div className="board-header">
@@ -442,7 +448,17 @@ function Board() {
                                   <span>3</span>
                                 </div>
                               </div>
-                              <div></div>
+                              <div 
+                                  className="avatar"
+                                  style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px"}}
+                              > 
+                                  {item.assignee_name && typeof item.assignee_name === "string"
+                                  ? item.assignee_name
+                                      .split(" ")
+                                      .map(word => word.charAt(0).toUpperCase()) // Extracts and capitalizes initials
+                                      .join("")
+                                  : ""}
+                              </div>
                             </div>
                           </div>
                         </SortableTicket>
