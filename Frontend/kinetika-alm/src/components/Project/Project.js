@@ -1,8 +1,10 @@
 import React, { useState } from "react"
 import "./Project.css"
 import { createProject } from "../../Service"
+import { useNavigate } from "react-router-dom"
 
 export default function ProjectForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     key: "",
@@ -35,7 +37,7 @@ export default function ProjectForm() {
       project_description : formData.description,
       lead_id : userId,
     }
-    window.location.href = '/main/project-list';
+    
     try {
       const response = await createProject("/projects", data)
 
@@ -48,7 +50,13 @@ export default function ProjectForm() {
       setError(err.message)
     } finally {
       setIsLoading(false)
+      navigate('/main/project-list');
     }
+  }
+
+  const handleCancelproject = () => {
+    setFormData({ name: "", key: "", description: "" })
+    navigate('/main/project-list');
   }
 
   return (
@@ -128,6 +136,7 @@ export default function ProjectForm() {
         </div>
 
         <div className="footer">
+          <button onClick={handleCancelproject}>Cancel</button>
           <button type="submit" disabled={isLoading}>
             {isLoading ? "Creating..." : "Create project"}
           </button>

@@ -66,10 +66,16 @@ const Login = () => {
         <div className="row vh-100">
           {/* Left Column */}
           <div className="vh-100 col-md-10 d-flex flex-column justify-content-center align-items-center" >
+          <img
+                    src="/namelogo.png"
+                    className="img-fluid"
+                    style={{ width: "15em", margin: "0 auto 20px",borderRadius:"8px" }}
+                    alt="Placeholder"
+                  />
             <form
               className="d-flex flex-column mb-0 form-width pt-5"
               onSubmit={handleSubmit} // Add onSubmit handler
-              style={{backgroundColor:"#fff", borderRadius:"8px", padding:"30px"}}
+              style={{backgroundColor:"#fff", borderRadius:"8px", padding:"20px"}}
             >
               <p className="bolder h5 mt-2">Welcome back!</p>
               <p className="sub-para">Login to Kinetika ALM.</p>

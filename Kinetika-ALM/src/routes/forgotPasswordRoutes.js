@@ -25,8 +25,6 @@ router.put(
 
     const email = req.params.email;
 
-    console.log(ResetUrlLink);
-
     try {
       const userExists = await checkIfUserExists(email);
       if (!userExists) {
@@ -55,8 +53,6 @@ router.put(
         }
       );
 
-      //   console.log("microservice: ", microserviceResponse);
-
       if (microserviceResponse.status === 200) {
         return res.status(200).json({
           message: "Password reset email sent successfully",
@@ -77,8 +73,7 @@ router.put(
 
 router.get("/validateToken/:token", async (req, res) => {
   const token = req.params.token;
-  //   console.log("Token: ", token);
-
+  
   try {
     // Query to check the token in the database
     const verifyTokenQuery = `
@@ -87,7 +82,7 @@ router.get("/validateToken/:token", async (req, res) => {
         WHERE token = ?
       `;
 
-    const [queryResult] = await db.query(verifyTokenQuery, [token]);
+    const queryResult = await db.query(verifyTokenQuery, [token]);
 
     if (queryResult.length > 0) {
       const tokenData = queryResult[0];
@@ -110,7 +105,6 @@ router.get("/validateToken/:token", async (req, res) => {
       });
     }
   } catch (error) {
-  //  console.error("Error validating token:", error);
     return res.status(500).json({
       message: `Internal server error ${error}`,
       error: error.message,
@@ -148,7 +142,7 @@ router.put(
         FROM passwordresettoken 
         WHERE Token = ?
       `;
-      const [tokenResult] = await db.query(verifyTokenQuery, [token]);
+      const tokenResult = await db.query(verifyTokenQuery, [token]);
 
       if (tokenResult.length === 0) {
         return res.status(404).json({ message: "Invalid or expired token" });
@@ -189,7 +183,6 @@ router.put(
         message: "Password updated successfully",
       });
     } catch (error) {
-      //console.error("Error updating password:", error);
       return res.status(500).json({
         message: `Internal server error ${error}`,
         error: error.message,

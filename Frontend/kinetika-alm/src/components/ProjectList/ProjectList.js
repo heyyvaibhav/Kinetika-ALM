@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getProject } from '../../Service';
 import './ProjectList.css';
+import Loading from '../Templates/Loading';
+import { useNavigate } from "react-router-dom";
 
 const ProjectList = () => {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,15 +37,7 @@ const ProjectList = () => {
   }
 
   const handleCreateProject = () => {
-    window.location.href = '/main/project';
-  }
-
-  if (isLoading) {
-    return <div className="loading">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
+    navigate('/main/project');
   }
 
   return (
@@ -82,8 +77,10 @@ const ProjectList = () => {
           </tbody>
         </table>
       
+        {isLoading && <Loading show={isLoading} />}
+
     </div>
-  );
+  );    
 };
 
 export default ProjectList;
