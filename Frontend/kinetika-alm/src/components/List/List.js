@@ -5,6 +5,8 @@ import Select from "react-select"
 import { getProject, getIssuesByProjectID, getStatus } from '../../Service';
 import Loading from "../Templates/Loading"
 import { AddTicketModal } from '../AddTicket/AddTicketModal';
+import IssueDetails from '../IssueDetails/IssueDetails';
+import { toast } from 'react-toastify';
 
 function List() {
   const [tickets, setTickets] = useState([]);
@@ -14,13 +16,15 @@ function List() {
   const [status, setStatus] = useState([]);
   const [ticketModal, setTicketModal] = useState(false);
   const [statusList, setStatusList] = useState([]);
+  const [issueDetail, setIssueDetail] = useState(false);
+  const [selectedIssue, setSelectedIssue] = useState(null)
 
   useEffect(() => {
       const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
       getColumns();
       if (storedProjectIds.length > 0) {
-          setSelectedProjects(storedProjectIds);
-          fetchIssues(storedProjectIds);
+        setSelectedProjects(storedProjectIds);
+        fetchIssues(storedProjectIds);
       }
   }, []);
 
@@ -62,6 +66,11 @@ function List() {
   };
 
   const fetchIssues = async (projectIds) => {
+    if (!projectIds || projectIds.length === 0) {
+      toast.warning("No Project IDs provided.")
+      setTickets([]);
+      return;
+    }
       getColumns();
       setIsLoading(true);
       try {
@@ -105,6 +114,18 @@ function List() {
         setIsLoading(false);
     }
 };
+
+  const handleCloseTicket = () => {
+    setIssueDetail(false)
+    setTicketModal(false)
+    setSelectedIssue(null)
+    fetchIssues()
+  };
+
+  const handleTicketDetail = (issue) => {
+    setSelectedIssue(issue)
+    setIssueDetail(true)
+  };
 
   const customStyles = {
     control: (provided, state) => ({
@@ -158,10 +179,6 @@ function List() {
     // Updated handleAddTicket function
     setTicketModal(true)
   }
-  const handleCloseTicket = () => {
-    setTicketModal(false)
-    fetchIssues()
-  }
 
   return (
     <div className="list">
@@ -176,10 +193,15 @@ function List() {
         value={projectList.length > 0 
           ? projectList.filter(opt => selectedProjects?.includes(opt.value)) 
           : []}
-        options={projectList}
-        styles={customStyles}
-        onMenuOpen={fetchProjects}
-        onChange={handleSelect}
+          options={projectList}
+          styles={customStyles}
+          onMenuOpen={fetchProjects}
+          onChange={(selectedOptions) => {
+              const selectedIds = selectedOptions.map((opt) => opt.value);
+              setSelectedProjects(selectedIds);
+              localStorage.setItem("selectedProjectIds", JSON.stringify(selectedIds));
+              fetchIssues(selectedIds);
+          }}
         isLoading={isLoading}
         noOptionsMessage={() => (isLoading ? "Loading..." : "No projects found")}
         placeholder="Select a project"
@@ -207,7 +229,7 @@ function List() {
             </tr>
           ) : (
             tickets.map(ticket => (
-              <tr key={ticket.issue_id}>
+              <tr key={ticket.issue_id} onClick={() => handleTicketDetail(ticket)}>
                 <td>{ticket.issue_key}</td>
                 <td>{ticket.issue_type_id}</td>
                 <td>{ticket.summary}</td>
@@ -246,6 +268,7 @@ function List() {
 
       {isLoading && <Loading show={isLoading} />}
       {ticketModal && <AddTicketModal onclose={handleCloseTicket} statusList={statusList} />}{" "}
+      {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />}
     </div>
   );
 }

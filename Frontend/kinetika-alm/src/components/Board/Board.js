@@ -10,6 +10,7 @@ import { getProject, getIssuesByProjectID, getStatus, addStatus, deleteStatus, c
 import Select from "react-select"
 import IssueDetails from "../IssueDetails/IssueDetails.js"
 import Loading from "../Templates/Loading.js"
+import { toast } from "react-toastify"
 
 function Board() {
   const [columns, setColumns] = useState([])
@@ -203,6 +204,14 @@ function Board() {
   }, [])
 
   const fetchIssues = async (projectIds) => {
+    if (!projectIds || projectIds.length === 0) {
+      toast.warning("No Project IDs provided.")
+      setColumns((prevColumns) =>
+          prevColumns.map((col) => ({ ...col, items: [] }))
+      );
+      return;
+    }
+
     setIsLoading(true)
     try {
       const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}`)
