@@ -10,7 +10,7 @@ module.exports = {
               <p><strong>Email:</strong> ${user.email}</p>
               <p><strong>Password:</strong> ${user.password}</p>
               <p>You can log in by clicking the link below:</p>
-              <p><a href="http://82.180.144.167:3000/" style="color: rgb(29, 53, 87); text-decoration: none; font-weight: bold;">Login to Kinetika ALM</a></p>
+              <p><a href="https://stagealm.kinetikalabs.com/" style="color: rgb(29, 53, 87); text-decoration: none; font-weight: bold;">Login to Kinetika ALM</a></p>
               <p>If you have any technical issues or need assistance, please feel free to reach out to our customer support team at 
                 <a href="mailto:contact@kinetikalabs.com" style="color: rgb(29, 53, 87); text-decoration: none;">itsupport@kinetikalabs.com</a>.
               </p>
