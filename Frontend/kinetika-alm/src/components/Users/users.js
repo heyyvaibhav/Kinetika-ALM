@@ -55,7 +55,7 @@ const Users = () => {
 
   return (
     <div className="users-container">
-       <div className="users-header">
+      <div className="users-header">
         <h2>Users</h2>
         <button onClick={handleAddUser}>Add User</button>
       </div>
@@ -98,23 +98,23 @@ const Users = () => {
               </td>
               <td>{user.email}</td>
               <td>
-                  <span
-                    style={{ 
-                      fontSize: "12px",
-                      display: "inline-block",  
-                      padding: "4px",      
-                      minWidth: "80px",
-                      textAlign: "center",      
-                      fontWeight: "bold",
-                      color: user.Status === "Active" ? "#1E7E34" : 
-                        user.Status === "Disabled" ? "#DC3545" : "black" ,
-                      backgroundColor: user.Status === "Active" ? "#E6F4EA" : 
-                        user.Status === "Disabled" ? "#FDE7E9" : "#ddd" ,
-                      borderRadius:"10px", 
-                    }}
-                  >
-                    {user.Status}
-                  </span>
+                <span
+                  style={{ 
+                    fontSize: "12px",
+                    display: "inline-block",  
+                    padding: "4px",      
+                    minWidth: "80px",
+                    textAlign: "center",      
+                    fontWeight: "bold",
+                    color: user.Status === "Active" ? "#1E7E34" : 
+                      user.Status === "Disabled" ? "#DC3545" : "black" ,
+                    backgroundColor: user.Status === "Active" ? "#E6F4EA" : 
+                      user.Status === "Disabled" ? "#FDE7E9" : "#ddd" ,
+                    borderRadius:"10px", 
+                  }}
+                >
+                  {user.Status}
+                </span>
               </td>
               <td>{user.FailedLoginAttempts}</td>
               <td>{formatDate(user.created_at)}</td>
