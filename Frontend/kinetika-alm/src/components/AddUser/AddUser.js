@@ -3,6 +3,7 @@ import "./AddUser.css"
 import { UserType } from "../DropdownOptions"
 import { addUser } from "../../Service"
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 const AddUser = ({ isOpen, onClose }) => {
   const [username, setUsername] = useState("")
@@ -64,7 +65,22 @@ const AddUser = ({ isOpen, onClose }) => {
           </div>
           <div className="form-group">
             <label htmlFor="email">Email:</label>
-            <input type="email" id="email" style={{width:"100%"}} value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Enter email"/>
+            <input
+              type="email"
+              id="email"
+              style={{ width: "100%" }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                  toast.warning("Please enter a valid email address");
+                  setEmail("");
+                }
+              }}
+              required
+              placeholder="Enter email"
+            />
           </div>
 
           {/* <div className="form-group" style={{ position: "relative" }}>
