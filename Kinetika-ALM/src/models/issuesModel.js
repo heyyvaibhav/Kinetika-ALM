@@ -19,7 +19,31 @@ const IssuesModel = {
       issueData.reporter_id,
       issueData.assignee_id,
     ];
-    return db.query(query, values);
+
+    const result = await db.query(query, values);
+    const issueId = result.insertId;
+
+    const historyQuery = `
+        INSERT INTO issuehistory (issue_id, updated_by, old_value, new_value, field_changed)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const historyValues = [
+        issueId,
+        issueData.reporter_id, // Assuming the reporter is the creator
+        null, // No old value for a new issue
+        JSON.stringify({
+            summary: issueData.summary,
+            description: issueData.description,
+            status: issueData.status || '1',
+            priority: issueData.priority || 'Medium',
+            assignee_id: issueData.assignee_id,
+        }),
+        'Issue Created',
+    ];
+
+    await db.query(historyQuery, historyValues);
+    return result;
   },
 
   getIssuesByProject: async (projectIds) => {
@@ -51,20 +75,61 @@ const IssuesModel = {
   },
 
   updateIssue: async (issueId, updateData) => {
+    const currentData = await db.query(
+        'SELECT description, status, priority, assignee_id FROM issues WHERE issue_id = ?',
+        [issueId]
+    );
+
+    if (!currentData) {
+        throw new Error('Issue not found');
+    }
+
+    const oldData = currentData[0];
+
+    // Update the issue
     const query = `
-      UPDATE issues SET summary = ?, description = ?, issue_type_id = ?, status = ?, priority = ?, assignee_id = ?, updated_at = NOW()
-      WHERE issue_id = ?
+        UPDATE issues 
+        SET  description = ?, status = ?, priority = ?, assignee_id = ?, updated_at = NOW()
+        WHERE issue_id = ?
     `;
     const values = [
-      updateData.summary,
-      updateData.description,
-      updateData.issue_type_id,
-      updateData.status,
-      updateData.priority,
-      updateData.assignee_id,
-      issueId,
+        // updateData.summary,
+        updateData.description,
+        // updateData.issue_type_id,
+        updateData.status,
+        updateData.priority,
+        updateData.assignee_id,
+        issueId,
     ];
-    return db.query(query, values);
+    await db.query(query, values);
+
+    // Prepare history insertion
+    const historyQuery = `
+        INSERT INTO issuehistory (issue_id, updated_by, old_value, new_value, field_changed)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    // Define changes to track as separate entries
+    const changes = [
+      { field: 'description', old: oldData.description, new: updateData.description },
+      { field: 'status', old: oldData.status, new: updateData.status },
+      { field: 'priority', old: oldData.priority, new: updateData.priority },
+      { field: 'assignee', old: oldData.assignee_id, new: updateData.assignee_id }
+    ];
+
+    // Insert separate history records for each field change
+    for (const change of changes) {
+      if (change.old !== change.new) {
+          const historyValues = [
+              issueId,
+              updateData.userid, 
+              change.old ? change.old.toString() : null,
+              change.new ? change.new.toString() : null,
+              change.field,
+          ];
+          await db.query(historyQuery, historyValues);
+      }
+    }
   },
 
   deleteIssue: async (issueId) => {

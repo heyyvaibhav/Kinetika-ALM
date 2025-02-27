@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import "./Board.css"
 import { AddTicketModal } from "../AddTicket/AddTicketModal.js"
 import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
@@ -79,10 +79,8 @@ function Board() {
   const getColumns = async () => {
     try {
       const response = await getStatus(`/status`)
-      // console.log(response)
 
       const statuses = response.statuses; // Extract array
-      console.log(statuses);
       setStatusList(statuses);
       if (!Array.isArray(statuses)) {
           throw new Error("Invalid response format");
@@ -107,8 +105,6 @@ function Board() {
             data: { fallbackStatusId: fallbackStatusId }
         });
 
-        console.log("Payload sent:", { fallbackid: fallbackStatusId });
-
         // Remove the column from state
         setColumns((prev) => prev.filter((col) => col.id !== columnId));
 
@@ -131,7 +127,6 @@ function Board() {
   };
 
   const confirmDelete = (columnId) => {
-    console.log(fallbackStatusId);
     if (fallbackStatusId) {
       deleteColumn(columnId, fallbackStatusId);
       setShowModal(false);
@@ -245,7 +240,7 @@ function Board() {
         });
 
         // ✅ **Fix Priority Sorting**
-        const priorityOrder = { high: 1, medium: 2, low: 3 };
+        const priorityOrder = { High: 1, Medium: 2, Low: 3 };
 
         newColumns = newColumns.map((column) => ({
             ...column,
@@ -352,9 +347,15 @@ function Board() {
   }
 
   const getRandomColor = () => {
-    const colors = ["#FF5733", "#3357FF", "#FF33A1", "#FF8C33", "#8C33FF"];
+    const colors = [
+        "#FF5733", "#3357FF", "#FF33A1", "#FF8C33", "#8C33FF",
+        "#33FF57", "#FFC300", "#DAF7A6", "#C70039", "#900C3F",
+        "#581845", "#FF6F61", "#6B5B95", "#88B04B", "#F7CAC9",
+        "#92A8D1", "#955251", "#B565A7", "#009B77", "#DD4132",
+    ];
     return colors[Math.floor(Math.random() * colors.length)];
-  }
+  };
+  const acolor = useMemo(getRandomColor, []);
 
 
   return (
@@ -452,7 +453,7 @@ function Board() {
                     <SortableContext items={column.items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
                       {column.items.map((item) => (
                         <SortableTicket key={item.issue_id} id={item.issue_id}>
-                          <div className="ticket" onClick={() => handleTicketDetail(item)}>
+                          <div className="ticket" onAuxClick={() => handleTicketDetail(item)}>
                             <div style={{ borderBottom: "1px solid #ddd", marginBottom: "10px" }}>
                               <p style={{ marginBottom: "8px" }}>
                                 {" "}
@@ -493,7 +494,7 @@ function Board() {
                               </div>
                               <div 
                                   className="avatar"
-                                  style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
+                                  style={{ backgroundColor: acolor, color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
                               > 
                                   {item.assignee_name && typeof item.assignee_name === "string"
                                   ? item.assignee_name

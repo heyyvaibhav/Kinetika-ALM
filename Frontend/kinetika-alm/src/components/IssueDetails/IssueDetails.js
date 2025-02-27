@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import "./IssueDetails.css"
-import { addComment, getComments, updateIssueStatus, getStatus, getUserList } from "../../Service"
+import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory } from "../../Service"
+import { toast } from "react-toastify"
 
 const IssueDetails = ({ onClose, issue }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(true)
@@ -11,20 +12,28 @@ const IssueDetails = ({ onClose, issue }) => {
   const [description, setDescription] = useState(issue.description)
   const [newComment, setNewComment] = useState("")
   const [comments, setComments] = useState([])
+  const [history, setHistory] = useState([])
   const [statusList, setStatusList] = useState([])
   const [users, setUsers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
+  const userid = localStorage.getItem("userId");
+
   function formatDate(isoString) {
-    const date = new Date(isoString)
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const date = new Date(isoString);
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    const month = monthNames[date.getMonth()]
-    const day = date.getDate()
-    const year = date.getFullYear()
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
 
-    return `${month} ${day}, ${year}`
-  }
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const amPm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM
+
+    return `${month} ${day}, ${year} - ${formattedHours}:${minutes} ${amPm}`;
+}
 
   const getColumns = async () => {
     try {
@@ -42,18 +51,18 @@ const IssueDetails = ({ onClose, issue }) => {
   }
 
   const fetchUsers = async () => {
-      setIsLoading(true)
-      try {
-        const response = await getUserList("/users")
-        const usersArray = Array.isArray(response.data) ? response.data : [response.data]
-        setUsers(usersArray)
-      } catch (error) {
-        console.log(error)
-        setIsLoading(false)
-      } finally {
-        setIsLoading(false)
-      }
+    setIsLoading(true)
+    try {
+      const response = await getUserList("/users")
+      const usersArray = Array.isArray(response.data) ? response.data : [response.data]
+      setUsers(usersArray)
+    } catch (error) {
+      console.error(error)
+      setIsLoading(false)
+    } finally {
+      setIsLoading(false)
     }
+  }
 
   const handleStatusChange = (e) => {
     setStatus(e.target.value)
@@ -66,9 +75,9 @@ const IssueDetails = ({ onClose, issue }) => {
   const data = {
     "description": description,
     "assignee_id": assignee,
-    // reporter,
     "status": status,
     "priority": priority,
+    "userid" : userid,
   }
 
   const saveChanges = async () => {
@@ -93,18 +102,27 @@ const IssueDetails = ({ onClose, issue }) => {
   useEffect(() => {
     fetchUsers();
     getColumns();
-    if (activeTab === "comments") fetchComments();
   }, []); 
 
+  useEffect(() => {
+    if (activeTab === "comments") fetchComments();
+    if (activeTab === "history")  fetchHistory();
+  }, [activeTab]); 
+
   const getRandomColor = () => {
-    const colors = ["#FF5733", "#3357FF", "#FF33A1", "#FF8C33", "#8C33FF"];
+    const colors = [
+        "#FF5733", "#3357FF", "#FF33A1", "#FF8C33", "#8C33FF",
+        "#33FF57", "#FFC300", "#DAF7A6", "#C70039", "#900C3F",
+        "#581845", "#FF6F61", "#6B5B95", "#88B04B", "#F7CAC9",
+        "#92A8D1", "#955251", "#B565A7", "#009B77", "#DD4132"
+    ];
     return colors[Math.floor(Math.random() * colors.length)];
-  }
+  };
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault()
     if (!newComment.trim()) {
-      alert("Comment cannot be empty");
+      toast.warning("Comments can not be empty.")
       return;
     }
   
@@ -114,13 +132,43 @@ const IssueDetails = ({ onClose, issue }) => {
         comment_text: newComment
       });
   
-      console.log("Comment submitted:", response.data);
       setNewComment("");
       fetchComments(); 
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
   }
+
+  const fetchHistory = async () => {
+    try {
+      const response = await getHistory(`/issues/history/issuehistory/${issue.issue_id}`);
+      setHistory(response)
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch history:', error);
+    }
+  }
+
+  function formatTime(isoString) {
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffMs = now - date;
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
+
+    if (diffSeconds < 60) return `${diffSeconds} seconds ago`;
+    if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays < 30) return `${diffDays} days ago`;
+    if (diffMonths < 12) return `${diffMonths} months ago`;
+    
+    return `${diffYears} years ago`;
+}
 
   return (
     <div className="modal-overlay">
@@ -185,24 +233,31 @@ const IssueDetails = ({ onClose, issue }) => {
                     </div>
                   </form>
 
-                  {/* Here you would map through and display existing comments */}
                   <div className="comments-section">
-                    <h3 style={{marginBottom:"10px "}}>Comments</h3>
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
+                      <h3 style={{ marginBottom:"10px" }}>Comments</h3>
+                    </div>
                     {comments.length > 0 ? (
                       comments.map((comment, index) => (
-                        <div key={index} className="comment" style={{marginBottom:"10px"}}>
-                          <div style={{display:"flex", justifyContent:"space-between"}}>
-                            <div style={{display:"flex", justifyContent:"space-between", gap: "6px"}}>
-                              <div className="avatar"> VA </div>
-                              <strong>{comment.username || "Vaibhav"}</strong>
-                            </div>
-
-                            <small>{formatDate(comment.created_at)}</small>
+                        <div key={index} className="comment">
+                          <div 
+                            className="avatar"
+                            style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                          > 
+                            {comment.username && typeof comment.username === "string"
+                            ? comment.username
+                                .split(" ")
+                                .map(word => word.charAt(0).toUpperCase())
+                                .join("")
+                            : ""}
                           </div>
-                          
-                          
-                          <p>{comment.comment_text}</p>
-                         
+                          <div style={{width:"100%"}}>
+                            <div style={{display:"flex", justifyContent:"space-between", gap:"4px",}}>
+                              <strong>{comment.username || "Undefined"}</strong>
+                              <small>{formatTime(comment.created_at)}</small>
+                            </div>
+                            <div><p>{comment.comment_text}</p></div>
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -214,8 +269,55 @@ const IssueDetails = ({ onClose, issue }) => {
 
               {activeTab === "history" && (
                 <div>
-                  
-                  {/* Here you would display more detailed history */}
+                  <div className="history-section">
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
+                      <h3 style={{ marginBottom:"10px" }}>History</h3>
+                    </div>
+
+                    {history.length > 0 ? (
+                      history.map((entry, index) => (
+                        <div key={index} className="history">
+                          <div 
+                            className="avatar"
+                            style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                          > 
+                            {entry.username && typeof entry.username === "string"
+                            ? entry.username
+                                .split(" ")
+                                .map(word => word.charAt(0).toUpperCase())
+                                .join("")
+                            : ""}
+                          </div>
+                          <div style={{width:"100%",  alignItems:"center"}}>
+                            <div style={{display:"flex", justifyContent:"space-between", gap:"4px",}}>
+                              <strong>{entry.username || "Undefined"}</strong>
+                              <small>{formatTime(entry.updated_at)}</small>
+                            </div>
+                            <div>
+                              {
+                              (entry.field_changed === "Comment Added") ? (
+                                <span> Added a comment.</span>
+                              ) : (entry.field_changed === "Issue Created") ? (
+                                <span> Created an issue.</span>
+                              ) : (entry.field_changed === "assignee") ? (
+                                <span> Assigned the issue to <span className="b">{entry.new_value}</span>.</span>
+                              ) : (entry.field_changed === "description") ? (
+                                <span> Updated the issue description.</span>
+                              ) : (entry.field_changed === "priority") ? (
+                                <span> Updated the issue priority from <span className="b">{entry.old_value}</span> to <span className="b">{entry.new_value}</span>.</span>
+                              ) : (entry.field_changed === "status") ? (
+                                <span> Updated the issue status from <span className="b">{statusList.find(s => s.ID == entry.old_value)?.Name || 'Unknown Status'}</span> to <span className="b">{statusList.find(s => s.ID == entry.new_value)?.Name || 'Unknown Status'}</span>.</span>
+                              ) : (
+                                <span> Updated the issue <span className="b">{entry.field_changed}</span> from <span className="b">{entry.old_value}</span> to <span className="b">{entry.new_value}</span></span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No Issue history present.</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -259,9 +361,9 @@ const IssueDetails = ({ onClose, issue }) => {
                   <div className="detail-item">
                     <label>Priority</label>
                     <select className="detail-button" value={priority} onChange={handlePriorityChange}>
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
                     </select>
                   </div>
 
@@ -285,7 +387,7 @@ const IssueDetails = ({ onClose, issue }) => {
                 </div>
               )}
             </div>
-              <div style={{fontSize:"13px", color:"#bfbfbf"}}>
+              <div style={{fontSize:"13px", color:"#bfbfbf", padding:"0 6px"}}>
                 <p>Created On: {formatDate(issue.created_at)}</p>
                 <p>Updated On: {formatDate(issue.updated_at)}</p>
               </div>

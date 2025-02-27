@@ -45,8 +45,6 @@ function List() {
     }
   }
 
-  console.log(status);
-
   const fetchProjects = async () => {
     setIsLoading(true);
     try {

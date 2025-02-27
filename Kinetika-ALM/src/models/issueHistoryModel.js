@@ -8,11 +8,18 @@ class IssueHistoryModel {
   static async getHistoryByIssueId(issueId) {
     try {
       const rows = await dbConfig.query(
-        `SELECT ih.*, u.full_name AS username
-          FROM issuehistory ih
-          LEFT JOIN users u ON ih.updated_by = u.user_id
-          WHERE ih.issue_id = ?
-          ORDER BY ih.updated_at DESC;
+        `SELECT 
+            ih.*,
+            u.full_name AS username,
+            CASE 
+                WHEN ih.field_changed = 'assignee' AND ih.new_value IS NOT NULL 
+                THEN (SELECT full_name FROM users WHERE user_id = ih.new_value) 
+                ELSE ih.new_value 
+            END AS new_value
+        FROM issuehistory ih
+        LEFT JOIN users u ON ih.updated_by = u.user_id
+        WHERE ih.issue_id = ?
+        ORDER BY ih.updated_at DESC
         `,
         [issueId]
       );

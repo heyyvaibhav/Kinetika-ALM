@@ -223,9 +223,9 @@ export function AddTicketModal({ onclose , statusList }) {
               Priority<span className="required">*</span>
             </label>
             <select className="select-input" name="priority">
-              <option>Low</option>
-              <option>Mid</option>
-              <option>High</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
             </select>
           </div>
 
@@ -245,13 +245,13 @@ export function AddTicketModal({ onclose , statusList }) {
             <label>
               Summary<span className="required">*</span>
             </label>
-            <input type="text" maxLength={255} className="text-input" placeholder="Enter summary" name="summary" style={{width:"100%"}} />
+            <input type="text" maxLength={255} className="text-input" placeholder="Enter summary" name="summary" style={{width:"100%"}} required />
           </div>
 
           <div className="form-group">
             <label>Description</label>
             
-              <textarea className="editor-content" maxLength={500} placeholder="Enter the Description" />
+              <textarea className="editor-content" maxLength={500} placeholder="Enter the Description" required/>
             
           </div>
 

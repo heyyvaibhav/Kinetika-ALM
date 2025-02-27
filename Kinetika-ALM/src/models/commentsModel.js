@@ -2,7 +2,6 @@ const db = require('../config/dbConfig');
 
 class CommentsModel {
   static async getCommentsByIssueId(issueId) {
-    console.log(issueId);
     const rows = await db.query(
       `
             SELECT 
@@ -19,7 +18,6 @@ class CommentsModel {
         `,
       [issueId]
     );
-    console.log(rows);
     return rows;
   }
 

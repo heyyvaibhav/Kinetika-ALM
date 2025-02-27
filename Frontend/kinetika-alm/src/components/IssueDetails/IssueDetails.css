@@ -67,7 +67,6 @@
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 24px;
-    margin-top: 20px;
     height: calc(90vh - 100px);
   }
   
@@ -85,8 +84,48 @@
   }
 
   .comments-section {
+    border-radius: 10px;
+    height: 300px;
+    overflow-y: auto;
     text-align: start;
   }
+
+  .comments-section::-webkit-scrollbar {
+    display: none;
+  }
+
+  .history-section{
+    border-radius: 10px;
+    height: 300px;
+    overflow-y: auto;
+    text-align: start;
+  }
+
+  .history-section::-webkit-scrollbar {
+    display: none;
+  }
+
+  .comment {
+    gap: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+
+  .history {
+    gap: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+
+  .b {font-weight: 500;}
   
   .play-button {
     background: none;
@@ -103,7 +142,6 @@
   }
   
   .details-card {
-
     padding: 16px;
     border-radius: 8px;
   }
