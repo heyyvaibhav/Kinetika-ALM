@@ -7,8 +7,13 @@ class IssueHistoryModel {
   // Method to retrieve history by issue ID
   static async getHistoryByIssueId(issueId) {
     try {
-      const [rows] = await dbConfig.execute(
-        'SELECT * FROM issuehistory WHERE issue_id = ? ORDER BY updated_at DESC',
+      const rows = await dbConfig.query(
+        `SELECT ih.*, u.full_name AS username
+          FROM issuehistory ih
+          LEFT JOIN users u ON ih.updated_by = u.user_id
+          WHERE ih.issue_id = ?
+          ORDER BY ih.updated_at DESC;
+        `,
         [issueId]
       );
       return rows;
@@ -21,7 +26,7 @@ class IssueHistoryModel {
   // Method to insert a new history record
   static async insertHistory(issueId, updatedBy, oldValue, newValue, fieldChanged) {
     try {
-      const [result] = await dbConfig.execute(
+      const result = await dbConfig.query(
         'INSERT INTO issuehistory (issue_id, updated_by, old_value, new_value, field_changed) VALUES (?, ?, ?, ?, ?)',
         [issueId, updatedBy, oldValue, newValue, fieldChanged]
       );

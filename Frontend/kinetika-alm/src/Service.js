@@ -285,3 +285,15 @@ export const checkIssuesForStatus = async (endpoint) => {
     errorHandle(error);
   }
 };
+
+export const getHistory = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.get(endpoint);
+    toast.success(response.data.message);
+    // console.log("Response is: ", response);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};

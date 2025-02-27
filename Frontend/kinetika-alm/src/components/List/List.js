@@ -119,7 +119,7 @@ function List() {
     setIssueDetail(false)
     setTicketModal(false)
     setSelectedIssue(null)
-    fetchIssues()
+    fetchIssues(selectedProjects)
   };
 
   const handleTicketDetail = (issue) => {

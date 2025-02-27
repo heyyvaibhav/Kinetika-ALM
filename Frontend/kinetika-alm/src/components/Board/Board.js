@@ -112,7 +112,7 @@ function Board() {
         // Remove the column from state
         setColumns((prev) => prev.filter((col) => col.id !== columnId));
 
-        fetchIssues();
+        fetchIssues(selectedProjects);
     } catch (error) {
         console.error("Error deleting column:", error);
     }
@@ -204,6 +204,7 @@ function Board() {
   }, [])
 
   const fetchIssues = async (projectIds) => {
+    console.log(projectIds);
     if (!projectIds || projectIds.length === 0) {
       toast.warning("No Project IDs provided.")
       setColumns((prevColumns) =>
@@ -295,7 +296,7 @@ function Board() {
     setIssueDetail(false)
     setTicketModal(false)
     setSelectedIssue(null)
-    fetchIssues()
+    fetchIssues(selectedProjects)
   }
   const handleTicketDetail = (issue) => {
     setSelectedIssue(issue)
