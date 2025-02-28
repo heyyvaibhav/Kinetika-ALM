@@ -10,9 +10,12 @@ import ProjectList from './components/ProjectList/ProjectList.js';
 import Login from "./components/Login/Login.js";
 import ProtectedRoute from "./components/ProtectedRoutes.js";
 import MainPage from "./components/MainPage/MainPage.js";
-import Forgot_Password from "./components/Forgot_Password/Forgot_Password.js";
-// import Password_Recovery from "./components/Password_Recovery/Password_Recovery.js";
+import DetailsFull from "./components/IssueDetails/DetailsFull.js";
 import { ToastContainer } from "react-toastify";
+
+const Forgot_Password = React.lazy(() =>
+  import("./components/Forgot_Password/Forgot_Password.js")
+);
 const Password_Recovery = React.lazy(() =>
   import("./components/Password_Recovery/Password_Recovery.js")
 );
@@ -80,6 +83,7 @@ function App() {
                  />
                 <Route path="project" element={<Project />} />
                 <Route path="project-list" element={<ProjectList />} />
+                <Route path="browse/:issuekey" element={<DetailsFull />} />
               </Route>
             </Routes>
           </div>

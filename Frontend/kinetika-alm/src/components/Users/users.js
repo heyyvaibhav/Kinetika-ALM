@@ -8,9 +8,13 @@ import AddUser from "../AddUser/AddUser"
 
 const Users = () => {
   const [users, setUsers] = useState([])
+  const [filteredUsers, setFilteredUsers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [sortOrder, setSortOrder] = useState("asc")
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -32,6 +36,10 @@ const Users = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  useEffect(() => {
+    handleSearchAndFilter()
+  }, [users, searchTerm, sortOrder])
+
   const fetchUsers = async () => {
     try {
       const response = await getUserList("/users")
@@ -44,13 +52,32 @@ const Users = () => {
     }
   }
 
+  const handleSearchAndFilter = () => {
+    let filtered = [...users]
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (UserType.find(u => u.value === user.role)?.type || "").toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+    filtered.sort((a, b) =>
+      sortOrder === "asc" ? a.full_name.localeCompare(b.full_name) : b.full_name.localeCompare(a.full_name)
+    )
+    setFilteredUsers(filtered)
+  }
+
   const handleAddUser = () => {
     setIsModalOpen(true)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    fetchUsers();
+    fetchUsers()
+  }
+
+  const handleFilter = () => {
+    setIsFilterModalOpen(true)
   }
 
   return (
@@ -60,8 +87,13 @@ const Users = () => {
         <button onClick={handleAddUser}>Add User</button>
       </div>
 
-      <SearchContainer />
-      
+      <SearchContainer
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        setSortOrder={setSortOrder}
+        handleFilter={handleFilter}
+      />
+
       <table>
         <thead>
           <tr>
@@ -73,7 +105,7 @@ const Users = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <tr key={user.user_id}>
               <td>
                 <div className="name-cell">
@@ -126,11 +158,16 @@ const Users = () => {
       {isLoading && <Loading show={isLoading} /> }
 
       {isModalOpen && <AddUser isOpen={isModalOpen} onClose={handleCloseModal} />}
-    </div>
 
-   
+      {isFilterModalOpen && (
+        <div className="filter-modal">
+          <h3>Filter Options</h3>
+          <button onClick={() => setIsFilterModalOpen(false)}>Close</button>
+          {/* Add filter form components here */}
+        </div>
+      )}
+    </div>
   )
 }
 
 export default Users
-

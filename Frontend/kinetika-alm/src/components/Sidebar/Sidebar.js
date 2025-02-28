@@ -40,7 +40,7 @@ function Sidebar({ open, closeMenu }) {
       </nav>
     </div>
 
-      <nav style={{paddingRight:"20px", paddingLeft:"0"}}>
+      <nav style={{ width:"230px" }}>
         <div onClick={logout} className="logout">
           <img src='/logout.svg' style={{ width: "24px", height: "24px", marginLeft:"-0.2em", marginRight: "0.8em"}} />
           Logout

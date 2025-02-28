@@ -452,7 +452,7 @@ function Board() {
                     <SortableContext items={column.items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
                       {column.items.map((item) => (
                         <SortableTicket key={item.issue_id} id={item.issue_id}>
-                          <div className="ticket" onAuxClick={() => handleTicketDetail(item)}>
+                          <div className="ticket" onClick={() => handleTicketDetail(item)}>
                             <div style={{ borderBottom: "1px solid #ddd", marginBottom: "10px" }}>
                               <p style={{ marginBottom: "8px" }}>
                                 {" "}

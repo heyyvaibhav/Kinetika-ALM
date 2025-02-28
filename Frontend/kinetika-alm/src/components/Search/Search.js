@@ -1,14 +1,8 @@
 import React, { useState } from "react"
 import "./SearchContainer.css"
 
-const SearchContainer = () => {
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value)
-    // Implement search logic here
-  }
-
+const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter }) => {
+  
   return (
         <div className="controls">
             <div className="search-container" style={{ width: '100%' }}>
@@ -17,7 +11,7 @@ const SearchContainer = () => {
                 type="text"
                 placeholder="Search"
                 value={searchTerm}
-                onChange={handleSearch}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
               />
             </div>
@@ -25,7 +19,7 @@ const SearchContainer = () => {
                 <div className="mt-2 control-buttons">
                 <button
                     className="control-btn"
-                    // onClick={() => handleSort("name")}
+                    onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
                 >
                     <span className="btn-text">
                     <img src="/sort.svg" style={{ width:"24px", height:"24px" }} alt="sorticon" />
@@ -34,7 +28,7 @@ const SearchContainer = () => {
                 </button>
                 <button
                     className="control-btn"
-                    // onClick={() => setIsFilterButtonModalOpen(true)}
+                    onClick={handleFilter}
                 >
                     <span className="btn-text">
                     <img
