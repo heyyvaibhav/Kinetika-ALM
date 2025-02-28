@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import "./IssueDetails.css"
 import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory } from "../../Service"
 import { toast } from "react-toastify"
+import { useNavigate } from "react-router-dom";
 
 const IssueDetails = ({ onClose, issue }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(true)
@@ -17,6 +18,7 @@ const IssueDetails = ({ onClose, issue }) => {
   const [users, setUsers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
+  const navigate = useNavigate();
   const userid = localStorage.getItem("userId");
 
   function formatDate(isoString) {
@@ -33,7 +35,7 @@ const IssueDetails = ({ onClose, issue }) => {
     const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM
 
     return `${month} ${day}, ${year} - ${formattedHours}:${minutes} ${amPm}`;
-}
+  }
 
   const getColumns = async () => {
     try {
@@ -107,7 +109,7 @@ const IssueDetails = ({ onClose, issue }) => {
   useEffect(() => {
     if (activeTab === "comments") fetchComments();
     if (activeTab === "history")  fetchHistory();
-  }, [activeTab]); 
+  }, [activeTab]);
 
   const getRandomColor = () => {
     const colors = [
@@ -149,6 +151,10 @@ const IssueDetails = ({ onClose, issue }) => {
     }
   }
 
+  const handlePageBrowse = ( issue ) => {
+    navigate(`/main/browse/${issue.issue_key}`, { state: { issue } });
+  }
+
   function formatTime(isoString) {
     const date = new Date(isoString);
     const now = new Date();
@@ -175,7 +181,7 @@ const IssueDetails = ({ onClose, issue }) => {
       <div className="modal-container">
         <div className="modal-header">
           <div className="header-left">
-            <span className="issue-tag">{issue.issue_key}</span>
+            <span className="issue-tag" onClick={() => handlePageBrowse(issue)}>{issue.issue_key}</span>
             <h2 className="modal-title">{issue.summary}</h2>
           </div>
           <div className="header-right">
