@@ -128,7 +128,7 @@ const IssueDetails = ({ onClose, issue }) => {
   
     try {
       const response = await addComment(`/issues/comments/${issue.issue_id}/comments`, {
-        user_id: 1,
+        user_id: userid,
         comment_text: newComment
       });
   

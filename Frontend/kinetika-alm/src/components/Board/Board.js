@@ -36,44 +36,44 @@ function Board() {
   )
 
   const handleDragEnd = (event) => {
-    const { active, over } = event
+    // const { active, over } = event
 
-    if (!over) return
+    // if (!over) return
 
-    const activeId = active.id
-    const overId = over.id
+    // const activeId = active.id
+    // const overId = over.id
 
-    // Find the source and destination columns
-    const sourceColumn = columns.find((col) => col.items.some((item) => item.id === activeId))
-    const destColumn = columns.find((col) => col.id === overId)
+    // // Find the source and destination columns
+    // const sourceColumn = columns.find((col) => col.items.some((item) => item.id === activeId))
+    // const destColumn = columns.find((col) => col.id === overId)
 
-    if (sourceColumn && destColumn) {
-      setColumns((prevColumns) => {
-        const newColumns = prevColumns.map((col) => {
-          if (col.id === sourceColumn.id) {
-            return {
-              ...col,
-              items: col.items.filter((item) => item.id !== activeId),
-            }
-          }
-          if (col.id === destColumn.id) {
-            return {
-              ...col,
-              items: [...col.items, sourceColumn.items.find((item) => item.id === activeId)],
-            }
-          }
-          return col
-        })
-        return newColumns
-      })
-    } else if (active.id !== over.id) {
-      // Handle column reordering
-      setColumns((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
-        return arrayMove(items, oldIndex, newIndex)
-      })
-    }
+    // if (sourceColumn && destColumn) {
+    //   setColumns((prevColumns) => {
+    //     const newColumns = prevColumns.map((col) => {
+    //       if (col.id === sourceColumn.id) {
+    //         return {
+    //           ...col,
+    //           items: col.items.filter((item) => item.id !== activeId),
+    //         }
+    //       }
+    //       if (col.id === destColumn.id) {
+    //         return {
+    //           ...col,
+    //           items: [...col.items, sourceColumn.items.find((item) => item.id === activeId)],
+    //         }
+    //       }
+    //       return col
+    //     })
+    //     return newColumns
+    //   })
+    // } else if (active.id !== over.id) {
+    //   // Handle column reordering
+    //   setColumns((items) => {
+    //     const oldIndex = items.findIndex((item) => item.id === active.id)
+    //     const newIndex = items.findIndex((item) => item.id === over.id)
+    //     return arrayMove(items, oldIndex, newIndex)
+    //   })
+    // }
   }
 
   const getColumns = async () => {
@@ -199,8 +199,7 @@ function Board() {
   }, [])
 
   const fetchIssues = async (projectIds) => {
-    console.log(projectIds);
-    if (!projectIds || projectIds.length === 0) {
+    if ((!projectIds || projectIds.length === 0) || !selectedProjects) {
       toast.warning("No Project IDs provided.")
       setColumns((prevColumns) =>
           prevColumns.map((col) => ({ ...col, items: [] }))
@@ -291,7 +290,7 @@ function Board() {
     setIssueDetail(false)
     setTicketModal(false)
     setSelectedIssue(null)
-    fetchIssues(selectedProjects)
+    if (selectedProjects && selectedProjects.length > 0) fetchIssues(selectedProjects);
   }
   const handleTicketDetail = (issue) => {
     setSelectedIssue(issue)
@@ -355,7 +354,7 @@ function Board() {
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
-  const acolor = useMemo(getRandomColor, []);
+  // const acolor = useMemo(getRandomColor, []);
 
 
   return (
@@ -494,7 +493,7 @@ function Board() {
                               </div>
                               <div 
                                   className="avatar"
-                                  style={{ backgroundColor: acolor, color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
+                                  style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
                               > 
                                   {item.assignee_name && typeof item.assignee_name === "string"
                                   ? item.assignee_name

@@ -132,7 +132,30 @@ export function AddTicketModal({ onclose , statusList }) {
     widgetsRef.current.open();
   };
 
+  const handleAssignToMe = () => {
+    const assigneeSelect = document.querySelector('select[name="Assignee"]');
+    if (assigneeSelect) {
+      assigneeSelect.value = userid;
+      assigneeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+
   const handleSave = async () => {
+    const requiredFields = document.querySelectorAll('[required]');
+    let allValid = true;
+
+    requiredFields.forEach((field) => {
+        if (!field.value.trim()) {
+            field.classList.add('invalid-field');
+            toast.error(`Please fill the ${field.name} field.`);
+            allValid = false;
+        } else {
+            field.classList.remove('invalid-field');
+        }
+    });
+
+    if (!allValid) return;
+
     try {
       setIsLoading(true)
       const formData = new FormData()
@@ -140,11 +163,11 @@ export function AddTicketModal({ onclose , statusList }) {
       // Append ticket data to formData
       formData.append("project_id", document.querySelector('select[name="project"]').value)
       formData.append("issue_type_id", document.querySelector('select[name="issueType"]').value)
-      formData.append("priority", document.querySelector('select[name="priority"]').value)
-      formData.append("status", document.querySelector('select[name="status"]').value)
-      formData.append("summary", document.querySelector('input[name="summary"]').value)
+      formData.append("priority", document.querySelector('select[name="Priority"]').value)
+      formData.append("status", document.querySelector('select[name="Status"]').value)
+      formData.append("summary", document.querySelector('input[name="Summary"]').value)
       formData.append("description", document.querySelector(".editor-content").value)
-      formData.append("assignee_id", document.querySelector('select[name="assignee"]').value)
+      formData.append("assignee_id", document.querySelector('select[name="Assignee"]').value)
       formData.append("team", document.querySelector('select[name="team"]').value)
       formData.append("reporter_id", userid)
       formData.append("flagged", flagged ? 1 : 0)
@@ -222,7 +245,7 @@ export function AddTicketModal({ onclose , statusList }) {
             <label>
               Priority<span className="required">*</span>
             </label>
-            <select className="select-input" name="priority">
+            <select className="select-input" name="Priority">
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
@@ -231,7 +254,7 @@ export function AddTicketModal({ onclose , statusList }) {
 
           <div className="form-group">
             <label>Status</label>
-            <select className="select-input" defaultValue="1" name="status">
+            <select className="select-input" defaultValue="1" name="Status">
             {statusList.map((status) => (
               <option key={status.ID} value={status.ID}>
                 {status.Name}
@@ -245,19 +268,19 @@ export function AddTicketModal({ onclose , statusList }) {
             <label>
               Summary<span className="required">*</span>
             </label>
-            <input type="text" maxLength={255} className="text-input" placeholder="Enter summary" name="summary" style={{width:"100%"}} required />
+            <input type="text" maxLength={255} className="text-input" placeholder="Enter summary" name="Summary" style={{width:"100%"}} required />
           </div>
 
           <div className="form-group">
-            <label>Description</label>
+            <label>Description<span className="required">*</span></label>
             
-              <textarea className="editor-content" maxLength={500} placeholder="Enter the Description" required/>
+              <textarea name="Description" className="editor-content" maxLength={500} placeholder="Enter the Description" required/>
             
           </div>
 
           <div className="form-group">
-            <label>Assignee</label>
-            <select className="select-input" name="assignee">
+            <label>Assignee<span className="required">*</span></label>
+            <select className="select-input" name="Assignee" required>
               <option value="">Select assignee</option>
               {users.map(user => (
                 <option key={user.user_id} value={user.user_id}>
@@ -265,7 +288,7 @@ export function AddTicketModal({ onclose , statusList }) {
                 </option>
               ))}
             </select>
-            <span>Assign to me</span>
+            <strong className="assign-to-me" onClick={handleAssignToMe} style={{cursor: 'pointer', color: 'blue', margin:"0 8px"}}>Assign to me</strong>
           </div>
 
           <div className="form-group">

@@ -64,7 +64,7 @@ function List() {
   };
 
   const fetchIssues = async (projectIds) => {
-    if (!projectIds || projectIds.length === 0) {
+    if ((!projectIds || projectIds.length === 0) || !selectedProjects) {
       toast.warning("No Project IDs provided.")
       setTickets([]);
       return;
@@ -73,7 +73,7 @@ function List() {
       setIsLoading(true);
       try {
           const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}`);
-          console.log("Project Issues:", response.issues);
+          // console.log("Project Issues:", response.issues);
   
             response.issues.forEach((issue) => {
               const issueId = issue.issue_id;
@@ -89,7 +89,7 @@ function List() {
   };
 
   const handleSelect = async (selectedOption) => {
-    console.log("Selected Project:", selectedOption);
+    // console.log("Selected Project:", selectedOption);
     setIsLoading(true);
 
     try {
@@ -117,7 +117,7 @@ function List() {
     setIssueDetail(false)
     setTicketModal(false)
     setSelectedIssue(null)
-    fetchIssues(selectedProjects)
+    if (selectedProjects && selectedProjects.length > 0) fetchIssues(selectedProjects);
   };
 
   const handleTicketDetail = (issue) => {
