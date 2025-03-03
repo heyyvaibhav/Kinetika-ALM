@@ -274,7 +274,6 @@ const DetailsFull = () => {
                         onChange={(text) => setNewComment(text)}
                         className="form-control"
                       />
-                      <p>Preview: {newComment}</p> {/* Debugging output */}
                       <div style={{textAlign:"right", paddingTop:"10px"}}><button onClick={handleCommentSubmit}>Add Comment</button></div>
                     </div>
                   </form>
