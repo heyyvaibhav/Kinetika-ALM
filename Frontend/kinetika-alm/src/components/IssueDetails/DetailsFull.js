@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import './DetailsFull.css';
 import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory } from "../../Service"
 import { toast } from "react-toastify"
-
+import RichTextEditor from "../Templates/TextEditor"
 
 const DetailsFull = ( issue ) => {
     console.log(issue);
@@ -209,238 +209,236 @@ const DetailsFull = ( issue ) => {
     <div className="detail-background">
       <div className="detail-header">
         <h2>Issue Details - {issue.issue_key}</h2>
-        {/* <button onClick={handleAddTicket}>Create</button> */}
+        <button onClick={saveChanges}>Save</button>
       </div>
-      <div>
-        <div className="flex items-center gap-2">
-          <span
-            className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium cursor-pointer hover:bg-blue-200 transition-colors"
-          >
-            {issue.issue_key}
-          </span>
-          
-        </div>
-        
-      </div>
-
-      <div className="grid md:grid-cols-[1fr_300px] gap-6 p-6">
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <h3 className="font-medium">Description</h3>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[120px] font-sans"
-              maxLength={500}
-            />
-            <div className="flex justify-end">
-              <button onClick={saveChanges}>Save</button>
+      <div style={{display:"flex"}}>
+        <div className="detail-body" style={{width:"65%",  padding:"0 20px"}}>
+          <div className="space-y-6">
+            <div className="form-group">
+              <h3 style={{marginBottom:"10px"}}>Description</h3>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="form-control"
+                maxLength={500}
+                placeholder="Enter the description"
+                style={{ height:"100px"}}
+              />
             </div>
-          </div>
 
-          <div defaultValue="comments" value={activeTab} onValueChange={setActiveTab}>
-              <button value="comments" className="flex-1">
+            <div className="tabs" style={{ width:"80%", justifyContent:"space-between", background:"#F1F5F9", padding:"4px 8px", borderRadius:"10px",marginBottom:"20px"}}>
+              <button
+                className={`tab ${activeTab === "comments" ? "active" : ""}`}
+                onClick={() => setActiveTab("comments")}
+                style={{ color:"#000", width:"33%", marginLeft:"0.5%"}}
+              >
                 Comments
               </button>
-              <button value="history" className="flex-1">
+              <button
+                className={`tab ${activeTab === "history" ? "active" : ""}`}
+                onClick={() => setActiveTab("history")}
+                style={{ color:"#000", width:"33%",}}
+              >
                 History
               </button>
-
-            <div value="comments" className="space-y-4 mt-4">
-              <form onSubmit={handleCommentSubmit} className="space-y-2">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add a comment"
-                  className="min-h-[120px] font-sans"
-                  maxLength={500}
-                />
-                <div className="flex justify-end">
-                  <button type="submit">Add Comment</button>
-                </div>
-              </form>
-
-              <div className="space-y-4 mt-6">
-                <h3 className="font-medium sticky top-0 bg-white py-2 z-10">Comments</h3>
-                {comments.length > 0 ? (
-                  comments.map((comment, index) => (
-                    <div key={index} className="flex gap-3 pb-4 border-b">
-                      <div
-                        className="flex items-center justify-center h-9 w-9 rounded-full text-white font-bold text-sm flex-shrink-0"
-                        style={{ backgroundColor: getRandomColor() }}
-                      >
-                        {comment.username && typeof comment.username === "string"
-                          ? comment.username
-                              .split(" ")
-                              .map((word) => word.charAt(0).toUpperCase())
-                              .join("")
-                          : ""}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="font-medium">{comment.username || "Undefined"}</span>
-                          <span className="text-xs text-gray-500">{formatTime(comment.created_at)}</span>
-                        </div>
-                        <p className="text-gray-700">{comment.comment_text}</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center py-4">No comments yet. Be the first to add one!</p>
-                )}
-              </div>
+              <button
+                className={`tab ${activeTab === "attachments" ? "active" : ""}`}
+                onClick={() => setActiveTab("attachments")}
+                style={{ color:"#000", width:"33%", }}
+              >
+                Attachments
+              </button>
             </div>
 
-            <div value="history" className="space-y-4 mt-4">
-              <div className="space-y-4">
-                <h3 className="font-medium sticky top-0 bg-white py-2 z-10">History</h3>
-                {history.length > 0 ? (
-                  history.map((entry, index) => (
-                    <div key={index} className="flex gap-3 pb-4 border-b">
-                      <div
-                        className="flex items-center justify-center h-9 w-9 rounded-full text-white font-bold text-sm flex-shrink-0"
-                        style={{ backgroundColor: getRandomColor() }}
-                      >
-                        {entry.username && typeof entry.username === "string"
-                          ? entry.username
-                              .split(" ")
-                              .map((word) => word.charAt(0).toUpperCase())
-                              .join("")
-                          : ""}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="font-medium">{entry.username || "Undefined"}</span>
-                          <span className="text-xs text-gray-500">{formatTime(entry.updated_at)}</span>
-                        </div>
-                        <div className="text-gray-700">
-                          {entry.field_changed === "Comment Added" ? (
-                            <span> Added a comment.</span>
-                          ) : entry.field_changed === "Issue Created" ? (
-                            <span> Created an issue.</span>
-                          ) : entry.field_changed === "assignee" ? (
-                            <span>
-                              {" "}
-                              Assigned the issue to <span className="font-medium">{entry.new_value}</span>.
-                            </span>
-                          ) : entry.field_changed === "description" ? (
-                            <span> Updated the issue description.</span>
-                          ) : entry.field_changed === "priority" ? (
-                            <span>
-                              {" "}
-                              Updated the issue priority from <span className="font-medium">{entry.old_value}</span> to{" "}
-                              <span className="font-medium">{entry.new_value}</span>.
-                            </span>
-                          ) : entry.field_changed === "status" ? (
-                            <span>
-                              {" "}
-                              Updated the issue status from{" "}
-                              <span className="font-medium">
-                                {statusList.find((s) => s.ID == entry.old_value)?.Name || "Unknown Status"}
-                              </span>{" "}
-                              to{" "}
-                              <span className="font-medium">
-                                {statusList.find((s) => s.ID == entry.new_value)?.Name || "Unknown Status"}
-                              </span>
-                              .
-                            </span>
-                          ) : (
-                            <span>
-                              {" "}
-                              Updated the issue <span className="font-medium">{entry.field_changed}</span> from{" "}
-                              <span className="font-medium">{entry.old_value}</span> to{" "}
-                              <span className="font-medium">{entry.new_value}</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
+            <div className="tab-content" style={{textAlign: "center"}}>
+              {activeTab === "comments" && (
+                <div>
+                  <form onSubmit={handleCommentSubmit}>
+                    <div className="form-group">
+                      {/* <textarea
+                        resize="none"
+                        style={{ height:"80px", fontFamily:"sans-serif"}}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Add a comment"
+                        rows="3"
+                        maxLength={500}
+                        className="form-control"
+                      /> */}
+
+                      <RichTextEditor 
+                        style={{ height:"80px", fontFamily:"sans-serif"}}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        className="form-control"
+                      />
+                      <div style={{textAlign:"right", paddingTop:"10px"}}><button type="submit">Add Comment</button></div>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center py-4">No issue history present.</p>
-                )}
-              </div>
+                  </form>
+
+                  <div className="comments-section">
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
+                      <h3 style={{ marginBottom:"10px" }}>Comments</h3>
+                    </div>
+                    {comments.length > 0 ? (
+                      comments.map((comment, index) => (
+                        <div key={index} className="comment">
+                          <div 
+                            className="avatar"
+                            style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                          > 
+                            {comment.username && typeof comment.username === "string"
+                            ? comment.username
+                                .split(" ")
+                                .map(word => word.charAt(0).toUpperCase())
+                                .join("")
+                            : ""}
+                          </div>
+                          <div style={{width:"100%"}}>
+                            <div style={{display:"flex", justifyContent:"space-between", gap:"4px",}}>
+                              <strong>{comment.username || "Undefined"}</strong>
+                              <small>{formatTime(comment.created_at)}</small>
+                            </div>
+                            <div><p>{comment.comment_text}</p></div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No comments yet. Be the first to add one!</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "history" && (
+                <div>
+                  <div className="history-section">
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
+                      <h3 style={{ marginBottom:"10px" }}>History</h3>
+                    </div>
+
+                    {history.length > 0 ? (
+                      history.map((entry, index) => (
+                        <div key={index} className="history">
+                          <div 
+                            className="avatar"
+                            style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                          > 
+                            {entry.username && typeof entry.username === "string"
+                            ? entry.username
+                                .split(" ")
+                                .map(word => word.charAt(0).toUpperCase())
+                                .join("")
+                            : ""}
+                          </div>
+                          <div style={{width:"100%",  alignItems:"center"}}>
+                            <div style={{display:"flex", justifyContent:"space-between", gap:"4px",}}>
+                              <strong>{entry.username || "Undefined"}</strong>
+                              <small>{formatTime(entry.updated_at)}</small>
+                            </div>
+                            <div>
+                              {
+                              (entry.field_changed === "Comment Added") ? (
+                                <span> Added a comment.</span>
+                              ) : (entry.field_changed === "Issue Created") ? (
+                                <span> Created an issue.</span>
+                              ) : (entry.field_changed === "assignee") ? (
+                                <span> Assigned the issue to <span className="b">{entry.new_value}</span>.</span>
+                              ) : (entry.field_changed === "description") ? (
+                                <span> Updated the issue description.</span>
+                              ) : (entry.field_changed === "priority") ? (
+                                <span> Updated the issue priority from <span className="b">{entry.old_value}</span> to <span className="b">{entry.new_value}</span>.</span>
+                              ) : (entry.field_changed === "status") ? (
+                                <span> Updated the issue status from <span className="b">{statusList.find(s => s.ID == entry.old_value)?.Name || 'Unknown Status'}</span> to <span className="b">{statusList.find(s => s.ID == entry.new_value)?.Name || 'Unknown Status'}</span>.</span>
+                              ) : (
+                                <span> Updated the issue <span className="b">{entry.field_changed}</span> from <span className="b">{entry.old_value}</span> to <span className="b">{entry.new_value}</span></span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No Issue history present.</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
-
-        <div className="space-y-4">
-
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium">Details</h3>
-                <button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-                  className="p-0 h-auto"
-                >
-                  {/* <ChevronDown className={`h-5 w-5 transition-transform ${isDetailsOpen ? "rotate-180" : ""}`} /> */}
-                </button>
-              </div>
+        
+        <div style={{width:"35%", padding:"0 20px"}}>
+          <div className="details-section">
+            <div className="details-collapsible">
+              <button className="collapsible-header" onClick={() => setIsDetailsOpen(!isDetailsOpen)}>
+                <i className={`fas fa-chevron-down ${isDetailsOpen ? "rotate" : ""}`}></i>
+                <h3>Details</h3>
+              </button>
 
               {isDetailsOpen && (
-                <div className="space-y-4 pt-2">
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-500">Assignee</label>
-                    <select value={assignee} onValueChange={handleAssigneeChange} placeholder="Select assignee">
-                        {users.map((user) => (
-                          <option key={user.user_id} value={user.user_id}>
-                            {user.full_name}
-                          </option>
-                        ))}
+                <div className="collapsible-content">
+                  <div className="detail-item">
+                    <label>Assignee</label>
+                    <select className="detail-button" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
+                    {users.map(user => (
+                      <option key={user.user_id} value={user.user_id}>
+                        {user.full_name}
+                      </option>
+                    ))}
                     </select>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-500">Status</label>
-                    <select value={status} onValueChange={handleStatusChange}>
-                      
-                        {statusList.map((option) => (
-                          <option key={option.ID} value={option.ID}>
-                            {option.Name}
-                          </option>
-                        ))}
-                     
+                  <div className="detail-item">
+                    <label>Status</label>
+                    <select 
+                      className="detail-button" 
+                      value={status} 
+                      onChange={handleStatusChange}
+                    >
+                      {statusList.map((option) => (
+                        <option key={option.ID} value={option.ID}>
+                          {option.Name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-500">Priority</label>
-                    <select value={priority} onValueChange={handlePriorityChange}>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
+                  <div className="detail-item">
+                    <label>Priority</label>
+                    <select className="detail-button" value={priority} onChange={handlePriorityChange}>
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
                     </select>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-500">Reporter</label>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="flex items-center justify-center h-9 w-9 rounded-full text-white font-bold text-sm"
-                        style={{ backgroundColor: getRandomColor() }}
-                      >
+                  <div className="detail-item">
+                    <label>Reporter</label>
+                    <div className="reporter-info">
+                      <div 
+                        className="avatar"
+                        style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
+                      > 
                         {issue.reporter_name && typeof issue.reporter_name === "string"
-                          ? issue.reporter_name
-                              .split(" ")
-                              .map((word) => word.charAt(0).toUpperCase())
-                              .join("")
-                          : ""}
+                        ? issue.reporter_name
+                            .split(" ")
+                            .map(word => word.charAt(0).toUpperCase()) // Extracts and capitalizes initials
+                            .join("")
+                        : ""}
                       </div>
                       <span>{issue.reporter_name}</span>
                     </div>
                   </div>
                 </div>
               )}
-
-          </div>
-
-          <div className="text-xs text-gray-400 px-1 space-y-1">
-            <p>Created On: {formatDate(issue.created_at)}</p>
-            <p>Updated On: {formatDate(issue.updated_at)}</p>
+            </div>
+              <div style={{fontSize:"13px", color:"#bfbfbf", padding:"0 6px"}}>
+                <p>Created On: {formatDate(issue.created_at)}</p>
+                <p>Updated On: {formatDate(issue.updated_at)}</p>
+              </div>
           </div>
         </div>
+          
       </div>
     </div>
   )

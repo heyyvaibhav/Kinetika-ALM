@@ -174,7 +174,7 @@ const IssueDetails = ({ onClose, issue }) => {
     if (diffMonths < 12) return `${diffMonths} months ago`;
     
     return `${diffYears} years ago`;
-}
+  }
 
   return (
     <div className="modal-overlay">
@@ -227,6 +227,7 @@ const IssueDetails = ({ onClose, issue }) => {
                   <form onSubmit={handleCommentSubmit}>
                     <div className="form-group">
                       <textarea
+                        className="form-control"
                         resize="none"
                         style={{width:"100%", height:"80px", fontFamily:"sans-serif"}}
                         value={newComment}
@@ -235,7 +236,7 @@ const IssueDetails = ({ onClose, issue }) => {
                         rows="3"
                         maxLength={500}
                       />
-                      <div style={{textAlign:"right"}}><button type="submit">Add Comment</button></div>
+                      <div style={{textAlign:"right", marginTop:"10px"}}><button type="submit">Add Comment</button></div>
                     </div>
                   </form>
 

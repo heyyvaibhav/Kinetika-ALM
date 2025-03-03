@@ -18,3 +18,77 @@
     align-items: center;
     z-index: 10;
 }
+
+.details-collapsible {
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+  }
+  
+  .collapsible-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    background-color: #6b778c;
+  }
+  
+  .collapsible-header h3 {
+    margin: 0;
+  }
+  
+  .collapsible-header i.rotate {
+    transform: rotate(180deg);
+  }
+  
+  .collapsible-content {
+    padding: 16px;
+  }
+
+  .detail-item {
+    margin-bottom: 16px;
+  }
+  
+  .detail-item label {
+    display: block;
+    font-size: 14px;
+    color: #6b778c;
+    margin-bottom: 4px;
+  }
+
+  .tab {
+    border-radius: 10px;
+    background: transparent;
+  }
+
+  .tab:hover{
+    background-color: #eee;
+  }
+
+  .tab.active {
+    background-color: #fff !important;
+    border-radius: 10px;
+    box-shadow: 0px 2px 6px #D7DBDF;
+    font-weight: 700;
+  }
+
+  .detail-button {
+    width: 100%;
+    text-align: left;
+    padding: 8px;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: black;
+  }
+  
+  .detail-button:hover {
+    background-color: #f4f5f7;
+  }
