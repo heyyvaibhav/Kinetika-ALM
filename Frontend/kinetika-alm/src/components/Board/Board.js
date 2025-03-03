@@ -131,18 +131,16 @@ function Board() {
       deleteColumn(columnId, fallbackStatusId);
       setShowModal(false);
       setDeleteColumn("");
-    } // else {
-    //   alert("Please select a fallback status!");
-    // }
+    }
   };
 
   const addNewColumn = async () => {
     if (!newColumnTitle.trim()) {
-      alert("Column title cannot be empty!")
+      toast.warning("Column title cannot be empty!")
       return
     }
     if (columns.length >= 10) {
-      alert("You can't add more than 10 columns!")
+      toast.error("You can't add more than 10 columns!")
       return
     }
 
@@ -526,6 +524,7 @@ function Board() {
                 value={newColumnTitle}
                 onChange={(e) => setNewColumnTitle(e.target.value)}
                 placeholder="New column title"
+                className="form-control"
               />
               <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
                 <button onClick={addNewColumn}>

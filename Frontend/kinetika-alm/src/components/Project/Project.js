@@ -83,6 +83,7 @@ export default function ProjectForm() {
                 Name<span className="required-field">*</span>
               </label>
               <input
+                className="form-control"
                 id="name"
                 name="name"
                 value={formData.name}
@@ -105,6 +106,7 @@ export default function ProjectForm() {
                 <span className="required-field">*</span>
               </label>
               <input
+                className="form-control"
                 id="key"
                 name="key"
                 value={formData.key}
@@ -121,6 +123,7 @@ export default function ProjectForm() {
                 <span className="required-field">*</span>
               </label>
               <textarea
+                className="form-control"
                 id="description"
                 name="description"
                 value={formData.description}

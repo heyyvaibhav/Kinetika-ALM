@@ -101,22 +101,6 @@
     font-weight: 500;
   }
   
-  .select-input,
-  .text-input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.875rem;
-  }
-  
-  .select-input:focus,
-  .text-input:focus {
-    outline: none;
-    border-color: #4c9aff;
-    box-shadow: 0 0 0 2px rgba(76, 154, 255, 0.2);
-  }
-  
   .help-link {
     display: block;
     color: #0052cc;

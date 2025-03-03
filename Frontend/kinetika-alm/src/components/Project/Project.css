@@ -45,14 +45,11 @@
     font-weight: 650;
   }
   .form-group input {
-    height: 36px;
-    width: 300px;
     border-radius: 8px;
     border: 1px solid #ddd;
     padding: 8px 16px;
   }
   .form-group textarea {
-    width: 300px;
     border-radius: 8px;
     border: 1px solid #ddd;
     padding: 8px 16px;

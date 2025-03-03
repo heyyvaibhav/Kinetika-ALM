@@ -209,7 +209,7 @@ export function AddTicketModal({ onclose , statusList }) {
               <label>
                   Project<span className="required">*</span>
               </label>
-              <select className="select-input" name="project" defaultValue="" required>
+              <select className="form-control" name="project" defaultValue="" required>
                   <option disabled>Select a Project</option>
                   {isLoading ? (
                       <option>Loading...</option>
@@ -231,7 +231,7 @@ export function AddTicketModal({ onclose , statusList }) {
             <label>
               Issue Type<span className="required">*</span>
             </label>
-            <select className="select-input" name="issueType" required>
+            <select className="form-control" name="issueType" required>
             <option value="" disabled>Select an Issue Type</option>
             {issue_type.map((type) => (
               <option key={type.issue_type_id} value={type.issue_type_id}>
@@ -245,7 +245,7 @@ export function AddTicketModal({ onclose , statusList }) {
             <label>
               Priority<span className="required">*</span>
             </label>
-            <select className="select-input" name="Priority">
+            <select className="form-control" name="Priority">
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
@@ -254,7 +254,7 @@ export function AddTicketModal({ onclose , statusList }) {
 
           <div className="form-group">
             <label>Status</label>
-            <select className="select-input" defaultValue="1" name="Status">
+            <select className="form-control" defaultValue="1" name="Status">
             {statusList.map((status) => (
               <option key={status.ID} value={status.ID}>
                 {status.Name}
@@ -268,19 +268,19 @@ export function AddTicketModal({ onclose , statusList }) {
             <label>
               Summary<span className="required">*</span>
             </label>
-            <input type="text" maxLength={255} className="text-input" placeholder="Enter summary" name="Summary" style={{width:"100%"}} required />
+            <input type="text" maxLength={255} className="form-control" placeholder="Enter summary" name="Summary" style={{width:"100%"}} required />
           </div>
 
           <div className="form-group">
             <label>Description<span className="required">*</span></label>
             
-              <textarea name="Description" className="editor-content" maxLength={500} placeholder="Enter the Description" required/>
+              <textarea style={{height:"80px"}} name="Description" className="form-control" maxLength={500} placeholder="Enter the Description" required/>
             
           </div>
 
           <div className="form-group">
             <label>Assignee<span className="required">*</span></label>
-            <select className="select-input" name="Assignee" required>
+            <select className="form-control" name="Assignee" required>
               <option value="">Select assignee</option>
               {users.map(user => (
                 <option key={user.user_id} value={user.user_id}>
@@ -293,7 +293,7 @@ export function AddTicketModal({ onclose , statusList }) {
 
           <div className="form-group">
             <label>Team</label>
-            <select className="select-input" name="team">
+            <select className="form-control" name="team">
               <option value="" disabled>
                 Select Team
               </option>
@@ -314,7 +314,7 @@ export function AddTicketModal({ onclose , statusList }) {
 
           <div className="form-group">
             <label>Reporter</label>
-            <input className="text-input" style={{width:"100%"}} value={users.find(user => String(user.user_id) === String(userid))?.full_name || "Reporter not found"}  disabled/>
+            <input className="form-control" style={{width:"100%"}} value={users.find(user => String(user.user_id) === String(userid))?.full_name || "Reporter not found"}  disabled/>
           </div>
 
           <div className="form-group">

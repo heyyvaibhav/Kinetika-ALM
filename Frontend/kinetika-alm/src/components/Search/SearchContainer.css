@@ -14,17 +14,6 @@
     position: relative;
   }
   
-  .search-input {
-    padding: 8px;
-    padding-left: 32px;
-    padding-right: 8px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 60%;
-    height: 36px;
-    justify-items: absolute;
-  }
-  
   .search_icon{
     position: absolute;
     top:14%;

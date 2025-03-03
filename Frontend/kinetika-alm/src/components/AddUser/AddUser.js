@@ -57,15 +57,16 @@ const AddUser = ({ isOpen, onClose }) => {
         <form onSubmit={handleSubmit} style={{padding:"20px"}}>
           <div className="form-group">
             <label htmlFor="username">Username:</label>
-            <input type="text" id="username" maxLength={50} style={{width:"100%"}} value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="Enter a username" />
+            <input className="form-control" type="text" id="username" maxLength={50} style={{width:"100%"}} value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="Enter a username" />
           </div>
           <div className="form-group">
             <label htmlFor="fullName">Full Name:</label>
-            <input type="text" id="fullName" maxLength={100} style={{width:"100%"}} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Enter full name"/>
+            <input className="form-control" type="text" id="fullName" maxLength={100} style={{width:"100%"}} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Enter full name"/>
           </div>
           <div className="form-group">
             <label htmlFor="email">Email:</label>
             <input
+              className="form-control"
               type="email"
               id="email"
               style={{ width: "100%" }}
@@ -113,7 +114,7 @@ const AddUser = ({ isOpen, onClose }) => {
 
           <div className="form-group">
             <label htmlFor="role">Role:</label>
-            <select value={role} onChange={(e) => setRole(e.target.value)} style={{width:"100%"}}>
+            <select className="form-control" value={role} onChange={(e) => setRole(e.target.value)} style={{width:"100%"}}>
                 <option disabled value="">Select a Role</option>
                 {UserType.map((user) => (
                     <option key={user.value} value={user.value}>

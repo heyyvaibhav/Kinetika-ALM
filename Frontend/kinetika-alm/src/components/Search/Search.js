@@ -12,7 +12,15 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                 placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                className="form-control"
+                style={{padding: "8px",
+                    paddingLeft: "32px",
+                    paddingRight: "8px",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    width: "60%",                    
+                    height: "36px",
+                    justifyItems: "absolute",}}
               />
             </div>
             <div style={{borderRight: "1px solid #ddd", marginRight:"1em"}}>
