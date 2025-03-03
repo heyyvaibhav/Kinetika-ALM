@@ -19,7 +19,7 @@ import {
 } from "lucide-react"
 import styles from "./RichTextEditor.module.css"
 
-const RichTextEditor = () => {
+const RichTextEditor = ({ value, style, onChange, className }) => {
   const [editorState, setEditorState] = useState({
     text: "",
     selection: { start: 0, end: 0 },
@@ -79,12 +79,13 @@ const RichTextEditor = () => {
   }
 
   const handleInput = (e) => {
-    const text = e.currentTarget.innerText
-    setEditorState((prev) => ({
-      ...prev,
-      text,
-    }))
-  }
+    const text = e.currentTarget.innerHTML;
+    console.log("New Text:", text); // Debugging line
+
+    if (onChange) {
+      onChange(text); // Update parent state
+    }
+  };
 
   const handleSelectionChange = useCallback(() => {
     const selection = window.getSelection()
@@ -273,4 +274,3 @@ const RichTextEditor = () => {
 }
 
 export default RichTextEditor
-

@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from "react"
 import './DetailsFull.css';
 import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory } from "../../Service"
 import { toast } from "react-toastify"
-import RichTextEditor from "../Templates/TextEditor"
+import RichTextEditor from "../Templates/TextEditor.js"
+import { useLocation, useParams } from "react-router-dom";
 
-const DetailsFull = ( issue ) => {
-    console.log(issue);
+const DetailsFull = () => {
+  const location = useLocation();
+  const issue = location.state?.issue;
   const [isDetailsOpen, setIsDetailsOpen] = useState(true)
   const [assignee, setAssignee] = useState(issue.assignee_id)
   const [status, setStatus] = useState(issue.status)
@@ -144,7 +146,7 @@ const DetailsFull = ( issue ) => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault()
-    if (!newComment.trim()) {
+    if (!newComment.trim() || newComment === "<br>") {
       toast({
         title: "Warning",
         description: "Comments cannot be empty",
@@ -253,7 +255,7 @@ const DetailsFull = ( issue ) => {
             <div className="tab-content" style={{textAlign: "center"}}>
               {activeTab === "comments" && (
                 <div>
-                  <form onSubmit={handleCommentSubmit}>
+                  <form>
                     <div className="form-group">
                       {/* <textarea
                         resize="none"
@@ -266,13 +268,14 @@ const DetailsFull = ( issue ) => {
                         className="form-control"
                       /> */}
 
-                      <RichTextEditor 
-                        style={{ height:"80px", fontFamily:"sans-serif"}}
+                      <RichTextEditor
+                        style={{ height: "100px", fontFamily: "sans-serif", padding: "8px 16px" , textAlign:"left"}}
                         value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
+                        onChange={(text) => setNewComment(text)}
                         className="form-control"
                       />
-                      <div style={{textAlign:"right", paddingTop:"10px"}}><button type="submit">Add Comment</button></div>
+                      <p>Preview: {newComment}</p> {/* Debugging output */}
+                      <div style={{textAlign:"right", paddingTop:"10px"}}><button onClick={handleCommentSubmit}>Add Comment</button></div>
                     </div>
                   </form>
 
