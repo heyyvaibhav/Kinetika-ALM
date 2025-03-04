@@ -99,4 +99,27 @@ th {
   font-weight: 600 !important;
   color: #64748B !important;
 }
-  
+
+.filter-modal {
+  width: 400px;
+  top: 50%;
+  left: 50%;
+  translate:-50% -50%;
+  position: fixed !important;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.filter-footer {
+  padding: 16px;
+  border-top: 1px solid #ddd;
+  justify-content: flex-end;
+  gap: 8px;
+}
