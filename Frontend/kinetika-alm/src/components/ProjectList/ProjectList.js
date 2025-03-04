@@ -15,7 +15,7 @@ const ProjectList = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [users, setUsers] = useState([])
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState({ lead: "" });
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -77,12 +77,12 @@ const ProjectList = () => {
   const handleFilter = () => {
     setFilterModalOpen(true);
   }
-
+  const handleReset = () => {
+    setFilters({ lead:"" });
+  }
   const closeFilter = () => {
-    setFilters([]);
     setFilterModalOpen(false);
   }
-
   const applyFilters = async () => {
     setFilterModalOpen(false);
     setIsLoading(true);
@@ -145,12 +145,17 @@ const ProjectList = () => {
           <div className="filter-modal">
             <div className='filter-header'>
               <h3 style={{margin: "0"}}>Filter Projects</h3>
-              <h3 onClick={() => setFilterModalOpen(false)} style={{margin: "0"}}>X</h3>
+              <h3 onClick={closeFilter} style={{margin: "0"}}>X</h3>
             </div>
             <div className="modal-content">
               <div className='form-group'>
                 <label>Lead Name</label>
-                <select className="form-control" required onClick={fetchUsers} onChange={(e) => setFilters({ lead: parseInt(e.target.value) })}>
+                <select 
+                  className="form-control" 
+                  required onClick={fetchUsers} 
+                  onChange={(e) => setFilters({ ...filters, lead: e.target.value })}
+                  value={filters.lead}
+                >
                 <option value="">Select a name</option>
                 {users.map(user => (
                   <option key={user.user_id} value={user.user_id}>
@@ -161,6 +166,9 @@ const ProjectList = () => {
               </div>
             </div>
             <div className="filter-footer">
+            <div>
+                <button type="button" className="btn btn-secondary" onClick={handleReset}>Reset</button>
+              </div>
                 <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={closeFilter}>
                     Cancel
