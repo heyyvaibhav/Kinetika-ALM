@@ -14,7 +14,8 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOrder, setSortOrder] = useState("asc")
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+  const [filterModalOpen, setFilterModalOpen] = useState(false)
+  const [filters, setFilters] = useState({ status: "", role: "" });
 
   useEffect(() => {
     fetchUsers()
@@ -77,8 +78,35 @@ const Users = () => {
   }
 
   const handleFilter = () => {
-    setIsFilterModalOpen(true)
+    setFilterModalOpen(true);
   }
+
+  const handleReset = () => {
+    setFilters({ status: "", role: "" });
+  }
+  const closeFilter = () => {
+    setFilterModalOpen(false);
+  }
+  const applyFilters = async () => {
+    console.log(filters);
+    setFilterModalOpen(false);
+    setIsLoading(true);
+    try {
+        let queryParams = [];
+        if (filters.status) queryParams.push(`status=${filters.status}`);
+        if (filters.role) queryParams.push(`role=${filters.role}`);
+
+        const queryString = queryParams.length ? `?${queryParams.join("&")}` : "";
+        const response = await getUserList(`/users${queryString}`);
+
+        const usersArray = Array.isArray(response.data) ? response.data : [response.data];
+        setUsers(usersArray);
+        setFilteredUsers(usersArray);
+    } catch (err) {
+        setError("Failed to apply filters. Please try again later.");
+    }
+    setIsLoading(false);
+  };
 
   return (
     <div className="users-container">
@@ -105,7 +133,12 @@ const Users = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredUsers.map((user) => (
+        {filteredUsers.length === 0 ? (
+            <tr>
+              <td colSpan="5" style={{ textAlign: 'center' }}>No data found</td>
+            </tr>
+          ) : (
+          filteredUsers.map((user) => (
             <tr key={user.user_id}>
               <td>
                 <div className="name-cell">
@@ -151,7 +184,7 @@ const Users = () => {
               <td>{user.FailedLoginAttempts}</td>
               <td>{formatDate(user.created_at)}</td>
             </tr>
-          ))}
+          )))}
         </tbody>
       </table>
 
@@ -159,11 +192,59 @@ const Users = () => {
 
       {isModalOpen && <AddUser isOpen={isModalOpen} onClose={handleCloseModal} />}
 
-      {isFilterModalOpen && (
-        <div className="filter-modal">
-          <h3>Filter Options</h3>
-          <button onClick={() => setIsFilterModalOpen(false)}>Close</button>
-          {/* Add filter form components here */}
+      {filterModalOpen && (
+        <div className='modal-overlay'>
+          <div className="filter-modal">
+            <div className='filter-header'>
+              <h3 style={{margin: "0"}}>Filter Projects</h3>
+              <h3 onClick={closeFilter} style={{margin: "0"}}>X</h3>
+            </div>
+            <div className="modal-content">
+              <div className='form-group'>
+                <label>Status</label>
+                <select 
+                  required
+                  className="form-control"  
+                  value={filters.status} 
+                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                >
+                  <option value="">Select status</option>
+                  <option value="active">Active</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+              </div>
+
+              <div className='form-group'>
+                <label>Role</label>
+                <select 
+                  required
+                  className="form-control"  
+                  value={filters.role} 
+                  onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+                >
+                  <option value="">Select role</option>
+                  {UserType.map(user => (
+                    <option key={user.value} value={user.value}>
+                      {user.type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="filter-footer">
+              <div>
+                <button type="button" className="btn btn-secondary" onClick={handleReset}>Reset</button>
+              </div>
+                <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={closeFilter}>
+                    Cancel
+                  </button>
+                  <button type="button" className="btn btn-primary" onClick={applyFilters}>
+                    Apply
+                  </button>
+                </div>
+              </div>
+          </div>
         </div>
       )}
     </div>
