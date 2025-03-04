@@ -13,18 +13,20 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="form-control"
-                style={{padding: "8px",
+                style={{
+                    padding: "8px",
                     paddingLeft: "32px",
                     paddingRight: "8px",
                     border: "1px solid #ddd",
                     borderRadius: "8px",
                     width: "60%",                    
                     height: "36px",
-                    justifyItems: "absolute",}}
+                    justifyItems: "absolute",
+                }}
               />
             </div>
             <div style={{borderRight: "1px solid #ddd", marginRight:"1em"}}>
-                <div className="mt-2 control-buttons">
+                <div className="control-buttons">
                 <button
                     className="control-btn"
                     onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}

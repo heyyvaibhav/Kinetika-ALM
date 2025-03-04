@@ -88,7 +88,6 @@ const Users = () => {
     setFilterModalOpen(false);
   }
   const applyFilters = async () => {
-    console.log(filters);
     setFilterModalOpen(false);
     setIsLoading(true);
     try {
