@@ -4,8 +4,26 @@ const axios = require("axios");
 const microserviceUrl = process.env.microservice_url;
 
 class UsersModel {
-  static async getAllUsers() {
-    const rows = await db.query('SELECT user_id, full_name, email, FailedLoginAttempts, Status, role, created_at FROM users');
+  static async getAllUsers(filters = {}) {
+    let query = 'SELECT user_id, full_name, email, FailedLoginAttempts, Status, role, created_at FROM users';
+    let conditions = [];
+    let values = [];
+
+    if (filters.status) {
+        conditions.push('Status = ?');
+        values.push(filters.status);
+    }
+    
+    if (filters.role) {
+        conditions.push('role = ?');
+        values.push(filters.role);
+    }
+
+    if (conditions.length > 0) {
+        query += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    const rows = await db.query(query, values);
     return rows;
   }
 

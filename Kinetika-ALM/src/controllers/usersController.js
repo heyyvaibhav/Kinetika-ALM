@@ -4,7 +4,13 @@ const { successResponse, errorResponse } = require('../views/responseHandler');
 class UsersController {
   static async getAllUsers(req, res) {
     try {
-      const users = await UsersModel.getAllUsers();
+      const { status, role } = req.query;
+      const filters = {};
+
+      if (status) filters.status = status;
+      if (role) filters.role = role;
+      
+      const users = await UsersModel.getAllUsers(filters);
       successResponse(res, users, 'Users retrieved successfully');
     } catch (error) {
       errorResponse(res, error.message);
