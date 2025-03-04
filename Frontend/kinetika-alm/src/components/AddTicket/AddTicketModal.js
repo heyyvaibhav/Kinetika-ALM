@@ -166,7 +166,7 @@ export function AddTicketModal({ onclose , statusList }) {
       formData.append("priority", document.querySelector('select[name="Priority"]').value)
       formData.append("status", document.querySelector('select[name="Status"]').value)
       formData.append("summary", document.querySelector('input[name="Summary"]').value)
-      formData.append("description", document.querySelector(".editor-content").value)
+      formData.append("description", document.querySelector('textarea[name="Description"]').value.trim());
       formData.append("assignee_id", document.querySelector('select[name="Assignee"]').value)
       formData.append("team", document.querySelector('select[name="team"]').value)
       formData.append("reporter_id", userid)

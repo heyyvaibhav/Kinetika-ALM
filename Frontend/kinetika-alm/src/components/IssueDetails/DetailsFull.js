@@ -4,6 +4,7 @@ import { addComment, getComments, updateIssueStatus, getStatus, getUserList, get
 import { toast } from "react-toastify"
 import RichTextEditor from "../Templates/TextEditor.js"
 import { useLocation, useParams } from "react-router-dom";
+import Loading from "../Templates/Loading.js"
 
 const DetailsFull = () => {
   const location = useLocation();
@@ -442,6 +443,8 @@ const DetailsFull = () => {
         </div>
           
       </div>
+
+      {isLoading && <Loading show={isLoading} />}
     </div>
   )
 }
