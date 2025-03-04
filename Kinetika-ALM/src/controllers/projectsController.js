@@ -4,7 +4,8 @@ const ProjectsController = {
   // Get all projects
   getAllProjects: async (req, res) => {
     try {
-      const projects = await ProjectsModel.getAllProjects();
+      const leadId = req.query.lead;
+      const projects = await ProjectsModel.getAllProjects(leadId);
       res.status(200).json(projects);
     } catch (error) {
       console.error(error);
