@@ -46,12 +46,13 @@ const IssuesModel = {
     return result;
   },
 
-  getIssuesByProject: async (projectIds) => {
+  getIssuesByProject: async (projectIds, filters = {}) => {
     const placeholders = projectIds.map(() => "?").join(", "); // Create ?,?,? for IN clause
-    const query = `SELECT 
-    i.*,
-    reporter.full_name AS reporter_name,
-    assignee.full_name AS assignee_name
+    let query = `
+    SELECT 
+        i.*,
+        reporter.full_name AS reporter_name,
+        assignee.full_name AS assignee_name
     FROM 
         issues i
     LEFT JOIN 
@@ -59,13 +60,31 @@ const IssuesModel = {
     LEFT JOIN 
         users assignee ON i.assignee_id = assignee.user_id
     WHERE 
-        i.project_id IN (${placeholders});
+        i.project_id IN (${placeholders})
     `;
-    
-    return db.query(query, projectIds);
+
+    let queryParams = [...projectIds];
+
+    // Apply filters dynamically
+    if (filters.priority) {
+        query += " AND i.priority = ?";
+        queryParams.push(filters.priority);
+    }
+    if (filters.status) {
+        query += " AND i.status = ?";
+        queryParams.push(filters.status);
+    }
+    if (filters.assignee) {
+        query += " AND i.assignee_id = ?";
+        queryParams.push(filters.assignee);
+    }
+    if (filters.reporter) {
+        query += " AND i.reporter_id = ?";
+        queryParams.push(filters.reporter);
+    }
+
+    return db.query(query, queryParams);
   },
-  
-  
 
   getIssueById: async (issueId) => {
     const query = `
