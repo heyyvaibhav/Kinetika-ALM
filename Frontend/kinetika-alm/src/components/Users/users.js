@@ -195,7 +195,7 @@ const Users = () => {
         <div className='modal-overlay'>
           <div className="filter-modal">
             <div className='filter-header'>
-              <h3 style={{margin: "0"}}>Filter Projects</h3>
+              <h3 style={{margin: "0"}}>Filter Users</h3>
               <h3 onClick={closeFilter} style={{margin: "0"}}>X</h3>
             </div>
             <div className="modal-content">

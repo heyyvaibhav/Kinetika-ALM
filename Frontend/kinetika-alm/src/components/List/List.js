@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './List.css';
 import SearchContainer from '../Search/Search';
 import Select from "react-select"
-import { getProject, getIssuesByProjectID, getStatus } from '../../Service';
+import { getProject, getIssuesByProjectID, getStatus, getUserList } from '../../Service';
 import Loading from "../Templates/Loading"
 import { AddTicketModal } from '../AddTicket/AddTicketModal';
 import IssueDetails from '../IssueDetails/IssueDetails';
@@ -17,7 +17,13 @@ function List() {
   const [ticketModal, setTicketModal] = useState(false);
   const [statusList, setStatusList] = useState([]);
   const [issueDetail, setIssueDetail] = useState(false);
-  const [selectedIssue, setSelectedIssue] = useState(null)
+  const [selectedIssue, setSelectedIssue] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [filterModalOpen, setFilterModalOpen] = useState(false)
+  const [filters, setFilters] = useState({ priority: "", status: "", assignee: "", reporter: "" });
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
       const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
@@ -32,14 +38,13 @@ function List() {
     try {
       const response = await getStatus(`/status`)
       const statuses = response.statuses;
-
-        setStatusList(statuses);
-        
-        const mapping = {};
-        statuses.forEach(status => {
-          mapping[status.ID] = status.Name;
-        });
-        setStatus(mapping);
+      setStatusList(statuses);
+      
+      const mapping = {};
+      statuses.forEach(status => {
+        mapping[status.ID] = status.Name;
+      });
+      setStatus(mapping);
     } catch (error) {
       console.error("Error fetching column statuses.", error)
     }
@@ -63,29 +68,30 @@ function List() {
     setIsLoading(false);
   };
 
-  const fetchIssues = async (projectIds) => {
+  const fetchIssues = async (projectIds, queryString = "") => {
     if ((!projectIds || projectIds.length === 0) || !selectedProjects) {
-      toast.warning("No Project IDs provided.")
-      setTickets([]);
-      return;
+        toast.warning("No Project IDs provided.");
+        setTickets([]);
+        return;
     }
-      getColumns();
-      setIsLoading(true);
-      try {
-          const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}`);
-          // console.log("Project Issues:", response.issues);
-  
-            response.issues.forEach((issue) => {
-              const issueId = issue.issue_id;
-              if (!issueId) return;
-            });
 
-            setTickets(response.issues);
-        } catch (error) {
-          console.error("Failed to fetch project issues:", error);
-        } finally {
-          setIsLoading(false);
-      }
+    getColumns();
+    setIsLoading(true);
+
+    try {
+        const response = await getIssuesByProjectID(`issues/projects?project_ids=${projectIds.join(",")}${queryString}`);
+
+        response.issues.forEach((issue) => {
+            const issueId = issue.issue_id;
+            if (!issueId) return;
+        });
+
+        setTickets(response.issues);
+    } catch (error) {
+        console.error("Failed to fetch project issues:", error);
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const handleSelect = async (selectedOption) => {
@@ -111,7 +117,7 @@ function List() {
     } finally {
         setIsLoading(false);
     }
-};
+  };
 
   const handleCloseTicket = () => {
     setIssueDetail(false)
@@ -173,9 +179,63 @@ function List() {
     return `${month} ${day}, ${year}`;
   }
 
-  const handleAddTicket = (columnId) => {
-    // Updated handleAddTicket function
+  const handleAddTicket = () => {
     setTicketModal(true)
+  }
+
+  const handleFilter = () => {
+    fetchUsers();
+    setFilterModalOpen(true);
+  }
+  const handleReset = () => {
+    setFilters({ priority: "", status: "", assignee: "", reporter: "" });
+  }
+  const closeFilter = () => {
+    setFilterModalOpen(false);
+  }
+  const applyFilters = async () => {
+    console.log(filters);
+    setFilterModalOpen(false);
+    setIsLoading(true);
+
+    try {
+      let queryParams = [];
+
+      if (filters.priority) queryParams.push(`priority=${filters.priority}`);
+      if (filters.status) queryParams.push(`status=${filters.status}`);
+      if (filters.assignee) queryParams.push(`assignee=${filters.assignee}`);
+      if (filters.reporter) queryParams.push(`reporter=${filters.reporter}`);
+
+      const queryString = queryParams.length ? `&${queryParams.join("&")}` : "";
+      
+      await fetchIssues(selectedProjects, queryString); 
+    } catch (err) {
+        console.error("Failed to apply filters. Please try again later.", err);
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+
+  const filteredTickets = tickets.filter(ticket =>
+    (!searchTerm || ticket.summary.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (!selectedStatus || ticket.status === selectedStatus)
+  );
+
+  const sortedTickets = [...filteredTickets].sort((a, b) => {
+    return sortOrder === "asc" ? a.issue_key.localeCompare(b.issue_key) : b.issue_key.localeCompare(a.issue_key);
+  });
+
+  const fetchUsers = async () => {
+    try {
+      const response = await getUserList("/users")
+      const usersArray = Array.isArray(response.data) ? response.data : [response.data]
+      setUsers(usersArray)
+      setIsLoading(false)
+    } catch (error) {
+      console.error(error.message)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -184,22 +244,28 @@ function List() {
         <h2>Issue List</h2>
         <button onClick={handleAddTicket}>Create</button>
       </div>
+      
+      <SearchContainer 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+        setSortOrder={setSortOrder} 
+        handleFilter={handleFilter} 
+      />
 
-      <SearchContainer />
       <Select
         isMulti
         value={projectList.length > 0 
           ? projectList.filter(opt => selectedProjects?.includes(opt.value)) 
           : []}
-          options={projectList}
-          styles={customStyles}
-          onMenuOpen={fetchProjects}
-          onChange={(selectedOptions) => {
-              const selectedIds = selectedOptions.map((opt) => opt.value);
-              setSelectedProjects(selectedIds);
-              localStorage.setItem("selectedProjectIds", JSON.stringify(selectedIds));
-              fetchIssues(selectedIds);
-          }}
+        options={projectList}
+        styles={customStyles}
+        onMenuOpen={fetchProjects}
+        onChange={(selectedOptions) => {
+          const selectedIds = selectedOptions.map((opt) => opt.value);
+          setSelectedProjects(selectedIds);
+          localStorage.setItem("selectedProjectIds", JSON.stringify(selectedIds));
+          fetchIssues(selectedIds);
+        }}
         isLoading={isLoading}
         noOptionsMessage={() => (isLoading ? "Loading..." : "No projects found")}
         placeholder="Select a project"
@@ -221,12 +287,12 @@ function List() {
           </tr>
         </thead>
         <tbody>
-          {tickets.length === 0 ? (
+          {sortedTickets.length === 0 ? (
             <tr>
               <td colSpan="10" style={{ textAlign: 'center' , border:"none"}}>No data found</td>
             </tr>
           ) : (
-            tickets.map(ticket => (
+            sortedTickets.map(ticket => (
               <tr key={ticket.issue_id} onClick={() => handleTicketDetail(ticket)}>
                 <td>{ticket.issue_key}</td>
                 <td>{ticket.issue_type_id}</td>
@@ -266,7 +332,92 @@ function List() {
 
       {isLoading && <Loading show={isLoading} />}
       {ticketModal && <AddTicketModal onclose={handleCloseTicket} statusList={statusList} />}{" "}
-      {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />}
+      {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />} 
+
+      {filterModalOpen && (
+        <div className='modal-overlay'>
+          <div className="filter-modal">
+            <div className='filter-header'>
+              <h3 style={{margin: "0"}}>Filter Issues</h3>
+              <h3 onClick={closeFilter} style={{margin: "0"}}>X</h3>
+            </div>
+            <div className="modal-content">
+              <div className='form-group'>
+                <label>Priority</label>
+                <select 
+                  required
+                  className="form-control"  
+                  value={filters.priority} 
+                  onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
+                >
+                  <option value="">Select priority</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+
+              <div className='form-group'>
+                <label>Status</label>
+                <select 
+                  required
+                  className="form-control"  
+                  value={filters.status} 
+                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                >
+                  <option value="">Select status</option>
+                  {statusList.map((status) => (
+                    <option key={status.ID} value={status.ID}>{status.Name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className='form-group'>
+                <label>Assignee</label>
+                <select 
+                  required
+                  className="form-control"  
+                  value={filters.assignee} 
+                  onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}
+                >
+                  <option value="">Select assignee</option>
+                  {users.map((user) => (
+                    <option key={user.user_id} value={user.user_id}>{user.full_name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className='form-group'>
+                <label>Reporter</label>
+                <select 
+                  required
+                  className="form-control"  
+                  value={filters.reporter} 
+                  onChange={(e) => setFilters({ ...filters, reporter: e.target.value })}
+                >
+                  <option value="">Select reporter</option>
+                  {users.map((user) => (
+                    <option key={user.user_id} value={user.user_id}>{user.full_name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="filter-footer">
+              <div>
+                <button type="button" className="btn btn-secondary" onClick={handleReset}>Reset</button>
+              </div>
+                <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={closeFilter}>
+                    Cancel
+                  </button>
+                  <button type="button" className="btn btn-primary" onClick={applyFilters}>
+                    Apply
+                  </button>
+                </div>
+              </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
