@@ -7,6 +7,7 @@ import Loading from "../Templates/Loading"
 import { AddTicketModal } from '../AddTicket/AddTicketModal';
 import IssueDetails from '../IssueDetails/IssueDetails';
 import { toast } from 'react-toastify';
+import { issue_type } from '../DropdownOptions';
 
 function List() {
   const [tickets, setTickets] = useState([]);
@@ -216,11 +217,15 @@ function List() {
     }
   };
 
-
   const filteredTickets = tickets.filter(ticket =>
-    (!searchTerm || ticket.summary.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (!searchTerm 
+      || ticket.summary.toLowerCase().includes(searchTerm.toLowerCase()) 
+      || ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
+      || ticket.issue_key.toLowerCase().includes(searchTerm.toLowerCase())
+      || issue_type.find(type => type.issue_type_id === ticket.issue_type_id)?.issue_type_name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) &&
     (!selectedStatus || ticket.status === selectedStatus)
-  );
+);
 
   const sortedTickets = [...filteredTickets].sort((a, b) => {
     return sortOrder === "asc" ? a.issue_key.localeCompare(b.issue_key) : b.issue_key.localeCompare(a.issue_key);
@@ -295,7 +300,9 @@ function List() {
             sortedTickets.map(ticket => (
               <tr key={ticket.issue_id} onClick={() => handleTicketDetail(ticket)}>
                 <td>{ticket.issue_key}</td>
-                <td>{ticket.issue_type_id}</td>
+                <td>
+                  {issue_type.find(type => type.issue_type_id === ticket.issue_type_id)?.issue_type_name || 'Unknown'}
+                </td>
                 <td>{ticket.summary}</td>
                 <td>{ticket.description}</td>
                 <td>{ticket.priority}</td>
