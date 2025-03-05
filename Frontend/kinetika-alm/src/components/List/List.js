@@ -413,15 +413,15 @@ function List() {
               <div>
                 <button type="button" className="btn btn-secondary" onClick={handleReset}>Reset</button>
               </div>
-                <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                  <button type="button" className="btn btn-secondary" onClick={closeFilter}>
-                    Cancel
-                  </button>
-                  <button type="button" className="btn btn-primary" onClick={applyFilters}>
-                    Apply
-                  </button>
-                </div>
+              <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                <button type="button" className="btn btn-secondary" onClick={closeFilter}>
+                  Cancel
+                </button>
+                <button type="button" className="btn btn-primary" onClick={applyFilters}>
+                  Apply
+                </button>
               </div>
+            </div>
           </div>
         </div>
       )}

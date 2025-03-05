@@ -90,6 +90,7 @@ const DetailsFull = () => {
         title: "Changes saved",
         description: "Issue has been updated successfully",
       })
+      fetchHistory();
     } catch (error) {
       console.error("Error updating issue:", error)
       toast({

@@ -27,6 +27,12 @@ function Board() {
   const [showModal, setShowModal] = useState(false)
   const [fallbackStatusId, setFallbackStatusId] = useState("")
   const [deletecolumn, setDeleteColumn] = useState("")
+  // Add new state variables for search and sort
+  const [searchTerm, setSearchTerm] = useState("")
+  const [sortOrder, setSortOrder] = useState("asc")
+  const [showFilters, setShowFilters] = useState(false)
+  const [filterPriority, setFilterPriority] = useState([])
+  const [filterAssignee, setFilterAssignee] = useState([])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -112,7 +118,7 @@ function Board() {
     } catch (error) {
         console.error("Error deleting column:", error);
     }
-};
+  };
 
   const handleDeleteClick = async (columnId) => {
     setDeleteColumn(columnId);
@@ -354,6 +360,53 @@ function Board() {
   };
   // const acolor = useMemo(getRandomColor, []);
 
+  const handleFilter = () => {
+    setShowFilters(true);
+  }
+  const handleReset = () => {
+    // setFilters({ priority: "", status: "", assignee: "", reporter: "" });
+  }
+  const closeFilter = () => {
+    setShowFilters(false);
+  }
+
+  
+  const filteredColumns = useMemo(() => {
+    return columns.map(column => {
+      // Filter items based on search term
+      const filteredItems = column.items.filter(item => {
+        // Search in summary, issue_key, and description
+        const matchesSearch = searchTerm === "" || 
+          (item.summary && item.summary.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.issue_key && item.issue_key.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
+        
+        // Filter by priority if filter is active
+        const matchesPriority = filterPriority.length === 0 || 
+          (item.priority && filterPriority.includes(item.priority.toLowerCase()));
+        
+        // Filter by assignee if filter is active
+        const matchesAssignee = filterAssignee.length === 0 || 
+          (item.assignee_name && filterAssignee.includes(item.assignee_name));
+        
+        return matchesSearch && matchesPriority && matchesAssignee;
+      });
+
+      // Sort items based on sort order
+      const sortedItems = [...filteredItems].sort((a, b) => {
+        // Sort by updated_at date
+        const dateA = new Date(a.updated_at);
+        const dateB = new Date(b.updated_at);
+        
+        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      });
+
+      return {
+        ...column,
+        items: sortedItems
+      };
+    });
+  }, [columns, searchTerm, sortOrder, filterPriority, filterAssignee]);
 
   return (
     <div className="board">
@@ -361,7 +414,12 @@ function Board() {
         <h2>Issue Board</h2>
         <button onClick={handleAddTicket}>Create</button>
       </div>
-      <SearchContainer />
+      <SearchContainer 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+        setSortOrder={setSortOrder} 
+        handleFilter={handleFilter} 
+      />
       <Select
         isMulti
         value={projectList.length > 0 ? projectList.filter((opt) => selectedProjects.includes(opt.value)) : []}
@@ -375,8 +433,8 @@ function Board() {
       />
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <div className="board-columns">
-          <SortableContext items={columns.map((col) => col.id)} strategy={verticalListSortingStrategy}>
-            {columns.map((column) => (
+          <SortableContext items={filteredColumns.map((col) => col.id)} strategy={verticalListSortingStrategy}>
+            {filteredColumns.map((column) => (
               <SortableItem key={column.id} id={column.id}>
                 <div className="column">
                   <div className="column-header">
@@ -542,6 +600,76 @@ function Board() {
           )}
         </div>
       </DndContext>
+
+      {showFilters && (
+        <div className='modal-overlay'>
+          <div className="filter-modal">
+            <div className='filter-header'>
+              <h3 style={{margin: "0"}}>Filter Issues</h3>
+              <h3 onClick={closeFilter} style={{margin: "0"}}>X</h3>
+            </div>
+            <div className="modal-content">
+              <div className="form-group">
+                <h4>Priority</h4>
+                <div>
+                  <label style={{ display: "block", margin: "5px 0" }}>
+                    <input 
+                      type="checkbox" 
+                      checked={filterPriority.includes("high")} 
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFilterPriority([...filterPriority, "high"]);
+                        } else {
+                          setFilterPriority(filterPriority.filter(p => p !== "high"));
+                        }
+                      }} 
+                    /> High
+                  </label>
+                  <label style={{ display: "block", margin: "5px 0" }}>
+                    <input 
+                      type="checkbox" 
+                      checked={filterPriority.includes("medium")} 
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFilterPriority([...filterPriority, "medium"]);
+                        } else {
+                          setFilterPriority(filterPriority.filter(p => p !== "medium"));
+                        }
+                      }} 
+                    /> Medium
+                  </label>
+                  <label style={{ display: "block", margin: "5px 0" }}>
+                    <input 
+                      type="checkbox" 
+                      checked={filterPriority.includes("low")} 
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFilterPriority([...filterPriority, "low"]);
+                        } else {
+                          setFilterPriority(filterPriority.filter(p => p !== "low"));
+                        }
+                      }} 
+                    /> Low
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="filter-footer">
+              <div>
+                <button type="button" className="btn btn-secondary" onClick={handleReset}>Reset</button>
+              </div>
+              <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                <button type="button" className="btn btn-secondary" onClick={closeFilter}>
+                  Cancel
+                </button>
+                {/* <button type="button" className="btn btn-primary" onClick={applyFilters}>
+                  Apply
+                </button> */}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="modals">
