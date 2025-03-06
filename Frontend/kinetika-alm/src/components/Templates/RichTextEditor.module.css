@@ -128,6 +128,7 @@
   }
   
   .editorContent {
+    text-align: left;
     min-height: 200px;
     padding: 1rem;
     outline: none;
@@ -140,7 +141,8 @@
   .placeholder {
     color: #a0aec0;
     pointer-events: none;
-    position: absolute;
+    position: sticky;
+    top: 0;
   }
   
   

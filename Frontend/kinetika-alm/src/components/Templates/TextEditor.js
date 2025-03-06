@@ -19,7 +19,7 @@ import {
 } from "lucide-react"
 import styles from "./RichTextEditor.module.css"
 
-const RichTextEditor = ({ value, style, onChange, className }) => {
+const RichTextEditor = ({ style, onChange, className }) => {
   const [editorState, setEditorState] = useState({
     text: "",
     selection: { start: 0, end: 0 },
@@ -262,10 +262,10 @@ const RichTextEditor = ({ value, style, onChange, className }) => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           suppressContentEditableWarning
-          data-placeholder="Type @ to mention a teammate and notify them about this issue."
+          data-placeholder="Add a comment"
         >
           {!editorState.text && !isFocused && (
-            <span className={styles.placeholder}>Type @ to mention a teammate and notify them about this issue.</span>
+            <span className={styles.placeholder}>Add a comment here.</span>
           )}
         </div>
       </div>
