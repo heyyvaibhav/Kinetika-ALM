@@ -13,7 +13,7 @@ const Users = () => {
   const [error, setError] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const [sortOrder, setSortOrder] = useState("asc")
+  const [sortOrder, setSortOrder] = useState("nor")
   const [filterModalOpen, setFilterModalOpen] = useState(false)
   const [filters, setFilters] = useState({ status: "", role: "" });
 
@@ -63,7 +63,7 @@ const Users = () => {
       )
     }
     filtered.sort((a, b) =>
-      sortOrder === "asc" ? a.full_name.localeCompare(b.full_name) : b.full_name.localeCompare(a.full_name)
+      sortOrder === "nor" ? null : sortOrder === "asc" ? a.full_name.localeCompare(b.full_name) : b.full_name.localeCompare(a.full_name)
     )
     setFilteredUsers(filtered)
   }

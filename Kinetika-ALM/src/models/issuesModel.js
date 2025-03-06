@@ -138,7 +138,7 @@ const IssuesModel = {
 
     // Insert separate history records for each field change
     for (const change of changes) {
-      if (change.old !== change.new) {
+      if (change.old != change.new) {
           const historyValues = [
               issueId,
               updateData.userid, 

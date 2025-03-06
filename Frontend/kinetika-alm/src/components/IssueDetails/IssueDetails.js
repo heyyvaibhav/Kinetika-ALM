@@ -34,7 +34,7 @@ const IssueDetails = ({ onClose, issue }) => {
     const amPm = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM
 
-    return `${month} ${day}, ${year} - ${formattedHours}:${minutes} ${amPm}`;
+    return `${month} ${day}, ${year} at ${formattedHours}:${minutes} ${amPm}`;
   }
 
   const getColumns = async () => {
@@ -151,9 +151,11 @@ const IssueDetails = ({ onClose, issue }) => {
     }
   }
 
-  const handlePageBrowse = ( issue ) => {
-    navigate(`/main/browse/${issue.issue_key}`, { state: { issue } });
-  }
+  const handlePageBrowse = (issue) => {
+    localStorage.setItem("browseIssue", JSON.stringify(issue));
+    window.open(`/main/browse/${issue.issue_key}`, "_blank");
+  };
+  
 
   function formatTime(isoString) {
     const date = new Date(isoString);
@@ -195,11 +197,11 @@ const IssueDetails = ({ onClose, issue }) => {
           <div className="left-section">
             <div className="form-group">
               <h3 style={{marginBottom:"10px"}}>Description</h3>
-              <textarea value={description} style={{width:"100%", height:"80px", fontFamily:"sans-serif"}}
+              <textarea className="form-control" value={description} style={{width:"100%", height:"80px", fontFamily:"sans-serif"}}
                 onChange={(e) => setDescription(e.target.value)} maxLength={500}>
               </textarea>
 
-              <div style={{textAlign:"right"}}>
+              <div style={{textAlign:"right", marginTop:"10px"}}>
                 <button onClick={saveChanges}>Save</button>
               </div>
             </div>

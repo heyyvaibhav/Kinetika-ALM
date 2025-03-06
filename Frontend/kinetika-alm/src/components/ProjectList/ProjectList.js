@@ -12,7 +12,7 @@ const ProjectList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState("nor");
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [users, setUsers] = useState([])
   const [filters, setFilters] = useState({ lead: "" });
@@ -46,7 +46,7 @@ const ProjectList = () => {
     updatedProjects.sort((a, b) => {
       const nameA = a.project_name.toLowerCase();
       const nameB = b.project_name.toLowerCase();
-      return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      return sortOrder === "nor" ? null : sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
 
     setFilteredProjects(updatedProjects);

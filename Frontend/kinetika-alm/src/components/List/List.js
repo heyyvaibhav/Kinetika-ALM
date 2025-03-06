@@ -20,7 +20,7 @@ function List() {
   const [issueDetail, setIssueDetail] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState("nor");
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [filterModalOpen, setFilterModalOpen] = useState(false)
   const [filters, setFilters] = useState({ priority: "", status: "", assignee: "", reporter: "" });
@@ -228,7 +228,7 @@ function List() {
 );
 
   const sortedTickets = [...filteredTickets].sort((a, b) => {
-    return sortOrder === "asc" ? a.issue_key.localeCompare(b.issue_key) : b.issue_key.localeCompare(a.issue_key);
+    return sortOrder === "nor" ? null : sortOrder === "asc" ? a.issue_key.localeCompare(b.issue_key) : b.issue_key.localeCompare(a.issue_key);
   });
 
   const fetchUsers = async () => {

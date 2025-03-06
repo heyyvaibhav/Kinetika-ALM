@@ -7,12 +7,12 @@ import { useLocation, useParams } from "react-router-dom";
 import Loading from "../Templates/Loading.js"
 
 const DetailsFull = () => {
-  const location = useLocation();
-  const issue = location.state?.issue;
+  // const location = useLocation();
+  const issue = JSON.parse(localStorage.getItem("browseIssue"));
   const [isDetailsOpen, setIsDetailsOpen] = useState(true)
   const [assignee, setAssignee] = useState(issue.assignee_id)
-  const [status, setStatus] = useState(issue.status)
-  const [priority, setPriority] = useState(issue.priority)
+  const [status, _setStatus] = useState(issue.status)
+  const [priority, _setPriority] = useState(issue.priority)
   const [activeTab, setActiveTab] = useState("comments")
   const [description, setDescription] = useState(issue.description)
   const [newComment, setNewComment] = useState("")
@@ -23,6 +23,13 @@ const DetailsFull = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const userid = localStorage.getItem("userId");
+
+  const setStatus = (value) => {
+    _setStatus(value);
+  };
+  const setPriority = (value) => {
+    _setPriority(value); 
+  };
 
   function formatDate(isoString) {
     const date = new Date(isoString)
@@ -37,7 +44,7 @@ const DetailsFull = () => {
     const amPm = hours >= 12 ? "PM" : "AM"
     const formattedHours = hours % 12 || 12 // Convert 0 to 12 for AM
 
-    return `${month} ${day}, ${year} - ${formattedHours}:${minutes} ${amPm}`
+    return `${month} ${day}, ${year} at ${formattedHours}:${minutes} ${amPm}`
   }
 
   const getColumns = useCallback(async () => {
@@ -63,27 +70,24 @@ const DetailsFull = () => {
     }
   }, [])
 
-  const handleStatusChange = (value) => {
-    setStatus(value)
-  }
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value);
+  };
 
   const handlePriorityChange = (value) => {
     setPriority(value)
   }
 
-  const handleAssigneeChange = (value) => {
-    setAssignee(value)
-  }
-
   const data = {
-    description: description,
-    assignee_id: assignee,
-    status: status,
-    priority: priority,
-    userid: userid,
+    "description": description,
+    "assignee_id": assignee,
+    "status": status,
+    "priority": priority,
+    "userid" : userid,
   }
 
   const saveChanges = async () => {
+    console.log(data);
     try {
       await updateIssueStatus(`/issues/${issue.issue_id}`, data)
       toast({
@@ -147,6 +151,7 @@ const DetailsFull = () => {
   }
 
   const handleCommentSubmit = async (e) => {
+    setNewComment();
     e.preventDefault()
     if (!newComment.trim() || newComment === "<br>") {
       toast({
@@ -163,7 +168,6 @@ const DetailsFull = () => {
         comment_text: newComment,
       })
 
-      setNewComment("")
       fetchComments()
       toast({
         title: "Comment added",
@@ -281,7 +285,7 @@ const DetailsFull = () => {
                   </form>
 
                   <div className="comments-section">
-                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center", boxShadow: "0 2px 3px -1px rgba(0, 0, 0, 0.1)", marginBottom:"10px"}}>
                       <h3 style={{ marginBottom:"10px" }}>Comments</h3>
                     </div>
                     {comments.length > 0 ? (
@@ -303,7 +307,7 @@ const DetailsFull = () => {
                               <strong>{comment.username || "Undefined"}</strong>
                               <small>{formatTime(comment.created_at)}</small>
                             </div>
-                            <div><p>{comment.comment_text}</p></div>
+                            <div>  <p dangerouslySetInnerHTML={{ __html: comment.comment_text }}></p></div>
                           </div>
                         </div>
                       ))
@@ -316,8 +320,8 @@ const DetailsFull = () => {
 
               {activeTab === "history" && (
                 <div>
-                  <div className="history-section">
-                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
+                  <div className="history-section" style={{height: "550px"}}>
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center", boxShadow: "0 2px 3px -1px rgba(0, 0, 0, 0.1)", marginBottom:"10px"}}>
                       <h3 style={{ marginBottom:"10px" }}>History</h3>
                     </div>
 
@@ -383,7 +387,7 @@ const DetailsFull = () => {
                 <div className="collapsible-content">
                   <div className="detail-item">
                     <label>Assignee</label>
-                    <select className="detail-button" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
+                    <select className="form-control" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
                     {users.map(user => (
                       <option key={user.user_id} value={user.user_id}>
                         {user.full_name}
@@ -395,7 +399,7 @@ const DetailsFull = () => {
                   <div className="detail-item">
                     <label>Status</label>
                     <select 
-                      className="detail-button" 
+                      className="form-control" 
                       value={status} 
                       onChange={handleStatusChange}
                     >
@@ -409,7 +413,7 @@ const DetailsFull = () => {
 
                   <div className="detail-item">
                     <label>Priority</label>
-                    <select className="detail-button" value={priority} onChange={handlePriorityChange}>
+                    <select className="form-control" value={priority} onChange={handlePriorityChange}>
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
                       <option value="High">High</option>

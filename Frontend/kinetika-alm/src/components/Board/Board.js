@@ -29,7 +29,7 @@ function Board() {
   const [deletecolumn, setDeleteColumn] = useState("")
   // Add new state variables for search and sort
   const [searchTerm, setSearchTerm] = useState("")
-  const [sortOrder, setSortOrder] = useState("asc")
+  const [sortOrder, setSortOrder] = useState("nor")
   const [showFilters, setShowFilters] = useState(false)
   const [filterPriority, setFilterPriority] = useState([])
   const [filterAssignee, setFilterAssignee] = useState([])
@@ -398,7 +398,7 @@ function Board() {
         const dateA = new Date(a.updated_at);
         const dateB = new Date(b.updated_at);
         
-        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+        return sortOrder === "nor" ? null : sortOrder === "asc" ? dateA - dateB : dateB - dateA;
       });
 
       return {
