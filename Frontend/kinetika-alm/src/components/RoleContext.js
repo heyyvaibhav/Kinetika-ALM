@@ -14,7 +14,7 @@ export const RoleProvider = ({ children }) => {
   const [role, setRole] = useState(null);
   const [lastActivity, setLastActivity] = useState(Date.now());
 
-  const INACTIVITY_LIMIT = 30 * 60 * 1000; // Set inactivity limit to 5 minutes (in milliseconds)
+  const INACTIVITY_LIMIT = 30 * 60 * 1000;
 
   // Fetch role from UserDataFromToken
   const getRoleForAuth = () => {

@@ -80,7 +80,6 @@ const RichTextEditor = ({ style, onChange, className }) => {
 
   const handleInput = (e) => {
     const text = e.currentTarget.innerHTML;
-    console.log("New Text:", text); // Debugging line
 
     if (onChange) {
       onChange(text); // Update parent state

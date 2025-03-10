@@ -74,9 +74,9 @@ const DetailsFull = () => {
     setStatus(e.target.value);
   };
 
-  const handlePriorityChange = (value) => {
-    setPriority(value)
-  }
+  const handlePriorityChange = (e) => {
+    setPriority(e.target.value);
+  };
 
   const data = {
     "description": description,
@@ -87,7 +87,6 @@ const DetailsFull = () => {
   }
 
   const saveChanges = async () => {
-    console.log(data);
     try {
       await updateIssueStatus(`/issues/${issue.issue_id}`, data)
       toast({

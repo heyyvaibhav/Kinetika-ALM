@@ -25,7 +25,7 @@ const AddUser = ({ isOpen, onClose }) => {
 
     try {
       const response = await addUser("/users", userData);
-      console.log("User created successfully:", response.data);
+      // console.log("User created successfully:", response.data);
 
       setUsername("");
       setFullName("");

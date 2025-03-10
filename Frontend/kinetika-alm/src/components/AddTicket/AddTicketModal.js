@@ -180,7 +180,7 @@ export function AddTicketModal({ onclose , statusList }) {
       // Call the createTicket function from your Service.js
       const response = await createIssue("/issues", formData)
 
-      console.log("Ticket created:", response)
+      // console.log("Ticket created:", response)
       setIsLoading(false)
       onclose()
     } catch (error) {

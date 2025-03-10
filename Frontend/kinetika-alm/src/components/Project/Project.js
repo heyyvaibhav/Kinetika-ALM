@@ -29,7 +29,7 @@ export default function ProjectForm() {
     setIsLoading(true)
     setError(null)
 
-    console.log("Submitting form data:", formData)
+    // console.log("Submitting form data:", formData)
 
     const data = {
       project_name : formData.name,
@@ -41,10 +41,10 @@ export default function ProjectForm() {
     try {
       const response = await createProject("/projects", data)
 
-      console.log("Response status:", response.status) // Log the response status
+      // console.log("Response status:", response.status) // Log the response status
 
       const result = await response.json()
-      console.log("Project created:", result)
+      // console.log("Project created:", result)
     } catch (err) {
       console.error("Error submitting form:", err) // Log any errors
       setError(err.message)
