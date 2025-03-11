@@ -10,6 +10,15 @@ function Sidebar({ open, closeMenu }) {
 
   return (
     <div style={{justifyContent:"space-between"}}><div className="sidebar">
+      {open && (
+        <div
+          className="btn d-flex justify-content-end p-1"
+          onClick={closeMenu} // Close menu when clicked
+          style={{ cursor: "pointer" }}
+        >
+          <button className="btn btn-primary">X</button>
+        </div>
+      )}
       <div className="logo">
         <img src="/kinetikalogo.png" alt="Logo" width="100" style={{ borderRadius: "10px" }} />
         <h2>Kinetika ALM</h2>

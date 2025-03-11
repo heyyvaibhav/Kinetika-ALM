@@ -1,15 +1,15 @@
 .custom-width {
-    width: 18% !important;
-  }
-  
-  .custom-width-75 {
-    width: 82% !important;
-  }
-  
-  /* .col-3 {
-    width: 18.5% !important;
-  } */
-  html, body, .container-fluid, .row {
-    height: 100%;
-  }
+  width: 18% !important;
+}
+
+.custom-width-75 {
+  width: 82% !important;
+}
+
+/* .col-3 {
+  width: 18.5% !important;
+} */
+html, body, .container-fluid, .row {
+  height: 100%;
+}
   

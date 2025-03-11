@@ -38,14 +38,14 @@ const MainPage = () => {
           }}
         >
           {/* Mobile Menu Toggle Button */}
-          {/* <button
+          <button
             className="btn d-lg-none position-relative"
             style={{ top: "1em", left: "1.5em", 
              }}
             onClick={toggleMenu}
           >
             {menuVisible ? "" : <GiHamburgerMenu />}
-          </button> */}
+          </button>
           <Outlet />
           {/* Dynamically renders child routes */}
         </div>

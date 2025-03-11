@@ -292,7 +292,7 @@ const DetailsFull = () => {
                         <div key={index} className="comment">
                           <div 
                             className="avatar"
-                            style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                            style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
                           > 
                             {comment.username && typeof comment.username === "string"
                             ? comment.username
@@ -329,7 +329,7 @@ const DetailsFull = () => {
                         <div key={index} className="history">
                           <div 
                             className="avatar"
-                            style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                            style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
                           > 
                             {entry.username && typeof entry.username === "string"
                             ? entry.username
@@ -424,7 +424,7 @@ const DetailsFull = () => {
                     <div className="reporter-info">
                       <div 
                         className="avatar"
-                        style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
+                        style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
                       > 
                         {issue.reporter_name && typeof issue.reporter_name === "string"
                         ? issue.reporter_name

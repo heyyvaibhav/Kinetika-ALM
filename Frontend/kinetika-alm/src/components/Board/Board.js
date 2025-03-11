@@ -549,7 +549,7 @@ function Board() {
                               </div>
                               <div 
                                   className="avatar"
-                                  style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
+                                  style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
                               > 
                                   {item.assignee_name && typeof item.assignee_name === "string"
                                   ? item.assignee_name
