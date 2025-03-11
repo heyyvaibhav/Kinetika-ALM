@@ -27,12 +27,13 @@ function List() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-      const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
-      getColumns();
-      if (storedProjectIds.length > 0) {
+    const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
+    if (storedProjectIds.length > 0) {
         setSelectedProjects(storedProjectIds);
         fetchIssues(storedProjectIds);
-      }
+    }
+    getColumns();
+    if (projectList.length === 0) fetchProjects();
   }, []);
 
   const getColumns = async () => {
@@ -61,6 +62,7 @@ function List() {
           label: project.project_name,
         }));
         setProjectList(projectOptions);
+        localStorage.setItem("projectList", JSON.stringify(projectOptions));
       }
     } catch (error) {
       console.error("Failed to fetch projects:", error);
@@ -195,7 +197,6 @@ function List() {
     setFilterModalOpen(false);
   }
   const applyFilters = async () => {
-    console.log(filters);
     setFilterModalOpen(false);
     setIsLoading(true);
 

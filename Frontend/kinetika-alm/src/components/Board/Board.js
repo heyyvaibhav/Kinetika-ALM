@@ -185,6 +185,7 @@ function Board() {
           label: project.project_name,
         }))
         setProjectList(projectOptions)
+        localStorage.setItem("projectList", JSON.stringify(projectOptions));
       }
     } catch (error) {
       console.error("Failed to fetch projects:", error)
@@ -194,13 +195,19 @@ function Board() {
   }
 
   useEffect(() => {
-    const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || []
+    const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
+
     if (storedProjectIds.length > 0) {
-      setSelectedProjects(storedProjectIds)
-      fetchIssues(storedProjectIds)
+        setSelectedProjects(storedProjectIds);
+        fetchIssues(storedProjectIds);
     }
-    getColumns()
-  }, [])
+
+    getColumns();
+
+    if (projectList.length === 0) {
+        fetchProjects();
+    }
+  }, []);
 
   const fetchIssues = async (projectIds) => {
     if ((!projectIds || projectIds.length === 0) || !selectedProjects) {
