@@ -19,9 +19,9 @@ import {
 } from "lucide-react"
 import styles from "./RichTextEditor.module.css"
 
-const RichTextEditor = ({ style, onChange, className }) => {
+const RichTextEditor = ({ style, onChange, className, value }) => {
   const [editorState, setEditorState] = useState({
-    text: "",
+    text: value || "",
     selection: { start: 0, end: 0 },
     formats: {
       bold: false,
@@ -47,7 +47,6 @@ const RichTextEditor = ({ style, onChange, className }) => {
         [format]: value !== undefined ? value : !prev.formats[format],
       },
     }))
-
     if (editorRef.current) {
       editorRef.current.focus()
     }
@@ -79,12 +78,19 @@ const RichTextEditor = ({ style, onChange, className }) => {
   }
 
   const handleInput = (e) => {
-    const text = e.currentTarget.innerHTML;
+    const text = e.currentTarget.innerHTML
+    if (!editorRef.current) return
+
+    const editor = editorRef.current
+
+    if (editor.innerHTML.trim() === "<br>") {
+      editor.innerHTML = ""
+    }
 
     if (onChange) {
-      onChange(text); // Update parent state
+      onChange(text)
     }
-  };
+  }
 
   const handleSelectionChange = useCallback(() => {
     const selection = window.getSelection()
@@ -121,6 +127,18 @@ const RichTextEditor = ({ style, onChange, className }) => {
       document.removeEventListener("selectionchange", handleSelectionChange)
     }
   }, [showFontSizeMenu, showColorMenu, handleSelectionChange])
+
+  useEffect(() => {
+    if (editorRef.current && value !== undefined) {
+      if (editorRef.current.innerHTML !== value) {
+        editorRef.current.innerHTML = value
+        setEditorState((prev) => ({
+          ...prev,
+          text: value,
+        }))
+      }
+    }
+  }, [value])
 
   const ToolbarButton = ({ icon: Icon, active, onClick }) => (
     <button type="button" className={`${styles.toolbarButton} ${active ? styles.active : ""}`} onClick={onClick}>
@@ -262,11 +280,7 @@ const RichTextEditor = ({ style, onChange, className }) => {
           onBlur={() => setIsFocused(false)}
           suppressContentEditableWarning
           data-placeholder="Add a comment"
-        >
-          {!editorState.text && !isFocused && (
-            <span className={styles.placeholder}>Add a comment here.</span>
-          )}
-        </div>
+        />
       </div>
     </div>
   )

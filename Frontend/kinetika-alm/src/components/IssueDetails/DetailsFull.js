@@ -150,15 +150,13 @@ const DetailsFull = () => {
   }
 
   const handleCommentSubmit = async (e) => {
-    setNewComment();
+    setNewComment("");
     e.preventDefault()
-    if (!newComment.trim() || newComment === "<br>") {
-      toast({
-        title: "Warning",
-        description: "Comments cannot be empty",
-        variant: "warning",
-      })
-      return
+    const cleanedComment = newComment.replace(/&nbsp;|<p>|<\/p>|<br\s*\/?>|\n|\r/g, "").trim();
+
+    if (!newComment || !cleanedComment) {
+      toast.warning("Comments can not be empty!")
+      return;
     }
 
     try {
@@ -262,17 +260,6 @@ const DetailsFull = () => {
                 <div>
                   <form>
                     <div className="form-group">
-                      {/* <textarea
-                        resize="none"
-                        style={{ height:"80px", fontFamily:"sans-serif"}}
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Add a comment"
-                        rows="3"
-                        maxLength={500}
-                        className="form-control"
-                      /> */}
-
                       <RichTextEditor
                         style={{ height: "100px", fontFamily: "sans-serif", padding: "8px 16px" , textAlign:"left"}}
                         value={newComment}
@@ -306,7 +293,7 @@ const DetailsFull = () => {
                               <strong>{comment.username || "Undefined"}</strong>
                               <small>{formatTime(comment.created_at)}</small>
                             </div>
-                            <div>  <p dangerouslySetInnerHTML={{ __html: comment.comment_text }}></p></div>
+                            <div><p dangerouslySetInnerHTML={{ __html: comment.comment_text }}></p></div>
                           </div>
                         </div>
                       ))

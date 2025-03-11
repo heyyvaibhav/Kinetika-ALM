@@ -265,7 +265,7 @@ const IssueDetails = ({ onClose, issue }) => {
                               <strong>{comment.username || "Undefined"}</strong>
                               <small>{formatTime(comment.created_at)}</small>
                             </div>
-                            <div><p>{comment.comment_text}</p></div>
+                            <div><p dangerouslySetInnerHTML={{ __html: comment.comment_text }}></p></div>
                           </div>
                         </div>
                       ))
