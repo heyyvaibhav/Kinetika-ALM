@@ -256,6 +256,7 @@ function List() {
         setSearchTerm={setSearchTerm} 
         setSortOrder={setSortOrder} 
         handleFilter={handleFilter} 
+        view="list" 
       />
 
       <Select

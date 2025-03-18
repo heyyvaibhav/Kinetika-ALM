@@ -192,7 +192,7 @@ export function AddTicketModal({ onclose , statusList }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container">
+      <div className="modal-container" style={{width: "800px"}}>
         {/* Header */}
         <div className="modal-header">
           <h2>Create</h2>

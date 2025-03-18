@@ -180,7 +180,7 @@ const IssueDetails = ({ onClose, issue }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container">
+      <div className="modal-container" style={{ width: "65%" }}>
         <div className="modal-header">
           <div className="header-left">
             <span className="issue-tag" onClick={() => handlePageBrowse(issue)}>{issue.issue_key}</span>
@@ -197,7 +197,7 @@ const IssueDetails = ({ onClose, issue }) => {
           <div className="left-section">
             <div className="form-group">
               <h3 style={{marginBottom:"10px"}}>Description</h3>
-              <textarea className="form-control" value={description} style={{width:"100%", height:"80px", fontFamily:"sans-serif"}}
+              <textarea className="form-control" value={description} style={{width:"100%", height:"100px", fontFamily:"sans-serif"}}
                 onChange={(e) => setDescription(e.target.value)} maxLength={500}>
               </textarea>
 

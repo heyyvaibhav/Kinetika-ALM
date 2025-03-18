@@ -52,13 +52,27 @@ const IssuesModel = {
     SELECT 
         i.*,
         reporter.full_name AS reporter_name,
-        assignee.full_name AS assignee_name
+        assignee.full_name AS assignee_name,
+        COALESCE(comment_counts.comment_count, 0) AS comment,
+        COALESCE(attachment_counts.attachment_count, 0) AS attachment
     FROM 
         issues i
     LEFT JOIN 
         users reporter ON i.reporter_id = reporter.user_id
     LEFT JOIN 
         users assignee ON i.assignee_id = assignee.user_id
+    LEFT JOIN 
+        (
+            SELECT issue_id, COUNT(*) AS comment_count
+            FROM comments
+            GROUP BY issue_id
+        ) comment_counts ON i.issue_id = comment_counts.issue_id
+    LEFT JOIN 
+        (
+            SELECT issue_id, COUNT(*) AS attachment_count
+            FROM attachments
+            GROUP BY issue_id
+        ) attachment_counts ON i.issue_id = attachment_counts.issue_id
     WHERE 
         i.project_id IN (${placeholders})
     `;

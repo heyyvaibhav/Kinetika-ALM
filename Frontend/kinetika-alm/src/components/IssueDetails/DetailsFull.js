@@ -227,7 +227,7 @@ const DetailsFull = () => {
                 className="form-control"
                 maxLength={500}
                 placeholder="Enter the description"
-                style={{ height:"100px"}}
+                style={{ height:"140px" }}
               />
             </div>
 
