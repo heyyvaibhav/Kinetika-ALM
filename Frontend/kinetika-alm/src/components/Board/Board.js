@@ -32,7 +32,8 @@ function Board() {
   const [sortOrder, setSortOrder] = useState("nor")
   const [showFilters, setShowFilters] = useState(false)
   const [filterPriority, setFilterPriority] = useState([])
-  const [filterAssignee, setFilterAssignee] = useState([])
+  const [isModalOpening, setIsModalOpening] = useState(false);
+  const [assignees, setAssignees] = useState([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -170,6 +171,7 @@ function Board() {
       setNewColumnTitle("")
       setIsAddingColumn(false)
       getColumns()
+      fetchIssues(selectedProjects);
     } catch (error) {
       console.error("Error adding column:", error)
     }
@@ -292,10 +294,17 @@ function Board() {
   }
 
   const handleAddTicket = (columnId) => {
-    // Updated handleAddTicket function
-    setTicketModal(true)
-    setInitialStatus(columnId)
-  }
+    if (isModalOpening) return; 
+  
+    setIsModalOpening(true);
+    setTicketModal(true);
+    setInitialStatus(columnId);
+  
+    setTimeout(() => {
+      setIsModalOpening(false);
+    }, 500); 
+  };
+  
 
   const handleCloseTicket = () => {
     setIssueDetail(false)
@@ -303,10 +312,15 @@ function Board() {
     setSelectedIssue(null)
     if (selectedProjects && selectedProjects.length > 0) fetchIssues(selectedProjects);
   }
-  const handleTicketDetail = (issue) => {
-    setSelectedIssue(issue)
-    setIssueDetail(true)
-  }
+  const handleTicketDetail = (issue, event) => {
+    if (event.ctrlKey || event.metaKey) {
+      localStorage.setItem("browseIssue", JSON.stringify(issue));
+      window.open(`/main/browse/${issue.issue_key}`, "_blank");
+    } else {
+      setSelectedIssue(issue);
+      setIssueDetail(true);
+    }
+  };
 
   const customStyles = {
     control: (provided, state) => ({
@@ -371,37 +385,42 @@ function Board() {
     setShowFilters(true);
   }
   const handleReset = () => {
-    // setFilters({ priority: "", status: "", assignee: "", reporter: "" });
+    setFilterPriority([]);
+    fetchIssues(selectedProjects);
   }
   const closeFilter = () => {
     setShowFilters(false);
   }
 
+  const filterpriority = () => {
+    const filteredColumns = columns.map(column => ({
+      ...column,
+      items: column.items.filter(item =>
+        filterPriority.length === 0 || 
+        (item.priority && filterPriority.includes(item.priority.toLowerCase()))
+      )
+    }));
+  
+    setColumns(filteredColumns);
+    setShowFilters(false);
+  };
   
   const filteredColumns = useMemo(() => {
     return columns.map(column => {
-      // Filter items based on search term
       const filteredItems = column.items.filter(item => {
-        // Search in summary, issue_key, and description
         const matchesSearch = searchTerm === "" || 
           (item.summary && item.summary.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (item.issue_key && item.issue_key.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
         
         // Filter by priority if filter is active
-        const matchesPriority = filterPriority.length === 0 || 
-          (item.priority && filterPriority.includes(item.priority.toLowerCase()));
+        // const matchesPriority = filterPriority.length === 0 || 
+        //   (item.priority && filterPriority.includes(item.priority.toLowerCase()));
         
-        // Filter by assignee if filter is active
-        const matchesAssignee = filterAssignee.length === 0 || 
-          (item.assignee_name && filterAssignee.includes(item.assignee_name));
-        
-        return matchesSearch && matchesPriority && matchesAssignee;
+        return matchesSearch; // && matchesPriority;
       });
 
-      // Sort items based on sort order
       const sortedItems = [...filteredItems].sort((a, b) => {
-        // Sort by updated_at date
         const dateA = new Date(a.updated_at);
         const dateB = new Date(b.updated_at);
         
@@ -413,7 +432,7 @@ function Board() {
         items: sortedItems
       };
     });
-  }, [columns, searchTerm, sortOrder, filterPriority, filterAssignee]);
+  }, [columns, searchTerm, sortOrder]);
 
   return (
     <div className="board">
@@ -426,6 +445,8 @@ function Board() {
         setSearchTerm={setSearchTerm} 
         setSortOrder={setSortOrder} 
         handleFilter={handleFilter} 
+        view="board"
+        assignees={assignees}
       />
       <Select
         isMulti
@@ -515,7 +536,7 @@ function Board() {
                     <SortableContext items={column.items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
                       {column.items.map((item) => (
                         <SortableTicket key={item.issue_id} id={item.issue_id}>
-                          <div className="ticket" onClick={() => handleTicketDetail(item)}>
+                          <div className="ticket" onClick={(e) => handleTicketDetail(item, e)}>
                             <div style={{ borderBottom: "1px solid #ddd", marginBottom: "10px" }}>
                               <p style={{ marginBottom: "8px" }}>
                                 {" "}
@@ -538,7 +559,7 @@ function Board() {
                                   }}
                                 >
                                   <img src="/comment.svg" style={{ height: "24px", marginBottom: "-2.5px" }} />
-                                  <span>3</span>
+                                  <span>{item.comment}</span>
                                 </div>
                                 <div
                                   style={{
@@ -551,7 +572,7 @@ function Board() {
                                   }}
                                 >
                                   <img src="/attachment.svg" style={{ height: "20px", marginBottom: "-2.5px" }} />
-                                  <span>3</span>
+                                  <span>{item.attachment}</span>
                                 </div>
                               </div>
                               <div 
@@ -669,9 +690,9 @@ function Board() {
                 <button type="button" className="btn btn-secondary" onClick={closeFilter}>
                   Cancel
                 </button>
-                {/* <button type="button" className="btn btn-primary" onClick={applyFilters}>
+                <button type="button" className="btn btn-primary" onClick={filterpriority}>
                   Apply
-                </button> */}
+                </button>
               </div>
             </div>
           </div>

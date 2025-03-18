@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import "./SearchContainer.css"
 
-const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter }) => {
+const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter, view, assignees }) => {
   
   return (
         <div className="controls">
@@ -25,37 +25,65 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                 }}
               />
             </div>
-            <div style={{borderRight: "1px solid #ddd", marginRight:"1em"}}>
-                <div className="control-buttons">
-                <button
-                    className="control-btn"
-                    onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
-                >
-                    <span className="btn-text">
-                    <img src="/sort.svg" style={{ width:"24px", height:"24px" }} alt="sorticon" />
-                    Sort
-                    </span>
-                </button>
-                <button
-                    className="control-btn"
-                    onClick={handleFilter}
-                >
-                    <span className="btn-text">
-                    <img
-                        src="/filter.svg"
-                        style={{  width:"24px", height:"24px" }}
-                        alt="filtericon"
-                    />
-                    Filter
-                    </span>
-                </button>
+            
+            {(view === "board" || view === "list" ) ? (
+                <>
+                <div style={{ borderRight: "1px solid #ddd", marginRight: "1em" }}>
+                  <div className="control-buttons" style={{marginRight:"1em"}}>
+                      <button
+                          className="control-btn"
+                          onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                      >
+                          <span className="btn-text">
+                              <img src="/sort.svg" style={{ width: "24px", height: "24px" }} alt="sorticon" />
+                              Sort
+                          </span>
+                      </button>
+                      <button
+                          className="control-btn"
+                          onClick={handleFilter}
+                      >
+                          <span className="btn-text">
+                              <img
+                                  src="/filter.svg"
+                                  style={{ width: "24px", height: "24px" }}
+                                  alt="filtericon" />
+                              Filter
+                          </span>
+                      </button>
+                  </div>
                 </div>
-            </div>
-            <div className="user-profile-images">
-                <img src="/kinetikalogo.png" className="profile-img" alt="User 1" />
-                <img src="/image-modified.png" className="profile-img" alt="User 2" />
-                {/* <img src="/user3.jpg" className="profile-img" alt="User 3" /> */}
-            </div>
+
+                <div className="user-profile-images">
+                    <img src="/kinetikalogo.png" className="profile-img" alt="User 1" />
+                    <img src="/image-modified.png" className="profile-img" alt="User 2" />
+                </div>
+                </>
+            ) : (
+                <div className="control-buttons">
+                      <button
+                          className="control-btn"
+                          onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                      >
+                          <span className="btn-text">
+                              <img src="/sort.svg" style={{ width: "24px", height: "24px" }} alt="sorticon" />
+                              Sort
+                          </span>
+                      </button>
+                      <button
+                          className="control-btn"
+                          onClick={handleFilter}
+                      >
+                          <span className="btn-text">
+                              <img
+                                  src="/filter.svg"
+                                  style={{ width: "24px", height: "24px" }}
+                                  alt="filtericon" />
+                              Filter
+                          </span>
+                      </button>
+                  </div>
+            )}
         </div>
   )
 }
