@@ -1,8 +1,22 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import "./SearchContainer.css"
 
-const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter, view, assignees }) => {
-  
+const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter, view, assignees ,selectedAssignees, onAssigneeClick }) => {
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    const toggleDropdown = () => setShowDropdown(!showDropdown);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest(".dropdown") && !event.target.closest(".more-avatar")) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
+
+    
   return (
         <div className="controls">
             <div className="search-container" style={{ width: '100%' }}>
@@ -26,7 +40,7 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
               />
             </div>
             
-            {(view === "board" || view === "list" ) ? (
+            {(view === "board" && assignees.length > 0) ? (
                 <>
                 <div style={{ borderRight: "1px solid #ddd", marginRight: "1em" }}>
                   <div className="control-buttons" style={{marginRight:"1em"}}>
@@ -54,9 +68,45 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                   </div>
                 </div>
 
-                <div className="user-profile-images">
-                    <img src="/kinetikalogo.png" className="profile-img" alt="User 1" />
-                    <img src="/image-modified.png" className="profile-img" alt="User 2" />
+                <div className="user-profile-container">
+                    {assignees.length === 0 ? (
+                    <div className="no-assignees">No Assignees</div>
+                    ) : (
+                        <>
+                        {assignees.slice(0, 3).map(({ assignee_id, assignee_name }, index) => (
+                            <div 
+                                key={assignee_id} 
+                                className="avatar" 
+                                style={{ zIndex: assignees.length - index, height: "34px", width: "34px" }}
+                                title={assignee_name}
+                                onClick={() => onAssigneeClick(assignee_id)}
+                            > 
+                                {assignee_name.split(" ").map(word => word.charAt(0)).join("")}
+                            </div>
+                        ))}
+
+                        {assignees.length > 3 && (
+                            <div className="avatar more-avatar" onClick={toggleDropdown} style={{width: "30px", height: "30px"}}>
+                                +{assignees.length - 3}
+                            </div>
+                        )}
+
+                        {showDropdown && (
+                            <div className="dropdown">
+                                {assignees.map(({ assignee_id, assignee_name }) => (
+                                    <label key={assignee_id} className="dropdown-item">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={selectedAssignees.includes(assignee_id)}
+                                            onChange={() => onAssigneeClick(assignee_id)} 
+                                        />
+                                        {assignee_name}
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                        </>
+                    )}
                 </div>
                 </>
             ) : (

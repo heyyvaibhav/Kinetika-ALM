@@ -27,13 +27,13 @@ function Board() {
   const [showModal, setShowModal] = useState(false)
   const [fallbackStatusId, setFallbackStatusId] = useState("")
   const [deletecolumn, setDeleteColumn] = useState("")
-  // Add new state variables for search and sort
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOrder, setSortOrder] = useState("nor")
   const [showFilters, setShowFilters] = useState(false)
   const [filterPriority, setFilterPriority] = useState([])
   const [isModalOpening, setIsModalOpening] = useState(false);
   const [assignees, setAssignees] = useState([]);
+  const [selectedAssignee, setSelectedAssignee] = useState([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -251,6 +251,14 @@ function Board() {
             }
         });
 
+        const uniqueAssignees = Array.from(
+          new Map(response.issues.map(({ assignee_id, assignee_name }) => [assignee_id, { assignee_id, assignee_name }]))
+          .values()
+        );
+
+        setAssignees(uniqueAssignees);
+
+
         // ✅ **Fix Priority Sorting**
         const priorityOrder = { High: 1, Medium: 2, Low: 3 };
 
@@ -386,7 +394,7 @@ function Board() {
   }
   const handleReset = () => {
     setFilterPriority([]);
-    fetchIssues(selectedProjects);
+    if (selectedProjects && selectedProjects.length > 0) fetchIssues(selectedProjects);
   }
   const closeFilter = () => {
     setShowFilters(false);
@@ -404,6 +412,14 @@ function Board() {
     setColumns(filteredColumns);
     setShowFilters(false);
   };
+
+  const handleAssigneeClick = (assigneeId) => {
+    setSelectedAssignee((prev) =>
+        prev.includes(assigneeId)
+            ? prev.filter((id) => id !== assigneeId)
+            : [...prev, assigneeId]
+    );
+  };
   
   const filteredColumns = useMemo(() => {
     return columns.map(column => {
@@ -417,7 +433,10 @@ function Board() {
         // const matchesPriority = filterPriority.length === 0 || 
         //   (item.priority && filterPriority.includes(item.priority.toLowerCase()));
         
-        return matchesSearch; // && matchesPriority;
+        const matchesAssignee = selectedAssignee.length === 0 || 
+          (item.assignee_id && selectedAssignee.includes(item.assignee_id));
+
+        return matchesSearch && matchesAssignee; // && matchesPriority;
       });
 
       const sortedItems = [...filteredItems].sort((a, b) => {
@@ -432,7 +451,7 @@ function Board() {
         items: sortedItems
       };
     });
-  }, [columns, searchTerm, sortOrder]);
+  }, [columns, searchTerm, sortOrder, selectedAssignee]);
 
   return (
     <div className="board">
@@ -447,6 +466,8 @@ function Board() {
         handleFilter={handleFilter} 
         view="board"
         assignees={assignees}
+        selectedAssignees={selectedAssignee}
+        onAssigneeClick={handleAssigneeClick}
       />
       <Select
         isMulti

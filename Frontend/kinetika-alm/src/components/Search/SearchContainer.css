@@ -48,26 +48,69 @@
     color: #A6A4B2;
   }
 
-  .user-profile-images {
+  .user-profile-container {
     display: flex;
-    align-items: center;
     position: relative;
+    align-items: center;
   }
-  
-  .profile-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%; /* Makes the images circular */
-    object-fit: cover; /* Ensures the images maintain aspect ratio */
-    border: 2px solid #fff; /* Optional: Adds a border around the images */
-    margin-left: -6px; /* Creates a small overlapping effect */
-    z-index: 1; /* Ensures proper stacking */
+
+  .avatar {
+      background-color: #3357FF;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      text-transform: uppercase;
+      position: relative;
+      border: 2px solid white;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+      margin-left: -10px; /* Creates stacking effect */
   }
-  
-  .profile-img:nth-child(2) {
-    z-index: 2; /* Ensures the second image appears on top of the first */
+
+  .avatar:hover {
+      transform: scale(1.2);
+      z-index: 50;
   }
-  
-  .profile-img:nth-child(3) {
-    z-index: 3; /* Ensures the third image appears on top of the others */
+
+  .more-avatar {
+      background-color: #FF5733;
+  }
+
+  .dropdown {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      min-width: 150px;
+  }
+
+  .no-assignees {
+    text-align: center;
+    font-size: 10px;
+    color: #666;
+    background: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 4px;
+  }
+
+  .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      padding: 5px;
+      cursor: pointer;
+  }
+
+  .dropdown-item input {
+      cursor: pointer;
   }
