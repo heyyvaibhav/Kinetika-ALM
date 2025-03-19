@@ -459,9 +459,9 @@ function Board() {
         noOptionsMessage={() => (isLoading ? "Loading..." : "No projects found")}
         placeholder="Select a project"
       />
-      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
+      {/* <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}> */}
         <div className="board-columns">
-          <SortableContext items={filteredColumns.map((col) => col.id)} strategy={verticalListSortingStrategy}>
+          {/* <SortableContext items={filteredColumns.map((col) => col.id)} strategy={verticalListSortingStrategy}> */}
             {filteredColumns.map((column) => (
               <SortableItem key={column.id} id={column.id}>
                 <div className="column">
@@ -601,7 +601,7 @@ function Board() {
                 </div>
               </SortableItem>
             ))}
-          </SortableContext>
+          {/* </SortableContext> */}
 
           {isAddingColumn ? (
             <div className="add">
@@ -627,7 +627,7 @@ function Board() {
             </button>
           )}
         </div>
-      </DndContext>
+      {/* </DndContext> */}
 
       {showFilters && (
         <div className='modal-overlay'>
