@@ -54,7 +54,7 @@
     align-items: center;
   }
 
-  .avatar {
+  .avatarr {
       background-color: #3357FF;
       color: #fff;
       font-weight: bold;
@@ -71,13 +71,13 @@
       margin-left: -10px; /* Creates stacking effect */
   }
 
-  .avatar:hover {
+  .avatarr:hover {
       transform: scale(1.2);
       z-index: 10;
   }
 
   .more-avatar {
-      background-color: #FF5733;
+      background-color: #a3b3fc;
   }
 
   .dropdown {

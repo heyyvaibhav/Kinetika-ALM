@@ -1,8 +1,7 @@
 import React from "react";
 
-// Loading component to show the loading spinner and blurred overlay
 const Loading = ({ show }) => {
-//   if (!show) return null; // Don't render anything if show is false
+  if (!show) return null; // Don't render anything if show is false
 
   return (
     <div

@@ -76,7 +76,7 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                         {assignees.slice(0, 3).map(({ assignee_id, assignee_name }, index) => (
                             <div 
                                 key={assignee_id} 
-                                className="avatar" 
+                                className="avatarr" 
                                 style={{ zIndex: assignees.length - index, height: "34px", width: "34px" }}
                                 title={assignee_name}
                                 onClick={() => onAssigneeClick(assignee_id)}
@@ -91,7 +91,7 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                         ))}
 
                         {assignees.length > 3 && (
-                            <div className="avatar more-avatar" onClick={toggleDropdown} style={{width: "30px", height: "30px"}}>
+                            <div className="avatarr more-avatar" onClick={toggleDropdown} style={{width: "30px", height: "30px"}}>
                                 +{assignees.length - 3}
                             </div>
                         )}
