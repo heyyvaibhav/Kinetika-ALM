@@ -17,7 +17,7 @@ const Loading = ({ show }) => {
         display: "flex", // Center the spinner
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 3000, // Ensure the spinner is on top
+        zIndex: 6000, // Ensure the spinner is on top
       }}
     >
     <div className="loader">
