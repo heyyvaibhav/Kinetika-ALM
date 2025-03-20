@@ -114,3 +114,13 @@
   .dropdown-item input {
       cursor: pointer;
   }
+
+  .reset-button {
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 8px;
+    cursor: pointer;
+    width: 100%;
+  }

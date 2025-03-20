@@ -468,6 +468,7 @@ function Board() {
         assignees={assignees}
         selectedAssignees={selectedAssignee}
         onAssigneeClick={handleAssigneeClick}
+        setSelectedAssignees={setSelectedAssignee}
       />
       <Select
         isMulti
@@ -484,8 +485,8 @@ function Board() {
         <div className="board-columns">
           {/* <SortableContext items={filteredColumns.map((col) => col.id)} strategy={verticalListSortingStrategy}> */}
             {filteredColumns.map((column) => (
-              <SortableItem key={column.id} id={column.id}>
-                <div className="column">
+              // <SortableItem >
+                <div className="column" key={column.id} id={column.id} style={{  marginLeft : column.id == "1" ? "4px" : "0"}}>
                   <div className="column-header">
                     <div style={{ display: "flex" }}>
                       <img src="/plus-icon.svg" alt="Plus Icon" height="24" width="24" />
@@ -554,7 +555,7 @@ function Board() {
                   </div>
 
                   <div className="tickets">
-                    <SortableContext items={column.items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+                    {/* <SortableContext items={column.items.map((item) => item.id)} strategy={verticalListSortingStrategy}> */}
                       {column.items.map((item) => (
                         <SortableTicket key={item.issue_id} id={item.issue_id}>
                           <div className="ticket" onClick={(e) => handleTicketDetail(item, e)}>
@@ -611,7 +612,7 @@ function Board() {
                           </div>
                         </SortableTicket>
                       ))}
-                    </SortableContext>
+                    {/* </SortableContext> */}
                   </div>
 
                   <button className="create-issue" onClick={() => handleAddTicket(column.id)}>
@@ -620,7 +621,7 @@ function Board() {
                     <u>Create Issue</u>
                   </button>
                 </div>
-              </SortableItem>
+              // </SortableItem>
             ))}
           {/* </SortableContext> */}
 

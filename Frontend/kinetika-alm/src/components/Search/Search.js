@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import "./SearchContainer.css"
 
-const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter, view, assignees ,selectedAssignees, onAssigneeClick }) => {
+const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter, view, assignees ,selectedAssignees, onAssigneeClick, setSelectedAssignees }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
@@ -81,7 +81,12 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                                 title={assignee_name}
                                 onClick={() => onAssigneeClick(assignee_id)}
                             > 
-                                {assignee_name.split(" ").map(word => word.charAt(0)).join("")}
+                                {assignee_name && typeof assignee_name === "string"
+                                  ? assignee_name
+                                      .split(" ")
+                                      .map(word => word.charAt(0).toUpperCase()) // Extracts and capitalizes initials
+                                      .join("")
+                                  : ""}
                             </div>
                         ))}
 
@@ -103,6 +108,16 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                                         {assignee_name}
                                     </label>
                                 ))}
+
+                                <button 
+                                    className="reset-button" 
+                                    onClick={() => {
+                                        console.log("Reset button clicked!");  // ✅ Console log
+                                        setSelectedAssignees([]);  // ✅ Clear selected assignees
+                                    }}
+                                >
+                                    Reset
+                                </button>
                             </div>
                         )}
                         </>
