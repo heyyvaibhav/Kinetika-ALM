@@ -27,12 +27,9 @@
   }
   
   table {
-    /* width: 100% !important; */
+    width: 100% !important;
     border-collapse: collapse;
-    background: white;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important;
-    overflow-x: auto;
+    margin-bottom: 16px;
   }
 
   th, td {
@@ -82,4 +79,11 @@
   
   .add-ticket-form button {
     margin-top: 8px;
+  }
+
+  .table-container {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important;
+    border-radius: 8px;
+    overflow: auto;
+    margin-bottom: 24px;
   }

@@ -8,6 +8,7 @@ import { AddTicketModal } from '../AddTicket/AddTicketModal';
 import IssueDetails from '../IssueDetails/IssueDetails';
 import { toast } from 'react-toastify';
 import { issue_type } from '../DropdownOptions';
+import Pagination from "../Templates/Pagination";
 
 function List() {
   const [tickets, setTickets] = useState([]);
@@ -25,6 +26,9 @@ function List() {
   const [filterModalOpen, setFilterModalOpen] = useState(false)
   const [filters, setFilters] = useState({ priority: "", status: "", assignee: "", reporter: "" });
   const [users, setUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const maxPageButtons = 5;
 
   useEffect(() => {
     const storedProjectIds = JSON.parse(localStorage.getItem("selectedProjectIds")) || [];
@@ -250,6 +254,33 @@ function List() {
     }
   }
 
+  const getVisiblePages = () => {
+    const totalPages = Math.ceil(sortedTickets.length / itemsPerPage);
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+    let endPage = startPage + maxPageButtons - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - maxPageButtons + 1);
+    }
+
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
+  };
+
+  const visiblePages = getVisiblePages();
+
+
+  const shouldShowEllipses = () => {
+    const totalPages = Math.ceil(sortedTickets.length / itemsPerPage);
+    const remainingPages = totalPages - currentPage;
+
+    return remainingPages >= maxPageButtons - 2;
+  };
+
   return (
     <div className="list">
       <div className="list-header">
@@ -284,67 +315,77 @@ function List() {
         placeholder="Select a project"
       />
 
-      <table>
-        <thead>
-          <tr>
-            <th>Issue Key</th>
-            <th>Issue Type ID</th>
-            <th>Summary</th>
-            <th>Description</th>
-            <th>Priority</th>
-            <th style={{textAlign:"center", width:"100px"}}>Status</th>
-            <th>Assignee</th>
-            <th>Reporter</th>
-            <th>Created Date</th>
-            <th>Last Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedTickets.length === 0 ? (
+      <div className="table-container">
+        <table>
+          <thead>
             <tr>
-              <td colSpan="10" style={{ textAlign: 'center' , border:"none"}}>No data found</td>
+              <th>Issue Key</th>
+              <th>Issue Type ID</th>
+              <th>Summary</th>
+              <th>Description</th>
+              <th>Priority</th>
+              <th style={{textAlign:"center", width:"100px"}}>Status</th>
+              <th>Assignee</th>
+              <th>Reporter</th>
+              <th>Created Date</th>
+              <th>Last Updated</th>
             </tr>
-          ) : (
-            sortedTickets.map(ticket => (
-              <tr key={ticket.issue_id} onClick={() => handleTicketDetail(ticket)}>
-                <td>{ticket.issue_key}</td>
-                <td>
-                  {issue_type.find(type => type.issue_type_id === ticket.issue_type_id)?.issue_type_name || 'Unknown'}
-                </td>
-                <td>{ticket.summary}</td>
-                <td>{ticket.description}</td>
-                <td>{ticket.priority}</td>
-                <td>
-                  <span
-                    style={{ 
-                      fontSize: "12px",
-                      display: "inline-block",  
-                      padding: "4px",      
-                      minWidth: "80px",
-                      textAlign: "center",      
-                      fontWeight: "bold",
-                      color: ticket.status == "3" ? "#1E7E34" : 
-                            ticket.status == "2" ? "#D97706" : 
-                            ticket.status == "1" ? "#DC3545" : "black" ,
-                      backgroundColor: ticket.status == "3" ? "#E6F4EA" : 
-                            ticket.status == "2" ? "#FEF3C7" : 
-                            ticket.status == "1" ? "#FDE7E9" : "#ddd" ,
-                      borderRadius:"10px", 
-                    }}
-                  >
-                    {status[ticket.status]}
-                  </span>
-                </td>
-                <td>{ticket.assignee_name}</td>
-                <td>{ticket.reporter_name}</td>
-                <td>{formatDate(ticket.created_at)}</td>
-                <td>{formatDate(ticket.updated_at)}</td>
+          </thead>
+          <tbody>
+            {sortedTickets.length === 0 ? (
+              <tr>
+                <td colSpan="10" style={{ textAlign: 'center' , border:"none"}}>No data found</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-
+            ) : (
+              sortedTickets.map(ticket => (
+                <tr key={ticket.issue_id} onClick={() => handleTicketDetail(ticket)}>
+                  <td>{ticket.issue_key}</td>
+                  <td>
+                    {issue_type.find(type => type.issue_type_id === ticket.issue_type_id)?.issue_type_name || 'Unknown'}
+                  </td>
+                  <td>{ticket.summary}</td>
+                  <td>{ticket.description}</td>
+                  <td>{ticket.priority}</td>
+                  <td>
+                    <span
+                      style={{ 
+                        fontSize: "12px",
+                        display: "inline-block",  
+                        padding: "4px",      
+                        minWidth: "80px",
+                        textAlign: "center",      
+                        fontWeight: "bold",
+                        color: ticket.status == "3" ? "#1E7E34" : 
+                              ticket.status == "2" ? "#D97706" : 
+                              ticket.status == "1" ? "#DC3545" : "black" ,
+                        backgroundColor: ticket.status == "3" ? "#E6F4EA" : 
+                              ticket.status == "2" ? "#FEF3C7" : 
+                              ticket.status == "1" ? "#FDE7E9" : "#ddd" ,
+                        borderRadius:"10px", 
+                      }}
+                    >
+                      {status[ticket.status]}
+                    </span>
+                  </td>
+                  <td>{ticket.assignee_name}</td>
+                  <td>{ticket.reporter_name}</td>
+                  <td>{formatDate(ticket.created_at)}</td>
+                  <td>{formatDate(ticket.updated_at)}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+        <Pagination 
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+          shouldShowEllipses={shouldShowEllipses}
+          duplicateArray={sortedTickets}
+          itemsPerPage={itemsPerPage}
+          visiblePages={visiblePages}
+        />
+      </div>
+      
       {isLoading && <Loading show={isLoading} />}
       {ticketModal && <AddTicketModal onclose={handleCloseTicket} statusList={statusList} />}{" "}
       {issueDetail && selectedIssue && <IssueDetails issue={selectedIssue} onClose={handleCloseTicket} />} 
