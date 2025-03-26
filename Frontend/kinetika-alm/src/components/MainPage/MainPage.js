@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../Sidebar/Sidebar";
 import { Outlet } from "react-router-dom"; // Import Outlet
 import "./MainPage.css"; // For additional styling
@@ -7,7 +7,26 @@ import { ToastContainer } from "react-toastify";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 const MainPage = () => {
-  const [menuVisible, setMenuVisible] = useState(false); // State to control menu visibility on smaller screens
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1000);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [showButton, setShowButton] = useState(window.innerWidth < 1000);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isSmallScreen = window.innerWidth < 1000;
+      
+      setShowButton(isSmallScreen);
+      setMenuVisible(false);  // Always close menu on resize
+      setIsSidebarOpen(!isSmallScreen);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initialize on mount
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -17,13 +36,46 @@ const MainPage = () => {
     <div className="w-full max-w-full overflow-x-hidden container-fluid h-100">
       <div className="row h-100">
         {/* Left-side Menu */}
-        <div
-          className={`col-lg-2  p-0 ${
-            menuVisible ? "d-block position-absolute menuMobile" : "d-none d-lg-block"
-          }`}
-        >
-          <Sidebar open={menuVisible} closeMenu={() => setMenuVisible(false)}/>
+        {!isSidebarOpen ? (
+          <div>
+          {/* Background Overlay with Blur Effect */}
+          {menuVisible && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                backdropFilter: "blur(5px)", // Applies blur effect
+                backgroundColor: "rgba(0, 0, 0, 0.3)", // Semi-transparent dark overlay
+                zIndex: 9, // Keeps it behind the menu but above content
+              }}
+              onClick={() => setMenuVisible(false)} // Clicking outside closes menu
+            ></div>
+          )}
+        
+          {/* Sidebar Menu */}
+          <div
+            style={{
+              display: menuVisible ? "block" : "none",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: window.innerWidth < 500 ? "75%" : "50%", // Adjust sidebar width
+              height: "100%",
+              background: "#fff",
+              boxShadow: "2px 0 10px rgba(0, 0, 0, 0.2)", // Box shadow effect
+              padding: "1rem",
+              zIndex: 10, // Ensure menu is above the blurred background
+            }}
+          >
+            <Sidebar open={menuVisible} closeMenu={() => setMenuVisible(false)} />
+          </div>
         </div>
+        ) : (
+          <Sidebar open={menuVisible} closeMenu={() => setMenuVisible(false)} />
+        )}
 
         {/* Right-side Outlet */}
         <div
@@ -38,14 +90,14 @@ const MainPage = () => {
           }}
         >
           {/* Mobile Menu Toggle Button */}
-          <button
-            className="btn d-lg-none position-relative"
-            style={{ top: "1em", left: "1.5em", 
-             }}
-            onClick={toggleMenu}
-          >
-            {menuVisible ? "" : <GiHamburgerMenu />}
-          </button>
+          {showButton && !menuVisible && (
+            <button
+              style={{ top: "1em", left: "1.5em", zIndex:"2000", marginBottom :"-20px" , marginLeft :"20px" , height :"40px" }}
+              onClick={toggleMenu}
+            >
+              <GiHamburgerMenu />
+            </button>
+          )}
           <Outlet />
           {/* Dynamically renders child routes */}
         </div>

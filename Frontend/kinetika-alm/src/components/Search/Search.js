@@ -5,6 +5,16 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
     const [showDropdown, setShowDropdown] = useState(false);
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
+    const [max, setMax] = useState(window.innerWidth < 400 ? 1 : 3);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setMax(window.innerWidth < 400 ? 1 : 3);
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -73,7 +83,7 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                     <div className="no-assignees">No Assignees</div>
                     ) : (
                         <>
-                        {assignees.slice(0, 3).map(({ assignee_id, assignee_name }, index) => (
+                        {assignees.slice(0, max).map(({ assignee_id, assignee_name }, index) => (
                             <div 
                                 key={assignee_id} 
                                 className="avatarr" 
@@ -90,9 +100,9 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                             </div>
                         ))}
 
-                        {assignees.length > 3 && (
+                        {assignees.length > max && (
                             <div className="avatarr more-avatar" onClick={toggleDropdown} style={{width: "30px", height: "30px"}}>
-                                +{assignees.length - 3}
+                                +{assignees.length - max}
                             </div>
                         )}
 

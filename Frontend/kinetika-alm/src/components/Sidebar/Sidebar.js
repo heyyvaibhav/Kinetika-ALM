@@ -9,14 +9,14 @@ function Sidebar({ open, closeMenu }) {
   const userType = localStorage.getItem("UserType");
 
   return (
-    <div style={{justifyContent:"space-between"}}><div className="sidebar">
+    <div className="sidebar">
       {open && (
         <div
-          className="btn d-flex justify-content-end p-1"
-          onClick={closeMenu} // Close menu when clicked
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", textAlign: "end" }}
         >
-          <button className="btn btn-primary">X</button>
+          <button className="icon-button" onClick={closeMenu}>
+              <h1 className="close-icon">X</h1>
+            </button>
         </div>
       )}
       <div className="logo">
@@ -24,36 +24,28 @@ function Sidebar({ open, closeMenu }) {
         <h2>Kinetika ALM</h2>
       </div>
       <nav>
-        <NavLink to={"board"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
+        <NavLink to={"board"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>
           <img src='/board.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
           Board
         </NavLink>
-        <NavLink to={"list"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
+        <NavLink to={"list"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>
           <img src='/list.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
           List
         </NavLink>
         {(userType == "1" || userType == "2") && (
-          <NavLink to={"users"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
+          <NavLink to={"users"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>
             <img src='/users.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
             Users
           </NavLink>
         )}
-        {/* <NavLink to={"project"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
-          <img src='/project.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
-          Project
-        </NavLink> */}
-        <NavLink to={"project-list"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''}>
+        <NavLink to={"project-list"} style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>
           <img src='/projectlist.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
           Projects
         </NavLink>
-      </nav>
-    </div>
-
-      <nav style={{ width:"230px" }}>
-        <div onClick={logout} className="logout">
-          <img src='/logout.svg' style={{ width: "24px", height: "24px", marginLeft:"-0.2em", marginRight: "0.8em"}} />
+        <NavLink style={{ display: "flex", alignItems: "center" }} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>
+          <img src='/logout.svg' style={{ width: "24px", height: "24px", marginRight: "1em" }} />
           Logout
-        </div>
+        </NavLink>
       </nav>
     </div>
   );
