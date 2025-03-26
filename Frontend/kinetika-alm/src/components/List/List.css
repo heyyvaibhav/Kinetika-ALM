@@ -23,6 +23,7 @@
   .list-header h2 {
     font-size: 24px;
     color: #172b4d;
+    margin: 0;
   }
   
   table {

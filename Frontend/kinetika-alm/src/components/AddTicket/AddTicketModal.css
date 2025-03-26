@@ -44,7 +44,7 @@
   
   .icon-button {
     padding: 0.5rem;
-    background: none;
+    background: none !important;
     border: none;
     cursor: pointer;
     display: flex;

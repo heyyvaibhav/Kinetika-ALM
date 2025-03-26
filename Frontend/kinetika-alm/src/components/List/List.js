@@ -146,13 +146,19 @@ function List() {
         borderColor: "#4a90e2",
       },
       marginBottom: "20px",
+      "@media (max-width: 500px)": {
+        width: "100%",
+      },
     }),
     menu: (provided) => ({
       ...provided,
-      width: "80%", // Ensure dropdown menu width matches
+      width: "80%",
       borderRadius: "8px",
       backgroundColor: "white",
       boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+      "@media (max-width: 500px)": {
+        width: "100%",
+      },
     }),
     option: (provided, state) => ({
       ...provided,

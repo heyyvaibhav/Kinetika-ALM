@@ -16,9 +16,10 @@
     z-index: 10;
 }
   
-  h1 {
-    text-align: center;
-    color: #333;
+  .users-header h2 {
+    font-size: 24px;
+    color: #172b4d;
+    margin: 0;
   }
   
   .add-user-btn {

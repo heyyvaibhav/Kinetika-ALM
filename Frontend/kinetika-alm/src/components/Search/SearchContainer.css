@@ -124,3 +124,22 @@
     cursor: pointer;
     width: 100%;
   }
+
+  @media (max-width: 500px) {
+    .controls{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: end;
+    }
+    .search-container input{
+      width: 100% !important;
+      margin-bottom: 10px;
+    }
+    .control-buttons {
+      margin-right: 0.6em;
+      gap : 4px;
+    }
+    .btn-text {
+      gap: 0.15em;
+    }
+  }
