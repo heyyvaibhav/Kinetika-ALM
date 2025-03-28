@@ -1,5 +1,6 @@
 import React from "react";
 import { LuChevronRight, LuChevronLeft } from "react-icons/lu";
+import "./Templates.css";
 
 const Pagination = ({
   setCurrentPage,
@@ -15,23 +16,27 @@ const Pagination = ({
 
   return (
     <div
+      className="pagination_container"
       style={{ 
         backgroundColor: "white",
         display: "flex",
         justifyContent: "flex-end",
         alignItems: "baseline",
         textAlign: "center",
-        padding: "0.5rem" 
+        padding: "0.5rem",
+        marginBottom: "1em",
+        overflow : "hidden"
       }}
     >
       {/* Pagination Buttons */}
       <div
+        className="pagination_box"
         style={{
-            display: "flex",
-            alignItems: "center",
-            marginLeft: "auto",
-            marginRight: "auto",
-            gap: "0.5rem",
+          display: "flex",
+          alignItems: "center",
+          marginLeft: "auto",
+          marginRight: "auto",
+          gap: "0.5rem",
         }}
         >
         <div

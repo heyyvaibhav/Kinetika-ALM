@@ -5,6 +5,7 @@ import { getUserList } from "../../Service"
 import { UserType } from "../DropdownOptions"
 import SearchContainer from "../Search/Search"
 import AddUser from "../AddUser/AddUser"
+import Pagination from "../Templates/Pagination"
 
 const Users = () => {
   const [users, setUsers] = useState([])
@@ -16,6 +17,11 @@ const Users = () => {
   const [sortOrder, setSortOrder] = useState("nor")
   const [filterModalOpen, setFilterModalOpen] = useState(false)
   const [filters, setFilters] = useState({ status: "", role: "" });
+  const [duplicateArray, setDuplicateArray] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const maxPageButtons = 5;
+  
 
   useEffect(() => {
     fetchUsers()
@@ -107,6 +113,41 @@ const Users = () => {
     setIsLoading(false);
   };
 
+   useEffect(() => {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+  
+      setDuplicateArray(filteredUsers.slice(startIndex, endIndex));
+    }, [filteredUsers, currentPage]);
+  
+  
+    const getVisiblePages = () => {
+      const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  
+      let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+      let endPage = startPage + maxPageButtons - 1;
+  
+      if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
+      }
+  
+      return Array.from(
+        { length: endPage - startPage + 1 },
+        (_, i) => startPage + i
+      );
+    };
+  
+    const visiblePages = getVisiblePages();
+  
+  
+    const shouldShowEllipses = () => {
+      const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+      const remainingPages = totalPages - currentPage;
+  
+      return remainingPages >= maxPageButtons - 2;
+    };
+
   return (
     <div className="users-container">
       <div className="users-header">
@@ -121,71 +162,81 @@ const Users = () => {
         handleFilter={handleFilter}
       />
 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Failed Login Attempts</th>
-            <th>Created At</th>
-          </tr>
-        </thead>
-        <tbody>
-        {filteredUsers.length === 0 ? (
+      <div className="table-container">
+        <table>
+          <thead>
             <tr>
-              <td colSpan="5" style={{ textAlign: 'center' }}>No data found</td>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Failed Login Attempts</th>
+              <th>Created At</th>
             </tr>
-          ) : (
-          filteredUsers.map((user) => (
-            <tr key={user.user_id}>
-              <td>
-                <div className="name-cell">
-                    <div 
-                        className="avatar"
-                        style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", fontSize:"12px"}}
-                    > 
-                        {user.full_name && typeof user.full_name === "string"
-                        ? user.full_name
-                            .split(" ")
-                            .map(word => word.charAt(0).toUpperCase())
-                            .join("")
-                        : ""}
-                    </div>
-                    <div style={{display:"column"}}>
-                        <span>{user.full_name}</span>
-                        <p style={{fontSize:"10px", color:"gray"}}>
-                            {UserType.find(u => u.value == user.role)?.type}
-                        </p>
-                    </div>
-                </div>
-              </td>
-              <td>{user.email}</td>
-              <td>
-                <span
-                  style={{ 
-                    fontSize: "12px",
-                    display: "inline-block",  
-                    padding: "4px",      
-                    minWidth: "80px",
-                    textAlign: "center",      
-                    fontWeight: "bold",
-                    color: user.Status === "Active" ? "#1E7E34" : 
-                      user.Status === "Disabled" ? "#DC3545" : "black" ,
-                    backgroundColor: user.Status === "Active" ? "#E6F4EA" : 
-                      user.Status === "Disabled" ? "#FDE7E9" : "#ddd" ,
-                    borderRadius:"10px", 
-                  }}
-                >
-                  {user.Status}
-                </span>
-              </td>
-              <td>{user.FailedLoginAttempts}</td>
-              <td>{formatDate(user.created_at)}</td>
-            </tr>
-          )))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+          {duplicateArray.length === 0 ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center' }}>No data found</td>
+              </tr>
+            ) : (
+            duplicateArray.map((user) => (
+              <tr key={user.user_id}>
+                <td>
+                  <div className="name-cell">
+                      <div 
+                          className="avatar"
+                          style={{ backgroundColor: getRandomColor(), color: "#fff", fontWeight: "bold", fontSize:"12px"}}
+                      > 
+                          {user.full_name && typeof user.full_name === "string"
+                          ? user.full_name
+                              .split(" ")
+                              .map(word => word.charAt(0).toUpperCase())
+                              .join("")
+                          : ""}
+                      </div>
+                      <div style={{display:"column"}}>
+                          <span>{user.full_name}</span>
+                          <p style={{fontSize:"10px", color:"gray"}}>
+                              {UserType.find(u => u.value == user.role)?.type}
+                          </p>
+                      </div>
+                  </div>
+                </td>
+                <td>{user.email}</td>
+                <td>
+                  <span
+                    style={{ 
+                      fontSize: "12px",
+                      display: "inline-block",  
+                      padding: "4px",      
+                      minWidth: "80px",
+                      textAlign: "center",      
+                      fontWeight: "bold",
+                      color: user.Status === "Active" ? "#1E7E34" : 
+                        user.Status === "Disabled" ? "#DC3545" : "black" ,
+                      backgroundColor: user.Status === "Active" ? "#E6F4EA" : 
+                        user.Status === "Disabled" ? "#FDE7E9" : "#ddd" ,
+                      borderRadius:"10px", 
+                    }}
+                  >
+                    {user.Status}
+                  </span>
+                </td>
+                <td>{user.FailedLoginAttempts}</td>
+                <td>{formatDate(user.created_at)}</td>
+              </tr>
+            )))}
+          </tbody>
+        </table>
+        <Pagination 
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+          shouldShowEllipses={shouldShowEllipses}
+          duplicateArray={filteredUsers}
+          itemsPerPage={itemsPerPage}
+          visiblePages={visiblePages}
+        />
+      </div>
 
       {isLoading && <Loading show={isLoading} /> }
 

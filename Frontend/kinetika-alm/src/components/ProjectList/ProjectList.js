@@ -4,6 +4,7 @@ import './ProjectList.css';
 import Loading from '../Templates/Loading';
 import { useNavigate } from "react-router-dom";
 import SearchContainer from "../Search/Search";
+import Pagination from '../Templates/Pagination';
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -16,6 +17,10 @@ const ProjectList = () => {
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [users, setUsers] = useState([])
   const [filters, setFilters] = useState({ lead: "" });
+  const [duplicateArray, setDuplicateArray] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const maxPageButtons = 5;
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -97,6 +102,42 @@ const ProjectList = () => {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+  
+      setDuplicateArray(filteredProjects.slice(startIndex, endIndex));
+    }, [filteredProjects, currentPage]);
+  
+  
+    const getVisiblePages = () => {
+      const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+  
+      let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+      let endPage = startPage + maxPageButtons - 1;
+  
+      if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
+      }
+  
+      return Array.from(
+        { length: endPage - startPage + 1 },
+        (_, i) => startPage + i
+      );
+    };
+  
+    const visiblePages = getVisiblePages();
+  
+  
+    const shouldShowEllipses = () => {
+      const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+      const remainingPages = totalPages - currentPage;
+  
+      return remainingPages >= maxPageButtons - 2;
+    };
+  
+
 
   return (
     <div className="active-projects-table-container">
@@ -107,36 +148,46 @@ const ProjectList = () => {
       
       <SearchContainer searchTerm={searchTerm} setSearchTerm={setSearchTerm} setSortOrder={setSortOrder} handleFilter={handleFilter} />
       
-      <table>
-        <thead>
-          <tr>
-            <th>Project ID</th>
-            <th>Project Name</th>
-            <th>Project Key</th>
-            <th>Project Description</th>
-            <th>Lead on Project</th>
-            <th>Created at</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProjects.length === 0 ? (
+      <div className='table-container'>
+        <table>
+          <thead>
             <tr>
-              <td colSpan="6" style={{ textAlign: 'center' }}>No data found</td>
+              <th>Project ID</th>
+              <th>Project Name</th>
+              <th>Project Key</th>
+              <th>Project Description</th>
+              <th>Lead on Project</th>
+              <th>Created at</th>
             </tr>
-          ) : (
-            filteredProjects.map((project) => (
-              <tr key={project.project_id}>
-                <td>{project.project_id}</td>
-                <td>{project.project_name}</td>
-                <td>{project.project_key}</td>
-                <td>{project.project_description}</td>
-                <td>{project.lead_name}</td>
-                <td>{formatDate(project.created_at)}</td>
+          </thead>
+          <tbody>
+            {duplicateArray.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: 'center' }}>No data found</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              duplicateArray.map((project) => (
+                <tr key={project.project_id}>
+                  <td>{project.project_id}</td>
+                  <td>{project.project_name}</td>
+                  <td>{project.project_key}</td>
+                  <td>{project.project_description}</td>
+                  <td>{project.lead_name}</td>
+                  <td>{formatDate(project.created_at)}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+        <Pagination 
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+          shouldShowEllipses={shouldShowEllipses}
+          duplicateArray={filteredProjects}
+          itemsPerPage={itemsPerPage}
+          visiblePages={visiblePages}
+        />
+      </div>
       
       {isLoading && <Loading show={isLoading} />}
 

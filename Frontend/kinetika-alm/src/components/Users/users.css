@@ -7,6 +7,11 @@
     overflow: auto;
 }
 
+.users-container::-webkit-scrollbar{
+  display: none;
+}
+
+
 .users-header {
     margin-bottom: 20px;
     display: flex;
