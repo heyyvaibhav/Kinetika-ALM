@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './List.css';
 import SearchContainer from '../Search/Search';
 import Select from "react-select"
@@ -9,6 +9,7 @@ import IssueDetails from '../IssueDetails/IssueDetails';
 import { toast } from 'react-toastify';
 import { issue_type } from '../DropdownOptions';
 import Pagination from "../Templates/Pagination";
+import HeaderNav from "../Templates/HeaderNav";
 
 function List() {
   const [tickets, setTickets] = useState([]);
@@ -26,6 +27,7 @@ function List() {
   const [filterModalOpen, setFilterModalOpen] = useState(false)
   const [filters, setFilters] = useState({ priority: "", status: "", assignee: "", reporter: "" });
   const [users, setUsers] = useState([]);
+  const [duplicateArray, setDuplicateArray] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const maxPageButtons = 5;
@@ -236,11 +238,17 @@ function List() {
       || issue_type.find(type => type.issue_type_id === ticket.issue_type_id)?.issue_type_name.toLowerCase().includes(searchTerm.toLowerCase())
     ) &&
     (!selectedStatus || ticket.status === selectedStatus)
-);
+  );
 
-  const sortedTickets = [...filteredTickets].sort((a, b) => {
-    return sortOrder === "nor" ? null : sortOrder === "asc" ? a.issue_key.localeCompare(b.issue_key) : b.issue_key.localeCompare(a.issue_key);
-  });
+  const sortedTickets = useMemo(() => {
+    return [...filteredTickets].sort((a, b) => {
+      if (sortOrder === "nor") return 0; // No sorting when "nor" is selected
+      return sortOrder === "asc"
+        ? a.issue_key.localeCompare(b.issue_key)
+        : b.issue_key.localeCompare(a.issue_key);
+    });
+  }, [tickets, sortOrder]);
+  
 
   const fetchUsers = async () => {
     try {
@@ -253,6 +261,14 @@ function List() {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    setDuplicateArray(sortedTickets.slice(startIndex, endIndex));
+  }, [sortedTickets, currentPage]);
+
 
   const getVisiblePages = () => {
     const totalPages = Math.ceil(sortedTickets.length / itemsPerPage);
@@ -283,11 +299,16 @@ function List() {
 
   return (
     <div className="list">
-      <div className="list-header">
+      {/* <div className="list-header">
         <h2>Issue List</h2>
         <button onClick={handleAddTicket}>Create</button>
-      </div>
-      
+      </div> */}
+      <HeaderNav 
+        name="Issue List"
+        button_name="Create"
+        buttonClick={handleAddTicket}
+      />
+
       <SearchContainer 
         searchTerm={searchTerm} 
         setSearchTerm={setSearchTerm} 
@@ -332,12 +353,12 @@ function List() {
             </tr>
           </thead>
           <tbody>
-            {sortedTickets.length === 0 ? (
+            {duplicateArray.length === 0 ? (
               <tr>
-                <td colSpan="10" style={{ textAlign: 'center' , border:"none"}}>No data found</td>
+                <td colSpan="10" style={{ textAlign: 'center' }}>No data found</td>
               </tr>
             ) : (
-              sortedTickets.map(ticket => (
+              duplicateArray.map(ticket => (
                 <tr key={ticket.issue_id} onClick={() => handleTicketDetail(ticket)}>
                   <td>{ticket.issue_key}</td>
                   <td>

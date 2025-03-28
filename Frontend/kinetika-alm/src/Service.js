@@ -34,9 +34,7 @@ export const getToken = () => {
 
 export const getUserType = () => {
   getUserDetails();
-  if (UserDataFromToken) {
-    // console.log("UserData: ", UserDataFromToken);
-
+  if (UserDataFromToken) { 
     return UserDataFromToken.type;
   }
 };
@@ -45,9 +43,7 @@ export const getUserDetails = () => {
   const token = JSON.parse(localStorage.getItem("token"));
   if (token) {
     UserDataFromToken = jwtDecode(token);
-    // console.log("User Data: ", UserDataFromToken);
   }
-
   return UserDataFromToken;
 };
 
@@ -241,7 +237,6 @@ export const getUserList = async (endpoint) => {
   //   getToken();
     const response = await apiClient.get(endpoint);
 
-    // console.log("Response is: ", response);
     return response.data;
   } catch (error) {
     errorHandle(error);

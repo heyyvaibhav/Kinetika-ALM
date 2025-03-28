@@ -28,8 +28,8 @@ class UsersModel {
   }
 
   static async getUserById(id) {
-    const [rows] = await db.query('SELECT * FROM users WHERE user_id = ?', [id]);
-    return rows[0];
+    const rows = await db.query('SELECT * FROM users WHERE user_id = ?', [id]);
+    return rows.map(({ password_hash, ...rest }) => rest);
   }
 
   static async createUser(data) {

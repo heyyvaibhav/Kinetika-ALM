@@ -6,6 +6,7 @@ import { UserType } from "../DropdownOptions"
 import SearchContainer from "../Search/Search"
 import AddUser from "../AddUser/AddUser"
 import Pagination from "../Templates/Pagination"
+import HeaderNav from "../Templates/HeaderNav"
 
 const Users = () => {
   const [users, setUsers] = useState([])
@@ -150,10 +151,16 @@ const Users = () => {
 
   return (
     <div className="users-container">
-      <div className="users-header">
+      {/* <div className="users-header">
         <h2>Users</h2>
         <button onClick={handleAddUser}>Add User</button>
-      </div>
+      </div> */}
+
+      <HeaderNav
+        name="Users"
+        button_name="Add User"
+        buttonClick={handleAddUser}
+      />
 
       <SearchContainer
         searchTerm={searchTerm}

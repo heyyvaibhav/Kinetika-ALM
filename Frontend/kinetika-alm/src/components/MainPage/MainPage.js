@@ -92,7 +92,7 @@ const MainPage = () => {
           {/* Mobile Menu Toggle Button */}
           {showButton && !menuVisible && (
             <button
-              style={{ top: "1em", left: "1.5em", zIndex:"2000", marginBottom :"-20px" , marginLeft :"20px" , height :"40px" }}
+              style={{ top: "1em", left: "1.5em", position: "sticky", zIndex:"2000", marginBottom :"-40px" , marginLeft :"20px" , height :"40px" }}
               onClick={toggleMenu}
             >
               <GiHamburgerMenu />

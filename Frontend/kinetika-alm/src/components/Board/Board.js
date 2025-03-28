@@ -11,6 +11,7 @@ import Select from "react-select"
 import IssueDetails from "../IssueDetails/IssueDetails.js"
 import Loading from "../Templates/Loading.js"
 import { toast } from "react-toastify"
+import HeaderNav from "../Templates/HeaderNav.js"
 
 function Board() {
   const [columns, setColumns] = useState([])
@@ -461,10 +462,16 @@ function Board() {
 
   return (
     <div className="board">
-      <div className="board-header">
+      {/* <div className="board-header">
         <h2>Issue Board</h2>
         <button onClick={handleAddTicket}>Create</button>
-      </div>
+      </div> */}
+      <HeaderNav
+        name="Issue Board"
+        button_name="Create"
+        buttonClick={handleAddTicket}
+      />
+
       <SearchContainer 
         searchTerm={searchTerm} 
         setSearchTerm={setSearchTerm} 

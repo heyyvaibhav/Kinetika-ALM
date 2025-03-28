@@ -2,7 +2,7 @@ import React from "react";
 import Nav from "./Nav";
 import './Templates.css'
 
-const HeaderNav = ({ name }) => {
+const HeaderNav = ({ name, button_name, buttonClick }) => {
     return (
       <div
         style={{ 
@@ -11,20 +11,20 @@ const HeaderNav = ({ name }) => {
           flexDirection: "row", 
           justifyContent: "space-between", 
           alignItems: "center", 
-          backgroundColor: "#F7F8F9", 
+          backgroundColor: "#fff", 
           padding: "1em 1em" 
         }}
       >
-        {/* <h5>{name}</h5> */}
-        <span style={{ fontSize: "1rem", fontWeight: "bold" }}>{name}</span>
+        <h2 style={{  fontWeight: "bold", margin : "0" }}>{name}</h2>
         <div
           style={{ 
             display: "flex", 
             flexDirection: "row", 
             justifyContent: "flex-start", 
-            alignItems: "baseline" 
+            alignItems: "center" 
           }}
         >
+          <div style={{ borderRight : "1px solid #ddd", marginRight: "0.8em"}}><button style={{margin:"0.8em"}} onClick={buttonClick}>{button_name}</button></div>
           <Nav />
         </div>
       </div>

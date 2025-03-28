@@ -5,6 +5,7 @@ import Loading from '../Templates/Loading';
 import { useNavigate } from "react-router-dom";
 import SearchContainer from "../Search/Search";
 import Pagination from '../Templates/Pagination';
+import HeaderNav from '../Templates/HeaderNav';
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -141,10 +142,16 @@ const ProjectList = () => {
 
   return (
     <div className="active-projects-table-container">
-      <div className='list-header'>
+      {/* <div className='list-header'>
         <h2>Active Projects</h2>
         <button onClick={handleCreateProject}>Create Project</button>
-      </div>
+      </div> */}
+
+      <HeaderNav
+        name="Projects"
+        button_name="Create Project"
+        buttonClick={handleCreateProject}
+      />
       
       <SearchContainer searchTerm={searchTerm} setSearchTerm={setSearchTerm} setSortOrder={setSortOrder} handleFilter={handleFilter} />
       
