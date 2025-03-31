@@ -292,3 +292,14 @@ export const getHistory = async (endpoint) => {
     errorHandle(error);
   }
 };
+
+export const fetchProfile = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.get(endpoint);
+    // toast.success(response.data.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};

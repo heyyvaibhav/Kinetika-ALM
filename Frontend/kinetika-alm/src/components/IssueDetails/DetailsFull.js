@@ -343,7 +343,7 @@ const DetailsFull = () => {
                               ) : (entry.field_changed === "priority") ? (
                                 <span> Updated the issue priority from <span className="b">{entry.old_value}</span> to <span className="b">{entry.new_value}</span>.</span>
                               ) : (entry.field_changed === "status") ? (
-                                <span> Updated the issue status from <span className="b">{statusList.find(s => s.ID == entry.old_value)?.Name || 'Unknown Status'}</span> to <span className="b">{statusList.find(s => s.ID == entry.new_value)?.Name || 'Unknown Status'}</span>.</span>
+                                <span> Updated the issue status from <span style={{color:"#1D3557", textDecoration:"underline"}} className="b">{statusList.find(s => s.ID == entry.old_value)?.Name || 'Unknown Status'}</span> to <span style={{color:"#1D3557", textDecoration:"underline"}} className="b">{statusList.find(s => s.ID == entry.new_value)?.Name || 'Unknown Status'}</span>.</span>
                               ) : (
                                 <span> Updated the issue <span className="b">{entry.field_changed}</span> from <span className="b">{entry.old_value}</span> to <span className="b">{entry.new_value}</span></span>
                               )}

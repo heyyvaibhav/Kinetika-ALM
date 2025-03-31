@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getUserList, getUserDetails } from "../../Service";
 import { UserType } from "../DropdownOptions";
 import './Templates.css';
 
 const Nav = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userDetail, setUserDetail] = useState();
   const [profileInfo, setProfileInfo] = useState([]);
 
@@ -30,18 +29,18 @@ const Nav = () => {
     fetchDetails();
   }, []);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const profileSection = () => {
+    navigate("/main/profile");
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
+  // const handleLogout = () => {
+  //   localStorage.clear();
+  //   navigate("/");
+  // };
 
-  const handleNotificationClick = () => {
-    navigate("/main/notification");
-  };
+  // const handleNotificationClick = () => {
+  //   navigate("/main/notification");
+  // };
 
   return (
     <div>
@@ -59,7 +58,8 @@ const Nav = () => {
 
             <div 
                 className="avatar"
-                style={{ backgroundColor: '#518ca6', color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
+                style={{ backgroundColor: '#518ca6', color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px", cursor:"pointer"}}
+                onClick={profileSection}
             > 
             {profileInfo[0]?.full_name && typeof profileInfo[0]?.full_name === "string"
             ? profileInfo[0]?.full_name

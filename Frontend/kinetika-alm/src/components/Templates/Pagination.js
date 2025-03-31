@@ -11,7 +11,7 @@ const Pagination = ({
   visiblePages,
 }) => {
   const totalItems = duplicateArray.length || 0;
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const startItem = duplicateArray.length == 0 ?  0 : (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
