@@ -24,7 +24,14 @@ const HeaderNav = ({ name, button_name, buttonClick }) => {
             alignItems: "center" 
           }}
         >
-          <div style={{ borderRight : "1px solid #ddd", marginRight: "0.8em"}}><button style={{margin:"0.8em"}} onClick={buttonClick}>{button_name}</button></div>
+
+          {name !== "Profile" && (
+            <div style={{ borderRight : "1px solid #ddd", marginRight: "0.8em"}}>
+              <button style={{margin:"0.8em"}} onClick={buttonClick}>
+                {button_name}
+              </button>
+            </div>
+          )}
           <Nav />
         </div>
       </div>
