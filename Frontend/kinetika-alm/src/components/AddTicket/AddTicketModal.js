@@ -347,7 +347,7 @@ export function AddTicketModal({ onclose , statusList }) {
         {/* Footer */}
         <div className="modal-footer">
           <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-            <button type="button" className="btn btn-secondary" onClick={onclose}>
+            <button type="button" className="btn btn-outline" onClick={onclose}>
               Cancel
             </button>
             <button type="button" className="btn btn-primary" onClick={handleSave}>

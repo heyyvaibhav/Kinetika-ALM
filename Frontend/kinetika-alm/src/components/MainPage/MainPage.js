@@ -49,7 +49,7 @@ const MainPage = () => {
                 height: "100vh",
                 backdropFilter: "blur(5px)", // Applies blur effect
                 backgroundColor: "rgba(0, 0, 0, 0.3)", // Semi-transparent dark overlay
-                zIndex: 9, // Keeps it behind the menu but above content
+                zIndex: 1001, // Keeps it behind the menu but above content
               }}
               onClick={() => setMenuVisible(false)} // Clicking outside closes menu
             ></div>
@@ -67,7 +67,7 @@ const MainPage = () => {
               background: "#fff",
               boxShadow: "2px 0 10px rgba(0, 0, 0, 0.2)", // Box shadow effect
               padding: "1rem",
-              zIndex: 10, // Ensure menu is above the blurred background
+              zIndex: 1002, // Ensure menu is above the blurred background
             }}
           >
             <Sidebar open={menuVisible} closeMenu={() => setMenuVisible(false)} />

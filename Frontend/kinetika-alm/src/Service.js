@@ -303,3 +303,51 @@ export const fetchProfile = async (endpoint) => {
     errorHandle(error);
   }
 };
+
+export const changePassword = async (endpoint, data) => {
+  try {
+    // getToken();
+    const response = await apiClient.post(endpoint, data);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};
+
+export const updateProfile = async (endpoint, data) => {
+  try {
+    // getToken();
+    const response = await apiClient.put(endpoint, data);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};
+
+export const uploadPicture = async (endpoint, data) => {
+  try {
+    // getToken();
+    const response = await apiClient.post(endpoint, data);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};
+
+export const deletePicture = async (endpoint) => {
+  try {
+    // getToken();
+    const response = await apiClient.delete(endpoint);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};

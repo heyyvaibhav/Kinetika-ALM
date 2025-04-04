@@ -11,12 +11,12 @@ router.get("/getProfile/:id", async (req, res) => {
   const profileId = req.params.id;
 
   const profileQuery =
-    `SELECT ws.full_name, COALESCE(wsi.MobileNumber, 'N/A') AS MobileNumber, ws.email, COALESCE(wsi.Address, 'N/A') AS Address, 
+    `SELECT ws.full_name, ws.created_at, ws.Status, COALESCE(wsi.MobileNumber, 'N/A') AS MobileNumber, ws.email, COALESCE(wsi.Address, 'N/A') AS Address, 
       COALESCE(wsi.DOB, 'N/A') AS DOB, 
       COALESCE(wsi.State, 'N/A') AS State, 
       COALESCE(wsi.City, 'N/A') AS City, 
       COALESCE(wsi.BIO, 'N/A') AS BIO, 
-      COALESCE(wsi.ProfileImage, 'default.png') AS ProfileImage FROM users AS ws 
+      wsi.ProfileImage AS ProfileImage FROM users AS ws 
       LEFT JOIN web_user_info AS wsi ON wsi.UserID = ws.user_id WHERE ws.user_id = ?`;
 
   try {
@@ -29,64 +29,44 @@ router.get("/getProfile/:id", async (req, res) => {
 });
 
 // Update user profile
-router.put(
-  "/updateProfile/:id",
-  authenticateToken,
-  [
-    body("Name").notEmpty().withMessage("Name is required"),
-    body("MobileNumber").notEmpty().withMessage("MobileNumber is required"),
-    body("Email").isEmail().withMessage("Valid Email is required"),
-    body("Address").notEmpty().withMessage("Address is required"),
-    body("DOB").isDate().withMessage("Valid Date of Birth is required"),
-    body("BIO").notEmpty().withMessage("Bio is required"),
-    body("City").notEmpty().withMessage("City is required"),
-    body("State").notEmpty().withMessage("State is required"),
-    body("ProfileImage").notEmpty().withMessage("ProfileImage is required"),
-  ],
-  async (req, res) => {
+router.put("/updateProfile/:id", async (req, res) => {
     const profileId = req.params.id;
     const {
-      Name,
       MobileNumber,
-      Email,
       Address,
       DOB,
       State,
       City,
       BIO,
-      ProfileImage,
     } = req.body;
 
-    const updateWebUser = "UPDATE users SET full_name = ?, email = ? WHERE user_id = ?";
     const selectWebUserInfo = "SELECT COUNT(*) AS recordCount FROM web_user_info WHERE UserID = ?";
     const insertWebUserInfo =
-      "INSERT INTO web_user_info (Address, DOB, State, City, BIO, ProfileImage, UserID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+      "INSERT INTO web_user_info (MobileNumber, Address, DOB, State, City, BIO, UserID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     const updateWebUserInfo =
-      "UPDATE web_user_info SET Address = ?, DOB = ?, State = ?, City = ?, BIO = ?, ProfileImage = ? WHERE UserID = ?";
+      "UPDATE web_user_info SET MobileNumber = ?, Address = ?, DOB = ?, State = ?, City = ?, BIO = ? WHERE UserID = ?";
 
     try {
-      await db.query(updateWebUser, [Name, MobileNumber, Email, profileId]);
-
-      const [[{ recordCount }]] = await db.query(selectWebUserInfo, [profileId]);
-
+      
+      const [{ recordCount }] = await db.query(selectWebUserInfo, [profileId]);
       if (recordCount > 0) {
         await db.query(updateWebUserInfo, [
+          MobileNumber,
           Address,
           DOB,
           State,
           City,
           BIO,
-          ProfileImage,
           profileId,
         ]);
       } else {
         await db.query(insertWebUserInfo, [
+          MobileNumber,
           Address,
           DOB,
           State,
           City,
           BIO,
-          ProfileImage,
           profileId,
         ]);
       }
@@ -100,14 +80,7 @@ router.put(
 );
 
 // Change password
-router.post(
-  "/changePassword/:id",
-  authenticateToken,
-  [
-    body("currentPassword").notEmpty().withMessage("Password is required"),
-    body("newPassword").notEmpty().withMessage("New Password is required"),
-  ],
-  async (req, res) => {
+router.post("/changePassword/:id", async (req, res) => {
     const userId = req.params.id;
     const { currentPassword, newPassword } = req.body;
 
@@ -138,8 +111,39 @@ router.post(
   }
 );
 
+// Upload profile picture
+router.post("/picture/:id", async (req, res) => {
+  const profileId = req.params.id;
+  const { ProfileImage } = req.body;
+
+  const selectWebUserInfo = "SELECT COUNT(*) AS recordCount FROM web_user_info WHERE UserID = ?";
+  const insertWebUserInfo =
+    "INSERT INTO web_user_info (ProfileImage, UserID) VALUES (?, ?)";
+  const updateWebUserInfo =
+    "UPDATE web_user_info SET ProfileImage = ? WHERE UserID = ?";
+
+  try {
+    const [{ recordCount }] = await db.query(selectWebUserInfo, [profileId]);
+    if (recordCount > 0) {
+      await db.query(updateWebUserInfo, [
+        ProfileImage,
+        profileId,
+      ]);
+    } else {
+      await db.query(insertWebUserInfo, [
+        ProfileImage,
+        profileId,
+      ]);
+    }
+    res.status(200).json({ message: "Profile picture saved successfully" });
+  } catch (err) {
+    console.error("Error uploading profile picture:", err);
+    res.status(500).json({ error: "An error occurred while updating the profile" });
+  }
+});
+
 // Delete profile picture
-router.delete("/deleteProfilePicture/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   const profileId = req.params.id;
 
   const deleteProfileImageQuery = "UPDATE web_user_info SET ProfileImage = NULL WHERE UserID = ?";

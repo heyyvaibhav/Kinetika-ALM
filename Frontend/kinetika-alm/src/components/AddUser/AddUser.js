@@ -128,7 +128,7 @@ const AddUser = ({ isOpen, onClose }) => {
         {/* Footer */}
         <div className="modal-footer">
             <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                <button type="button" className="btn btn-secondary" onClick={onClose}>
+                <button type="button" className="btn btn-outline" onClick={onClose}>
                 Cancel
                 </button>
                 <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
