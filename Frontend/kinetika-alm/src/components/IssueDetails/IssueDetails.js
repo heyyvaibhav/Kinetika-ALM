@@ -306,6 +306,8 @@ const IssueDetails = ({ onClose, issue }) => {
                               {
                               (entry.field_changed === "Comment Added") ? (
                                 <span> Added a comment.</span>
+                              ) : (entry.field_changed === "Attachment Added") ? (
+                                <span> Added an attachment.</span>
                               ) : (entry.field_changed === "Issue Created") ? (
                                 <span> Created an issue.</span>
                               ) : (entry.field_changed === "assignee") ? (

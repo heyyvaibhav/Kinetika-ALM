@@ -26,6 +26,7 @@ const Profile = () => {
     const { month, year } = getMonthAndYear(profile.created_at);
     const widgetsRef = useRef();
     const [showDropdown, setShowDropdown] = useState(false);
+    const [saveDisabled,  setSaveDisabled] = useState(true);
 
     const toggleDropdown = () => {
       setShowDropdown(!showDropdown);
@@ -63,16 +64,17 @@ const Profile = () => {
           },
           (error, result) => {
             if (!error && result && result.event === "success") {
-              const newImage = result.info.secure_url; // Extract the secure URL of the uploaded image
+              const newImage = result.info.secure_url;
               setFormData((prevState) => ({
-                ...prevState, // Spread the previous state to retain other properties
-                ProfileImage: newImage, // Set the `profile_image` property as a string
+                ...prevState,
+                ProfileImage: newImage,
               }));
-              widgetsRef.current.close(); // Close the widget after successful upload
+              widgetsRef.current.close();
               toast.success("Photo uploaded. Click Save!!", {
                 zIndex: 5000, // Correct syntax for custom zIndex
               });
               setLoading(false);
+              setSaveDisabled(false);
             } else if (error) {
               if (
                 error?.status?.includes("exceeds maximum allowed (5 MB)") &&
@@ -113,6 +115,7 @@ const Profile = () => {
         console.error("Error fetching profile:", error);
       } finally {
         setLoading(false);
+        setSaveDisabled(true);
       }
     }
 
@@ -231,8 +234,6 @@ const Profile = () => {
       return { month, year };
     }
 
-    console.log(profile.ProfileImage); 
-
   return (
 
     <div className="profile">
@@ -285,7 +286,7 @@ const Profile = () => {
                       
                       {profile.ProfileImage && <button onClick={handleRemove}>Remove Picture</button>}
 
-                      {!profile.ProfileImage && <button onClick={handleUploadPicture}>Save</button>}
+                      {!profile.ProfileImage && <button disabled={saveDisabled} style={{ cursor: saveDisabled ? "not-allowed" : "pointer" }} onClick={handleUploadPicture}>Save</button>}
                     </div>
                   )}
                   {profile.Status === "Active" && <div className="status-indicator"></div>}

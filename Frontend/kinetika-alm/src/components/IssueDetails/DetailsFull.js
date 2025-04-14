@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react"
 import './DetailsFull.css';
-import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory } from "../../Service"
+import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments } from "../../Service"
 import { toast } from "react-toastify"
 import RichTextEditor from "../Templates/TextEditor.js"
 import { useLocation, useParams } from "react-router-dom";
 import Loading from "../Templates/Loading.js"
+import { TbDownload } from "react-icons/tb";
 
 const DetailsFull = () => {
   // const location = useLocation();
@@ -18,6 +19,7 @@ const DetailsFull = () => {
   const [newComment, setNewComment] = useState("")
   const [comments, setComments] = useState([])
   const [history, setHistory] = useState([])
+  const [attachments, setAttachments] = useState([])
   const [statusList, setStatusList] = useState([])
   const [users, setUsers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -113,6 +115,23 @@ const DetailsFull = () => {
     }
   }
 
+  const fetchAttachments = async () => {
+    try {
+      const response = await getAttachments(`/issues/attachments/${issue.issue_id}/attachments`)
+      setAttachments(response.data)
+    } catch (error) {
+      console.error("Error fetching attachments:", error)
+    }
+  }
+
+  const handleAttachment = (entry) => {
+    const link = document.createElement("a");
+    link.href = entry.file_url; // or whatever field has the URL
+    link.download = entry.file_name; // suggested filename
+    link.target = "_blank";
+    link.click();
+  };
+
   useEffect(() => {
     fetchUsers()
     getColumns()
@@ -121,6 +140,7 @@ const DetailsFull = () => {
   useEffect(() => {
     if (activeTab === "comments") fetchComments()
     if (activeTab === "history") fetchHistory()
+    if (activeTab === "attachments") fetchAttachments()
   }, [activeTab])
 
   const getRandomColor = () => {
@@ -334,6 +354,8 @@ const DetailsFull = () => {
                               {
                               (entry.field_changed === "Comment Added") ? (
                                 <span> Added a comment.</span>
+                              ) : (entry.field_changed === "Attachment Added") ? (
+                                <span> Added an attachment.</span>
                               ) : (entry.field_changed === "Issue Created") ? (
                                 <span> Created an issue.</span>
                               ) : (entry.field_changed === "assignee") ? (
@@ -353,6 +375,46 @@ const DetailsFull = () => {
                       ))
                     ) : (
                       <p>No Issue history present.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "attachments" && (
+                <div>
+                  <div className="history-section" style={{height: "550px"}}>
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center", boxShadow: "0 2px 3px -1px rgba(0, 0, 0, 0.1)", marginBottom:"10px"}}>
+                      <h3 style={{ marginBottom:"10px" }}>Attachments</h3>
+                    </div>
+
+                    {attachments.length > 0 ? (
+                      attachments.map((entry, index) => (
+                        <div key={index} className="history">
+                          <div 
+                            className="avatar"
+                            style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                          > 
+                            {entry.username && typeof entry.username === "string"
+                            ? entry.username
+                                .split(" ")
+                                .map(word => word.charAt(0).toUpperCase())
+                                .join("")
+                            : ""}
+                          </div>
+                          <div style={{width:"100%",  alignItems:"center", gap: "8px"}}>
+                            <div style={{display:"flex", justifyContent:"space-between", gap:"4px",}}>
+                              <strong>{entry.username || "Undefined"}</strong>
+                              <small>{formatTime(entry.uploaded_at)}</small>
+                            </div>
+                            <div style={{display:"flex", justifyContent:"space-between"}}>
+                              <div>{entry.file_name}</div>
+                              <TbDownload color="#a6a4b2" size={20} onClick={() => window.open(entry.file_path, "_blank")} />
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No Issue Attachments present.</p>
                     )}
                   </div>
                 </div>

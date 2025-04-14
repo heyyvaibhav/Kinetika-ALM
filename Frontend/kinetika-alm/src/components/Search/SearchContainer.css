@@ -109,10 +109,17 @@
       font-size: 14px;
       padding: 5px;
       cursor: pointer;
+      width: 157px;
+      color: #003366;
+      border-radius: 8px;
   }
 
   .dropdown-item input {
       cursor: pointer;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f0f0f0;
   }
 
   .reset-button {

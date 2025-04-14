@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from "react"
 import "./AddTicketModal.css"
-import { getProject, createIssue, getUserList } from "../../Service"
+import { getProject, createIssue, getUserList, uploadAttachment } from "../../Service"
 import { toast } from "react-toastify"
 import { issue_type } from "../DropdownOptions"
 import Loading from "../Templates/Loading"
 import { NewRelicConfig } from "../../environment"
 
 export function AddTicketModal({ onclose , statusList }) {
-  const [file, setFile] = useState([])
   const [files, setFiles] = useState([])
   const [flagged, setFlagged] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -78,6 +77,7 @@ export function AddTicketModal({ onclose , statusList }) {
   }
   
   const widgetsRef = useRef();
+  console.log(files);
 
   const initializeCloudinaryWidget = () => {
     if (!window.cloudinary) {
@@ -98,8 +98,9 @@ export function AddTicketModal({ onclose , statusList }) {
         (error, result) => {
           if (!error && result && result.event === "success") {
             const url = result.info.secure_url; // Extract the secure URL of the uploaded image
-            setFile(url);
-
+            const name = result.info.original_filename;
+            const format = result.info.format;
+            setFiles((prevFiles) => [...prevFiles, { name, format, url }]);
             widgetsRef.current.close(); // Close the widget after successful upload
             toast.success("Photo uploaded successfully!!", {
               zIndex: 5000, // Correct syntax for custom zIndex
@@ -172,13 +173,16 @@ export function AddTicketModal({ onclose , statusList }) {
       formData.append("reporter_id", userid)
       formData.append("flagged", flagged ? 1 : 0)
 
-      // Append files to formData
-      files.forEach((file) => {
-        formData.append("attachments", file)
-      })
-
-      // Call the createTicket function from your Service.js
       const response = await createIssue("/issues", formData)
+      const issueID = response.issue_id;
+
+      for (const file of files) {
+        await uploadAttachment(`/issues/attachments/${issueID}/attachments`, {
+          filename: file.name,
+          fileurl: file.url,
+          uploaded_by: userid,
+        });
+      }
 
       // console.log("Ticket created:", response)
       setIsLoading(false)
@@ -332,6 +336,7 @@ export function AddTicketModal({ onclose , statusList }) {
               <ul className="file-list">
                 {files.map((file, index) => (
                   <li key={index}>{file.name}</li>
+                  // <li key={index}> {file.name}.{file.format} </li>
                 ))}
               </ul>
             )}

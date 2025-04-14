@@ -42,7 +42,7 @@ router.put("/updateProfile/:id", async (req, res) => {
 
     const selectWebUserInfo = "SELECT COUNT(*) AS recordCount FROM web_user_info WHERE UserID = ?";
     const insertWebUserInfo =
-      "INSERT INTO web_user_info (MobileNumber, Address, DOB, State, City, BIO, UserID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+      "INSERT INTO web_user_info (MobileNumber, Address, DOB, State, City, BIO, UserID) VALUES (?, ?, ?, ?, ?, ?, ?)";
     const updateWebUserInfo =
       "UPDATE web_user_info SET MobileNumber = ?, Address = ?, DOB = ?, State = ?, City = ?, BIO = ? WHERE UserID = ?";
 

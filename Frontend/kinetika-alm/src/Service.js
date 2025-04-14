@@ -351,3 +351,25 @@ export const deletePicture = async (endpoint) => {
     throw error;
   }
 };
+
+export const uploadAttachment = async (endpoint, data) => {
+  try {
+    // getToken();
+    const response = await apiClient.post(endpoint, data);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};
+
+export const getAttachments = async (endpoint) => {
+  try {
+  //   getToken();
+    const response = await apiClient.get(endpoint);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+  }
+};
