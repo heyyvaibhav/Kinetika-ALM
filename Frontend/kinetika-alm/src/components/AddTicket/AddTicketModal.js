@@ -8,6 +8,7 @@ import { NewRelicConfig } from "../../environment"
 
 export function AddTicketModal({ onclose , statusList }) {
   const [files, setFiles] = useState([])
+  const [projectID, setProjectID] = useState()
   const [flagged, setFlagged] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [projectList, setProjectList] = useState([])
@@ -160,7 +161,7 @@ export function AddTicketModal({ onclose , statusList }) {
       const formData = new FormData()
 
       // Append ticket data to formData
-      formData.append("project_id", document.querySelector('select[name="project"]').value)
+      formData.append("project_id", projectID)
       formData.append("issue_type_id", document.querySelector('select[name="issueType"]').value)
       formData.append("priority", document.querySelector('select[name="Priority"]').value)
       formData.append("status", document.querySelector('select[name="Status"]').value)
@@ -182,7 +183,7 @@ export function AddTicketModal({ onclose , statusList }) {
         });
       }
 
-      // console.log("Ticket created:", response)
+      setFiles([])
       setIsLoading(false)
       onclose()
     } catch (error) {
@@ -211,8 +212,8 @@ export function AddTicketModal({ onclose , statusList }) {
               <label>
                   Project<span className="required">*</span>
               </label>
-              <select className="form-control" name="project" defaultValue="" required>
-                  <option disabled>Select a Project</option>
+              <select className="form-control" name="project" defaultValue="" required value={projectID} onChange={(e) => setProjectID(e.target.value)}>
+                <option value="" disabled hidden>Select a Project</option>
                   {isLoading ? (
                       <option>Loading...</option>
                   ) : (
