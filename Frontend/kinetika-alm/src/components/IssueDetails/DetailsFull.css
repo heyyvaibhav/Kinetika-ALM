@@ -92,3 +92,16 @@
   .detail-button:hover {
     background-color: #f4f5f7;
   }
+
+  @media (max-width: 768px) {
+    .detailPage{
+      flex-direction: column-reverse;
+    }
+    .detail-body {
+      width: 100% !important;
+    }
+    .detailright{
+      width: 100% !important;
+      margin-bottom: 20px;
+    }
+  }

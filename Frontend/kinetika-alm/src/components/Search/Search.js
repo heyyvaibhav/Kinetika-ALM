@@ -122,7 +122,6 @@ const SearchContainer = ({ searchTerm, setSearchTerm, setSortOrder, handleFilter
                                 <button 
                                     className="reset-button" 
                                     onClick={() => {
-                                        console.log("Reset button clicked!");  // ✅ Console log
                                         setSelectedAssignees([]);  // ✅ Clear selected assignees
                                     }}
                                 >

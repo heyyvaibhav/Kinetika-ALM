@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import './DetailsFull.css';
-import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments } from "../../Service"
+import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment } from "../../Service"
 import { toast } from "react-toastify"
 import RichTextEditor from "../Templates/TextEditor.js"
 import { useLocation, useParams } from "react-router-dom";
 import Loading from "../Templates/Loading.js"
 import { TbDownload } from "react-icons/tb";
+import { NewRelicConfig } from "../../environment";
+import HeaderNav from "../Templates/HeaderNav";
 
 const DetailsFull = () => {
   // const location = useLocation();
@@ -22,6 +24,7 @@ const DetailsFull = () => {
   const [attachments, setAttachments] = useState([])
   const [statusList, setStatusList] = useState([])
   const [users, setUsers] = useState([])
+  const [files, setFiles] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   const userid = localStorage.getItem("userId");
@@ -132,6 +135,25 @@ const DetailsFull = () => {
     link.click();
   };
 
+  const AttachmentUpload = async () => {
+    try {
+      setIsLoading(true)
+      await uploadAttachment(`/issues/attachments/${issue.issue_id}/attachments`, {
+        filename: files[0]?.name,
+        fileurl: files[0]?.url,
+        uploaded_by: userid,
+      });
+
+      setFiles([])
+      fetchAttachments()
+    } catch (error) {
+      console.error("Error creating ticket:", error)
+      setIsLoading(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     fetchUsers()
     getColumns()
@@ -142,32 +164,6 @@ const DetailsFull = () => {
     if (activeTab === "history") fetchHistory()
     if (activeTab === "attachments") fetchAttachments()
   }, [activeTab])
-
-  const getRandomColor = () => {
-    const colors = [
-      "#FF5733",
-      "#3357FF",
-      "#FF33A1",
-      "#FF8C33",
-      "#8C33FF",
-      "#33FF57",
-      "#FFC300",
-      "#DAF7A6",
-      "#C70039",
-      "#900C3F",
-      "#581845",
-      "#FF6F61",
-      "#6B5B95",
-      "#88B04B",
-      "#F7CAC9",
-      "#92A8D1",
-      "#955251",
-      "#B565A7",
-      "#009B77",
-      "#DD4132",
-    ]
-    return colors[Math.floor(Math.random() * colors.length)]
-  }
 
   const handleCommentSubmit = async (e) => {
     setNewComment("");
@@ -230,13 +226,69 @@ const DetailsFull = () => {
     return `${diffYears} years ago`
   }
 
+  const widgetsRef = useRef();
+  const initializeCloudinaryWidget = () => {
+      if (!window.cloudinary) {
+        console.error("Cloudinary library is not loaded.");
+        return;
+      }
+  
+      if (!widgetsRef.current) {
+        // Initialize the Cloudinary widget only once
+        widgetsRef.current = window.cloudinary.createUploadWidget(
+          {
+            cloudName: NewRelicConfig.cloudName,
+            uploadPreset: NewRelicConfig.uploadPreset,
+            multiple: true, // Single upload only
+            clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"], // Acceptable formats
+            maxFileSize: 5 * 1024 * 1024, // 5 MB
+          },
+          (error, result) => {
+            if (!error && result && result.event === "success") {
+              const url = result.info.secure_url; // Extract the secure URL of the uploaded image
+              const name = result.info.original_filename;
+              const format = result.info.format;
+              setFiles([{ name, format, url }]);
+              widgetsRef.current.close(); // Close the widget after successful upload
+              toast.success("Photo uploaded successfully!!", {
+                zIndex: 5000, // Correct syntax for custom zIndex
+              });
+              setIsLoading(false);
+            } else if (error) {
+              if (
+                error?.status?.includes("exceeds maximum allowed (5 MB)") &&
+                error?.statusText?.includes("File size")
+              ) {
+                toast.error(
+                  "File size exceeds 5 MB. Please upload a smaller file."
+                );
+  
+                widgetsRef.current.close();
+              } else if (
+                error?.status === "File format not allowed" &&
+                error?.statusText?.includes("File format not allowed")
+              ) {
+                toast.error("File format not allowed");
+  
+                widgetsRef.current.close();
+              }
+              setIsLoading(false);
+            }
+          }
+        );
+      }
+      setIsLoading(true);
+      widgetsRef.current.open();
+    };
+
   return (
     <div className="detail-background">
-      <div className="detail-header">
-        <h2>Issue Details - {issue.issue_key}</h2>
-        <button onClick={saveChanges}>Save</button>
-      </div>
-      <div style={{display:"flex"}}>
+      <HeaderNav 
+        name={`Issue Details - ${issue.issue_key}`}
+        button_name="Save"
+        buttonClick={saveChanges}
+      />
+      <div className="detailPage" style={{display:"flex"}}>
         <div className="detail-body" style={{width:"65%",  padding:"0 20px"}}>
           <div className="space-y-6">
             <div className="form-group">
@@ -251,7 +303,7 @@ const DetailsFull = () => {
               />
             </div>
 
-            <div className="tabs" style={{ width:"80%", justifyContent:"space-between", background:"#F1F5F9", padding:"4px 8px", borderRadius:"10px",marginBottom:"20px"}}>
+            <div className="tabs" style={{ width:"100%", justifyContent:"space-between", background:"#F1F5F9", padding:"4px 8px", borderRadius:"10px",marginBottom:"20px"}}>
               <button
                 className={`tab ${activeTab === "comments" ? "active" : ""}`}
                 onClick={() => setActiveTab("comments")}
@@ -416,6 +468,13 @@ const DetailsFull = () => {
                     ) : (
                       <p>No Issue Attachments present.</p>
                     )}
+                    <div style={{textAlign: "right", marginTop:"10px"}}>
+                      {files.length === 0 ? (
+                        <button onClick={initializeCloudinaryWidget}>Add Attachment</button>
+                      ) : (
+                        <button onClick={AttachmentUpload}>Save Attachment</button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -423,7 +482,7 @@ const DetailsFull = () => {
           </div>
         </div>
         
-        <div style={{width:"35%", padding:"0 20px"}}>
+        <div className="detailright" style={{width:"35%", padding:"0 20px"}}>
           <div className="details-section">
             <div className="details-collapsible">
               <button className="collapsible-header" onClick={() => setIsDetailsOpen(!isDetailsOpen)}>
@@ -488,7 +547,7 @@ const DetailsFull = () => {
                 </div>
               )}
             </div>
-              <div style={{fontSize:"13px", color:"#bfbfbf", padding:"0 6px"}}>
+              <div style={{ textAlign: "center", fontSize:"13px", color:"#bfbfbf", padding:"0 6px"}}>
                 <p>Created On: {formatDate(issue.created_at)}</p>
                 <p>Updated On: {formatDate(issue.updated_at)}</p>
               </div>

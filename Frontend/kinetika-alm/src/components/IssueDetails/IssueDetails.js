@@ -194,7 +194,7 @@ const IssueDetails = ({ onClose, issue }) => {
         </div>
 
         <div className="modal-contentt">
-          <div className="left-section">
+          <div className="left-section" style={{width: "65%"}}>
             <div className="form-group">
               <h3 style={{marginBottom:"10px"}}>Description</h3>
               <textarea className="form-control" value={description} style={{width:"100%", height:"100px", fontFamily:"sans-serif"}}
@@ -206,7 +206,7 @@ const IssueDetails = ({ onClose, issue }) => {
               </div>
             </div>
 
-            <div className="tabs" style={{ width:"60%", justifyContent:"space-between", background:"#F1F5F9", padding:"4px 8px", borderRadius:"10px",marginBottom:"20px"}}>
+            <div className="tabs" style={{ width:"100%", justifyContent:"space-between", background:"#F1F5F9", padding:"4px 8px", borderRadius:"10px",marginBottom:"20px"}}>
               <button
                 className={`tab ${activeTab === "comments" ? "active" : ""}`}
                 onClick={() => setActiveTab("comments")}
@@ -334,7 +334,7 @@ const IssueDetails = ({ onClose, issue }) => {
             </div>
           </div>
 
-          <div className="details-section">
+          <div className="details-section" style={{width: "35%"}}>
             <div className="details-collapsible">
               <button className="collapsible-header" onClick={() => setIsDetailsOpen(!isDetailsOpen)}>
                 <i className={`fas fa-chevron-down ${isDetailsOpen ? "rotate" : ""}`}></i>
@@ -398,7 +398,7 @@ const IssueDetails = ({ onClose, issue }) => {
                 </div>
               )}
             </div>
-              <div style={{fontSize:"13px", color:"#bfbfbf", padding:"0 6px"}}>
+              <div style={{textAlign: "center", fontSize:"13px", color:"#bfbfbf", padding:"0 6px"}}>
                 <p>Created On: {formatDate(issue.created_at)}</p>
                 <p>Updated On: {formatDate(issue.updated_at)}</p>
               </div>

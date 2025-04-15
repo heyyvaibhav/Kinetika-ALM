@@ -68,8 +68,7 @@
     background: white;
     border-radius: 8px;
     color: black;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
     gap: 24px;
     height: calc(90vh - 100px);
   }
@@ -260,3 +259,15 @@
   }
   
   
+  @media (max-width: 768px) {
+    .modal-contentt{
+      flex-direction: column;
+    }
+    .left-section {
+      width: 100% !important;
+      margin-bottom: 20px;
+    }
+    .details-section{
+      width: 100% !important;
+    }
+  }

@@ -77,8 +77,6 @@ export function AddTicketModal({ onclose , statusList }) {
   }
   
   const widgetsRef = useRef();
-  console.log(files);
-
   const initializeCloudinaryWidget = () => {
     if (!window.cloudinary) {
       console.error("Cloudinary library is not loaded.");
