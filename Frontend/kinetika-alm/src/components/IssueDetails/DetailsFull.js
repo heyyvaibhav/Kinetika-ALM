@@ -3,7 +3,6 @@ import './DetailsFull.css';
 import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment } from "../../Service"
 import { toast } from "react-toastify"
 import RichTextEditor from "../Templates/TextEditor.js"
-import { useLocation, useParams } from "react-router-dom";
 import Loading from "../Templates/Loading.js"
 import { TbDownload } from "react-icons/tb";
 import { NewRelicConfig } from "../../environment";
@@ -228,58 +227,58 @@ const DetailsFull = () => {
 
   const widgetsRef = useRef();
   const initializeCloudinaryWidget = () => {
-      if (!window.cloudinary) {
-        console.error("Cloudinary library is not loaded.");
-        return;
-      }
-  
-      if (!widgetsRef.current) {
-        // Initialize the Cloudinary widget only once
-        widgetsRef.current = window.cloudinary.createUploadWidget(
-          {
-            cloudName: NewRelicConfig.cloudName,
-            uploadPreset: NewRelicConfig.uploadPreset,
-            multiple: true, // Single upload only
-            clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"], // Acceptable formats
-            maxFileSize: 5 * 1024 * 1024, // 5 MB
-          },
-          (error, result) => {
-            if (!error && result && result.event === "success") {
-              const url = result.info.secure_url; // Extract the secure URL of the uploaded image
-              const name = result.info.original_filename;
-              const format = result.info.format;
-              setFiles([{ name, format, url }]);
-              widgetsRef.current.close(); // Close the widget after successful upload
-              toast.success("Photo uploaded successfully!!", {
-                zIndex: 5000, // Correct syntax for custom zIndex
-              });
-              setIsLoading(false);
-            } else if (error) {
-              if (
-                error?.status?.includes("exceeds maximum allowed (5 MB)") &&
-                error?.statusText?.includes("File size")
-              ) {
-                toast.error(
-                  "File size exceeds 5 MB. Please upload a smaller file."
-                );
-  
-                widgetsRef.current.close();
-              } else if (
-                error?.status === "File format not allowed" &&
-                error?.statusText?.includes("File format not allowed")
-              ) {
-                toast.error("File format not allowed");
-  
-                widgetsRef.current.close();
-              }
-              setIsLoading(false);
+    if (!window.cloudinary) {
+      console.error("Cloudinary library is not loaded.");
+      return;
+    }
+
+    if (!widgetsRef.current) {
+      // Initialize the Cloudinary widget only once
+      widgetsRef.current = window.cloudinary.createUploadWidget(
+        {
+          cloudName: NewRelicConfig.cloudName,
+          uploadPreset: NewRelicConfig.uploadPreset,
+          multiple: true, // Single upload only
+          clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"], // Acceptable formats
+          maxFileSize: 5 * 1024 * 1024, // 5 MB
+        },
+        (error, result) => {
+          if (!error && result && result.event === "success") {
+            const url = result.info.secure_url; // Extract the secure URL of the uploaded image
+            const name = result.info.original_filename;
+            const format = result.info.format;
+            setFiles([{ name, format, url }]);
+            widgetsRef.current.close(); // Close the widget after successful upload
+            toast.success("Photo uploaded successfully!! Click Save.", {
+              zIndex: 5000, // Correct syntax for custom zIndex
+            });
+            setIsLoading(false);
+          } else if (error) {
+            if (
+              error?.status?.includes("exceeds maximum allowed (5 MB)") &&
+              error?.statusText?.includes("File size")
+            ) {
+              toast.error(
+                "File size exceeds 5 MB. Please upload a smaller file."
+              );
+
+              widgetsRef.current.close();
+            } else if (
+              error?.status === "File format not allowed" &&
+              error?.statusText?.includes("File format not allowed")
+            ) {
+              toast.error("File format not allowed");
+
+              widgetsRef.current.close();
             }
+            setIsLoading(false);
           }
-        );
-      }
-      setIsLoading(true);
-      widgetsRef.current.open();
-    };
+        }
+      );
+    }
+    setIsLoading(true);
+    widgetsRef.current.open();
+  };
 
   return (
     <div className="detail-background">
@@ -307,21 +306,21 @@ const DetailsFull = () => {
               <button
                 className={`tab ${activeTab === "comments" ? "active" : ""}`}
                 onClick={() => setActiveTab("comments")}
-                style={{ color:"#000", width:"33%", marginLeft:"0.5%"}}
+                style={{ color:"#000", width:"33%", marginLeft:"0.5%",  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', }}
               >
                 Comments
               </button>
               <button
                 className={`tab ${activeTab === "history" ? "active" : ""}`}
                 onClick={() => setActiveTab("history")}
-                style={{ color:"#000", width:"33%",}}
+                style={{ color:"#000", width:"33%",  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', }}
               >
                 History
               </button>
               <button
                 className={`tab ${activeTab === "attachments" ? "active" : ""}`}
                 onClick={() => setActiveTab("attachments")}
-                style={{ color:"#000", width:"33%", }}
+                style={{ color:"#000", width:"33%",  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', }}
               >
                 Attachments
               </button>

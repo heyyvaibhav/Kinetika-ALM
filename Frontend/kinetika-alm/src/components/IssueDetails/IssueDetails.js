@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import "./IssueDetails.css"
-import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory } from "../../Service"
+import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment } from "../../Service"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom";
+import { TbDownload } from "react-icons/tb";
+import { NewRelicConfig } from "../../environment";
 
 const IssueDetails = ({ onClose, issue }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(true)
@@ -14,11 +16,12 @@ const IssueDetails = ({ onClose, issue }) => {
   const [newComment, setNewComment] = useState("")
   const [comments, setComments] = useState([])
   const [history, setHistory] = useState([])
+  const [attachments, setAttachments] = useState([])
+  const [files, setFiles] = useState([])
   const [statusList, setStatusList] = useState([])
   const [users, setUsers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const navigate = useNavigate();
   const userid = localStorage.getItem("userId");
 
   function formatDate(isoString) {
@@ -99,6 +102,89 @@ const IssueDetails = ({ onClose, issue }) => {
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
+  }
+
+  const fetchAttachments = async () => {
+    try {
+      const response = await getAttachments(`/issues/attachments/${issue.issue_id}/attachments`)
+      setAttachments(response.data)
+    } catch (error) {
+      console.error("Error fetching attachments:", error)
+    }
+  }
+
+  const AttachmentUpload = async () => {
+    try {
+      setIsLoading(true)
+      await uploadAttachment(`/issues/attachments/${issue.issue_id}/attachments`, {
+        filename: files[0]?.name,
+        fileurl: files[0]?.url,
+        uploaded_by: userid,
+      });
+
+      setFiles([])
+      fetchAttachments()
+    } catch (error) {
+      console.error("Error creating ticket:", error)
+      setIsLoading(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const widgetsRef = useRef();
+  const initializeCloudinaryWidget = () => {
+    if (!window.cloudinary) {
+      console.error("Cloudinary library is not loaded.");
+      return;
+    }
+
+    if (!widgetsRef.current) {
+      // Initialize the Cloudinary widget only once
+      widgetsRef.current = window.cloudinary.createUploadWidget(
+        {
+          cloudName: NewRelicConfig.cloudName,
+          uploadPreset: NewRelicConfig.uploadPreset,
+          multiple: true, // Single upload only
+          clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"], // Acceptable formats
+          maxFileSize: 5 * 1024 * 1024, // 5 MB
+        },
+        (error, result) => {
+          if (!error && result && result.event === "success") {
+            const url = result.info.secure_url; // Extract the secure URL of the uploaded image
+            const name = result.info.original_filename;
+            const format = result.info.format;
+            setFiles([{ name, format, url }]);
+            widgetsRef.current.close(); // Close the widget after successful upload
+            toast.success("Photo uploaded successfully!! Click Save.", {
+              zIndex: 5000, // Correct syntax for custom zIndex
+            });
+            setIsLoading(false);
+          } else if (error) {
+            if (
+              error?.status?.includes("exceeds maximum allowed (5 MB)") &&
+              error?.statusText?.includes("File size")
+            ) {
+              toast.error(
+                "File size exceeds 5 MB. Please upload a smaller file."
+              );
+
+              widgetsRef.current.close();
+            } else if (
+              error?.status === "File format not allowed" &&
+              error?.statusText?.includes("File format not allowed")
+            ) {
+              toast.error("File format not allowed");
+
+              widgetsRef.current.close();
+            }
+            setIsLoading(false);
+          }
+        }
+      );
+    }
+    setIsLoading(true);
+    widgetsRef.current.open();
   };
   
   useEffect(() => {
@@ -109,6 +195,7 @@ const IssueDetails = ({ onClose, issue }) => {
   useEffect(() => {
     if (activeTab === "comments") fetchComments();
     if (activeTab === "history")  fetchHistory();
+    if (activeTab === "attachments") fetchAttachments();
   }, [activeTab]);
 
   const getRandomColor = () => {
@@ -210,16 +297,23 @@ const IssueDetails = ({ onClose, issue }) => {
               <button
                 className={`tab ${activeTab === "comments" ? "active" : ""}`}
                 onClick={() => setActiveTab("comments")}
-                style={{ color:"#000", width:"48%", marginRight:"2%", marginLeft:"1%"}}
+                style={{ color:"#000", width:"33%", marginLeft:"0.5%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',}}
               >
                 Comments
               </button>
               <button
                 className={`tab ${activeTab === "history" ? "active" : ""}`}
                 onClick={() => setActiveTab("history")}
-                style={{ color:"#000", width:"48%", marginRight:"1%"}}
+                style={{ color:"#000", width:"33%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',}}
               >
                 History
+              </button>
+              <button
+                className={`tab ${activeTab === "attachments" ? "active" : ""}`}
+                onClick={() => setActiveTab("attachments")}
+                style={{ color:"#000", width:"33%", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',}}
+              >
+                Attachments
               </button>
             </div>
 
@@ -328,6 +422,53 @@ const IssueDetails = ({ onClose, issue }) => {
                     ) : (
                       <p>No Issue history present.</p>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "attachments" && (
+                <div>
+                  <div className="history-section" style={{height: "550px"}}>
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center", boxShadow: "0 2px 3px -1px rgba(0, 0, 0, 0.1)", marginBottom:"10px"}}>
+                      <h3 style={{ marginBottom:"10px" }}>Attachments</h3>
+                    </div>
+
+                    {attachments.length > 0 ? (
+                      attachments.map((entry, index) => (
+                        <div key={index} className="history">
+                          <div 
+                            className="avatar"
+                            style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
+                          > 
+                            {entry.username && typeof entry.username === "string"
+                            ? entry.username
+                                .split(" ")
+                                .map(word => word.charAt(0).toUpperCase())
+                                .join("")
+                            : ""}
+                          </div>
+                          <div style={{width:"100%",  alignItems:"center", gap: "8px"}}>
+                            <div style={{display:"flex", justifyContent:"space-between", gap:"4px",}}>
+                              <strong>{entry.username || "Undefined"}</strong>
+                              <small>{formatTime(entry.uploaded_at)}</small>
+                            </div>
+                            <div style={{display:"flex", justifyContent:"space-between"}}>
+                              <div>{entry.file_name}</div>
+                              <TbDownload color="#a6a4b2" size={20} onClick={() => window.open(entry.file_path, "_blank")} />
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No Issue Attachments present.</p>
+                    )}
+                    <div style={{textAlign: "right", marginTop:"10px"}}>
+                      {files.length === 0 ? (
+                        <button onClick={initializeCloudinaryWidget}>Add Attachment</button>
+                      ) : (
+                        <button onClick={AttachmentUpload}>Save Attachment</button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
