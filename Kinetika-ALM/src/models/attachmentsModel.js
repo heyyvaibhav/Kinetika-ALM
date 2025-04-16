@@ -55,8 +55,6 @@ class AttachmentsModel {
   
       const { issue_id, file_name, uploaded_by } = rows[0];
 
-      console.log(file_name);
-
       await db.query(
         'DELETE FROM attachments WHERE attachment_id = ?',
         [attachmentId]
