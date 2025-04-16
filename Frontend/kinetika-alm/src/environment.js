@@ -5,7 +5,7 @@ const Environment = {
 };
   
 export const NewRelicConfig = {
-    cloudName: "dpnxkwezq",
+    cloudName: "dtcsaals9", 
     uploadPreset: "Nexus_app_pdfFiles",
 };
   
