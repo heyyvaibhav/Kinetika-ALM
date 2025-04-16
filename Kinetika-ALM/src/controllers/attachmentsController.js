@@ -19,6 +19,15 @@ class AttachmentsController {
       errorResponse(res, error.message);
     }
   }
+
+  static async deleteAttachment(req, res) {
+    try {
+      const attachmentId = await AttachmentsModel.deleteAttachment(req.params.id, req.params.attachment_id);
+      successResponse(res, { attachment_id: attachmentId }, 'Attachment deleted successfully', 200);
+    } catch (error) {
+      errorResponse(res, error.message);
+    }
+  }
 }
 
 module.exports = AttachmentsController;

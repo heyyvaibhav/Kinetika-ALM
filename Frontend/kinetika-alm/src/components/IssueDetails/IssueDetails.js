@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react"
 import "./IssueDetails.css"
-import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment } from "../../Service"
+import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment, deleteAttachment } from "../../Service"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom";
 import { TbDownload } from "react-icons/tb";
+import { MdDelete } from "react-icons/md";
 import { NewRelicConfig } from "../../environment";
 
 const IssueDetails = ({ onClose, issue }) => {
@@ -118,6 +119,7 @@ const IssueDetails = ({ onClose, issue }) => {
       setIsLoading(true)
       await uploadAttachment(`/issues/attachments/${issue.issue_id}/attachments`, {
         filename: files[0]?.name,
+        filesize: files[0]?.size,
         fileurl: files[0]?.url,
         uploaded_by: userid,
       });
@@ -129,6 +131,19 @@ const IssueDetails = ({ onClose, issue }) => {
       setIsLoading(false)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleRemoveAttachment = async (attachmentId) => {
+    setIsLoading(true);
+    try{
+      const response = await deleteAttachment(`/issues/attachments/${attachmentId}/attachments`);
+      toast.success(response.message);
+      fetchAttachments();
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -151,10 +166,13 @@ const IssueDetails = ({ onClose, issue }) => {
         },
         (error, result) => {
           if (!error && result && result.event === "success") {
-            const url = result.info.secure_url; // Extract the secure URL of the uploaded image
+            const url = result.info.secure_url;
+            const size = result.info.bytes >= 1048576
+              ? (result.info.bytes / (1024 * 1024)).toFixed(2) + " MB"
+              : (result.info.bytes / 1024).toFixed(2) + " KB";
             const name = result.info.original_filename;
             const format = result.info.format;
-            setFiles([{ name, format, url }]);
+            setFiles([{ name, size, format, url }]);
             widgetsRef.current.close(); // Close the widget after successful upload
             toast.success("Photo uploaded successfully!! Click Save.", {
               zIndex: 5000, // Correct syntax for custom zIndex
@@ -289,7 +307,7 @@ const IssueDetails = ({ onClose, issue }) => {
               </textarea>
 
               <div style={{textAlign:"right", marginTop:"10px"}}>
-                <button onClick={saveChanges}>Save</button>
+                <button onClick={saveChanges}>Save Details</button>
               </div>
             </div>
 
@@ -336,7 +354,7 @@ const IssueDetails = ({ onClose, issue }) => {
                     </div>
                   </form>
 
-                  <div className="comments-section">
+                  <div className="comments-section" style={{padding:"0 6px"}}>
                     <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
                       <h3 style={{ marginBottom:"10px" }}>Comments</h3>
                     </div>
@@ -372,7 +390,7 @@ const IssueDetails = ({ onClose, issue }) => {
 
               {activeTab === "history" && (
                 <div>
-                  <div className="history-section">
+                  <div className="history-section" style={{padding:"0 6px"}}>
                     <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center"}}>
                       <h3 style={{ marginBottom:"10px" }}>History</h3>
                     </div>
@@ -402,6 +420,8 @@ const IssueDetails = ({ onClose, issue }) => {
                                 <span> Added a comment.</span>
                               ) : (entry.field_changed === "Attachment Added") ? (
                                 <span> Added an attachment.</span>
+                              ) : (entry.field_changed === "Attachment Removed") ? (
+                                <span> Removed <span className="b">{entry.old_value}</span> attachment.</span>
                               ) : (entry.field_changed === "Issue Created") ? (
                                 <span> Created an issue.</span>
                               ) : (entry.field_changed === "assignee") ? (
@@ -428,40 +448,69 @@ const IssueDetails = ({ onClose, issue }) => {
 
               {activeTab === "attachments" && (
                 <div>
-                  <div className="history-section" style={{height: "550px"}}>
-                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center", boxShadow: "0 2px 3px -1px rgba(0, 0, 0, 0.1)", marginBottom:"10px"}}>
+                  <div className="history-section" style={{padding:"0 6px"}}>
+                    <div style={{height:"40px", position:"sticky", top:"0", zIndex:"10", width:"100%", background:"white", alignItems:"center", marginBottom:"10px"}}>
                       <h3 style={{ marginBottom:"10px" }}>Attachments</h3>
                     </div>
 
-                    {attachments.length > 0 ? (
-                      attachments.map((entry, index) => (
-                        <div key={index} className="history">
-                          <div 
-                            className="avatar"
-                            style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"37.62px", fontSize:"14px"}}
-                          > 
-                            {entry.username && typeof entry.username === "string"
-                            ? entry.username
-                                .split(" ")
-                                .map(word => word.charAt(0).toUpperCase())
-                                .join("")
-                            : ""}
-                          </div>
-                          <div style={{width:"100%",  alignItems:"center", gap: "8px"}}>
-                            <div style={{display:"flex", justifyContent:"space-between", gap:"4px",}}>
-                              <strong>{entry.username || "Undefined"}</strong>
-                              <small>{formatTime(entry.uploaded_at)}</small>
-                            </div>
-                            <div style={{display:"flex", justifyContent:"space-between"}}>
-                              <div>{entry.file_name}</div>
-                              <TbDownload color="#a6a4b2" size={20} onClick={() => window.open(entry.file_path, "_blank")} />
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No Issue Attachments present.</p>
-                    )}
+                    <div className="table-container" style={{maxHeight:"300px"}}>
+                      <table>
+                          <thead style={{position:"sticky", top:"0", zIndex:"10", borderBottom: "1px solid #ddd"}}>
+                            <tr>
+                              <th></th>
+                              <th>Name</th>
+                              <th>Size</th>
+                              <th>Date Added</th>
+                              {attachments.length > 0 && (
+                              <>
+                                <th></th>
+                                <th></th>
+                              </>
+                              )}
+                            </tr>
+                          </thead>
+                          <tbody>
+                          {attachments.length > 0 ? (
+                            attachments.map((entry, index) => (
+                            <tr key={index}>
+                              <td>
+                              <div 
+                                className="avatar"
+                                style={{ backgroundColor: '#3357FF', color: "#fff", fontWeight: "bold", height:"34px", width:"34px", fontSize:"14px"}}
+                              > 
+                                {entry.username && typeof entry.username === "string"
+                                ? entry.username
+                                    .split(" ")
+                                    .map(word => word.charAt(0).toUpperCase())
+                                    .join("")
+                                : ""}
+                              </div>
+                              </td>
+                              <td>{entry.file_name}</td> 
+                              <td>{entry.file_size || "N/A"}</td>
+                              <td>{formatDate(entry.uploaded_at).replace(' at ', ' ')}</td>
+                              <td style={{textAlign:"center"}}>
+                                <MdDelete
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleRemoveAttachment(entry.attachment_id)}
+                                  color="#a6a4b2" size={20}
+                                />
+                              </td>
+                              <td style={{textAlign:"center"}}>
+                                <TbDownload
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => window.open(entry.file_path, "_blank")}
+                                  color="#a6a4b2" size={20}
+                                />
+                              </td>
+                            </tr>
+                          ))) : (
+                            <td colSpan={5} style={{textAlign: "center"}}>No Issue Attachments present.</td>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
                     <div style={{textAlign: "right", marginTop:"10px"}}>
                       {files.length === 0 ? (
                         <button onClick={initializeCloudinaryWidget}>Add Attachment</button>
