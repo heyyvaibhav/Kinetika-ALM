@@ -97,9 +97,12 @@ export function AddTicketModal({ onclose , statusList }) {
         (error, result) => {
           if (!error && result && result.event === "success") {
             const url = result.info.secure_url; // Extract the secure URL of the uploaded image
+            const size = result.info.bytes >= 1048576
+              ? (result.info.bytes / (1024 * 1024)).toFixed(2) + " MB"
+              : (result.info.bytes / 1024).toFixed(2) + " KB";
             const name = result.info.original_filename;
             const format = result.info.format;
-            setFiles((prevFiles) => [...prevFiles, { name, format, url }]);
+            setFiles((prevFiles) => [...prevFiles, { name, size, format, url }]);
             widgetsRef.current.close(); // Close the widget after successful upload
             toast.success("Photo uploaded successfully!!", {
               zIndex: 5000, // Correct syntax for custom zIndex
@@ -178,6 +181,7 @@ export function AddTicketModal({ onclose , statusList }) {
       for (const file of files) {
         await uploadAttachment(`/issues/attachments/${issueID}/attachments`, {
           filename: file.name,
+          filesize: file.size,
           fileurl: file.url,
           uploaded_by: userid,
         });
