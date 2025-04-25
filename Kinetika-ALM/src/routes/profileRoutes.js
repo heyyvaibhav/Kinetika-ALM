@@ -3,6 +3,27 @@ const { authenticateToken } = require("../auth"); // Import authenticateToken
 const db = require('../config/dbConfig');
 const bcrypt = require("bcryptjs");
 const { body, param, validationResult } = require("express-validator");
+require('dotenv').config();
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.cloudinary_cloudName,
+  api_key: process.env.cloudinary_api_key,
+  api_secret: process.env.cloudinary_secret_key,
+});
+
+const getPublicIdFromUrl = (url) => {
+  const parts = url.split("/");
+  let publicId = "";
+  const resourceType = parts[parts.indexOf("upload") - 1];
+  if (resourceType == "image" || resourceType == "video") {
+    publicId = parts[parts.length - 1].split(".")[0];
+  } else {
+    publicId = parts[parts.length - 1];
+  }
+
+  return { publicId, resourceType };
+};
 
 const router = express.Router();
 
@@ -146,11 +167,38 @@ router.post("/picture/:id", async (req, res) => {
 router.delete("/delete/:id", async (req, res) => {
   const profileId = req.params.id;
 
-  const deleteProfileImageQuery = "UPDATE web_user_info SET ProfileImage = NULL WHERE UserID = ?";
-
   try {
-    await db.query(deleteProfileImageQuery, [profileId]);
-    res.status(200).json({ message: "Profile picture deleted successfully" });
+    const [rows] = await db.query(
+      'SELECT ProfileImage FROM web_user_info WHERE UserID = ?',
+      [profileId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { publicId, resourceType } = getPublicIdFromUrl(rows.ProfileImage);
+
+    if (!publicId) {
+      return res.status(400).json({ message: 'No profile image to delete' });
+    }
+
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType,
+      invalidate: "true",
+    });
+
+
+    if (result.result !== 'ok') {
+      return res.status(500).json({ message: 'Cloudinary deletion failed', result });
+    }
+
+    await db.query(
+      'UPDATE web_user_info SET ProfileImage = NULL WHERE UserID = ?',
+      [profileId]
+    );
+
+    res.status(200).json({ message: 'Profile image deleted successfully' });
   } catch (err) {
     console.error("Error deleting profile picture:", err);
     res.status(500).json({ error: "An error occurred while deleting the profile picture" });

@@ -1,4 +1,25 @@
 const db = require('../config/dbConfig');
+require('dotenv').config();
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.cloudinary_cloudName,
+  api_key: process.env.cloudinary_api_key,
+  api_secret: process.env.cloudinary_secret_key,
+});
+
+const getPublicIdFromUrl = (url) => {
+  const parts = url.split("/");
+  let publicId = "";
+  const resourceType = parts[parts.indexOf("upload") - 1];
+  if (resourceType == "image" || resourceType == "video") {
+    publicId = parts[parts.length - 1].split(".")[0];
+  } else {
+    publicId = parts[parts.length - 1];
+  }
+
+  return { publicId, resourceType };
+};
 
 class AttachmentsModel {
   static async getAttachmentsByIssueId(issueId) {
@@ -45,7 +66,7 @@ class AttachmentsModel {
   static async deleteAttachment(attachmentId) {
     try {
       const rows = await db.query(
-        'SELECT issue_id, file_name, uploaded_by FROM attachments WHERE attachment_id = ?',
+        'SELECT issue_id, file_name, file_path, uploaded_by FROM attachments WHERE attachment_id = ?',
         [attachmentId]
       );
   
@@ -53,28 +74,40 @@ class AttachmentsModel {
         throw new Error('Attachment not found');
       }
   
-      const { issue_id, file_name, uploaded_by } = rows[0];
+      const { issue_id, file_name, file_path, uploaded_by } = rows[0];
 
-      await db.query(
-        'DELETE FROM attachments WHERE attachment_id = ?',
-        [attachmentId]
-      );
+     
+      const { publicId, resourceType } = getPublicIdFromUrl(file_path);
 
-      const historyQuery = `
-        INSERT INTO issuehistory (issue_id, updated_by, old_value, new_value, field_changed)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-      const historyValues = [
-        issue_id,
-        uploaded_by,
-        file_name,
-        null,
-        'Attachment Removed',
-      ];
-  
-      await db.query(historyQuery, historyValues);
-  
-      return { success: true, message: 'Attachment deleted successfully' };
+      const result = await cloudinary.uploader.destroy(publicId, {
+        resource_type: resourceType,
+        invalidate: "true",
+      });
+
+      if (result.result == "ok") {
+        await db.query(
+          'DELETE FROM attachments WHERE attachment_id = ?',
+          [attachmentId]
+        );
+
+        const historyQuery = `
+          INSERT INTO issuehistory (issue_id, updated_by, old_value, new_value, field_changed)
+          VALUES (?, ?, ?, ?, ?)
+        `;
+        const historyValues = [
+          issue_id,
+          uploaded_by,
+          file_name,
+          null,
+          'Attachment Removed',
+        ];
+    
+        await db.query(historyQuery, historyValues);
+        return { success: true, message: 'Attachment deleted successfully' };
+      } else {
+        return res.status(404).json({ message: result });
+      }
+      
     } catch (error) {
       console.error('Error deleting attachment:', error);
       throw error;

@@ -26,7 +26,6 @@ const Profile = () => {
     const { month, year } = getMonthAndYear(profile.created_at);
     const widgetsRef = useRef();
     const [showDropdown, setShowDropdown] = useState(false);
-    const [saveDisabled,  setSaveDisabled] = useState(true);
 
     const toggleDropdown = () => {
       setShowDropdown(!showDropdown);
@@ -51,74 +50,68 @@ const Profile = () => {
         console.error("Cloudinary library is not loaded.");
         return;
       }
-  
+    
       if (!widgetsRef.current) {
-        // Initialize the Cloudinary widget only once
         widgetsRef.current = window.cloudinary.createUploadWidget(
           {
             cloudName: NewRelicConfig.cloudName,
             uploadPreset: NewRelicConfig.uploadPreset,
-            multiple: false, // Single upload only
-            clientAllowedFormats: ["jpeg", "jpg", "png"], // Acceptable formats
-            maxFileSize: 5 * 1024 * 1024, // 5 MB
+            multiple: false,
+            clientAllowedFormats: ["jpeg", "jpg", "png"],
+            maxFileSize: 5 * 1024 * 1024,
           },
-          (error, result) => {
+          async (error, result) => {
             if (!error && result && result.event === "success") {
               const newImage = result.info.secure_url;
+    
+              // Update formData state
               setFormData((prevState) => ({
                 ...prevState,
                 ProfileImage: newImage,
               }));
+    
               widgetsRef.current.close();
-              toast.success("Photo uploaded. Click Save!!", {
-                zIndex: 5000, // Correct syntax for custom zIndex
-              });
-              setLoading(false);
-              setSaveDisabled(false);
+    
+              try {
+                setLoading(true);
+                const response = await uploadPicture(`/picture/${userTokenData.id}`, {
+                  ProfileImage: newImage,
+                });
+                toast.success(response.message);
+                toggleDropdown();
+                fetchProfileByID();
+              } catch (err) {
+                console.error("Upload error:", err);
+                toast.error("Failed to save profile image.");
+              } finally {
+                setLoading(false);
+              }
             } else if (error) {
               if (
                 error?.status?.includes("exceeds maximum allowed (5 MB)") &&
                 error?.statusText?.includes("File size")
               ) {
                 toast.error("File size exceeds 5 MB. Please upload a smaller file.");
-                widgetsRef.current.close();
               } else if (
                 error?.status === "File format not allowed" &&
                 error?.statusText?.includes("File format not allowed")
               ) {
                 toast.error("File format not allowed");
-                widgetsRef.current.close();
+              } else {
+                console.error("Upload Error:", error);
               }
-              setLoading(false);
-            }
-            else if (error) {
-              console.error("Upload Error:", error);
+    
+              widgetsRef.current.close();
               setLoading(false);
             }
           }
         );
       }
+    
       setLoading(true);
-      widgetsRef.current.open(); // Open the widget
+      widgetsRef.current.open();
     };
-
-    const handleUploadPicture = async () => {
-      setLoading(true);
-      try{
-        const response = await uploadPicture(`/picture/${userTokenData.id}`, {
-          ProfileImage: formData.ProfileImage
-        });
-        toast.success(response.message);
-        toggleDropdown();
-        fetchProfileByID();
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      } finally {
-        setLoading(false);
-        setSaveDisabled(true);
-      }
-    }
-
+    
     const handleRemove = async () => {
       setLoading(true);
       try{
@@ -285,8 +278,6 @@ const Profile = () => {
                         </button>}
                       
                       {profile.ProfileImage && <button onClick={handleRemove}>Remove Picture</button>}
-
-                      {!profile.ProfileImage && <button disabled={saveDisabled} style={{ cursor: saveDisabled ? "not-allowed" : "pointer" }} onClick={handleUploadPicture}>Save</button>}
                     </div>
                   )}
                   {profile.Status === "Active" && <div className="status-indicator"></div>}

@@ -8,6 +8,7 @@ import { TbDownload } from "react-icons/tb";
 import { MdDelete } from "react-icons/md";
 import { NewRelicConfig } from "../../environment";
 import HeaderNav from "../Templates/HeaderNav";
+import TextareaAutosize from 'react-textarea-autosize';
 
 const DetailsFull = () => {
   // const location = useLocation();
@@ -127,34 +128,6 @@ const DetailsFull = () => {
     }
   }
 
-  const handleAttachment = (entry) => {
-    const link = document.createElement("a");
-    link.href = entry.file_url; // or whatever field has the URL
-    link.download = entry.file_name; // suggested filename
-    link.target = "_blank";
-    link.click();
-  };
-
-  const AttachmentUpload = async () => {
-    try {
-      setIsLoading(true)
-      await uploadAttachment(`/issues/attachments/${issue.issue_id}/attachments`, {
-        filename: files[0]?.name,
-        filesize: files[0]?.size,
-        fileurl: files[0]?.url,
-        uploaded_by: userid,
-      });
-
-      setFiles([])
-      fetchAttachments()
-    } catch (error) {
-      console.error("Error creating ticket:", error)
-      setIsLoading(false)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleRemoveAttachment = async (attachmentId) => {
     setIsLoading(true);
     try{
@@ -246,18 +219,17 @@ const DetailsFull = () => {
       console.error("Cloudinary library is not loaded.");
       return;
     }
-
+  
     if (!widgetsRef.current) {
-      // Initialize the Cloudinary widget only once
       widgetsRef.current = window.cloudinary.createUploadWidget(
         {
           cloudName: NewRelicConfig.cloudName,
           uploadPreset: NewRelicConfig.uploadPreset,
-          multiple: true, // Single upload only
-          clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"], // Acceptable formats
-          maxFileSize: 5 * 1024 * 1024, // 5 MB
+          multiple: true,
+          clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"],
+          maxFileSize: 5 * 1024 * 1024,
         },
-        (error, result) => {
+        async (error, result) => {
           if (!error && result && result.event === "success") {
             const url = result.info.secure_url;
             const size = result.info.bytes >= 1048576
@@ -265,30 +237,48 @@ const DetailsFull = () => {
               : (result.info.bytes / 1024).toFixed(2) + " KB";
             const name = result.info.original_filename;
             const format = result.info.format;
-            setFiles([{ name, size, format, url }]);
-            widgetsRef.current.close(); // Close the widget after successful upload
-            toast.success("Photo uploaded successfully!! Click Save.", {
-              zIndex: 5000, // Correct syntax for custom zIndex
-            });
-            setIsLoading(false);
+  
+            const fileData = {
+              name,
+              size,
+              format,
+              url,
+            };
+  
+            setFiles([fileData]);
+            widgetsRef.current.close();
+            toast.success("Attachment uploaded successfully.", { zIndex: 5000 });
+  
+            try {
+              setIsLoading(true);
+              await uploadAttachment(`/issues/attachments/${issue.issue_id}/attachments`, {
+                filename: name,
+                filesize: size,
+                fileurl: url,
+                uploaded_by: userid,
+              });
+  
+              setFiles([]);
+              fetchAttachments();
+            } catch (err) {
+              console.error("Error uploading attachment:", err);
+            } finally {
+              setIsLoading(false);
+            }
           } else if (error) {
             if (
               error?.status?.includes("exceeds maximum allowed (5 MB)") &&
               error?.statusText?.includes("File size")
             ) {
-              toast.error(
-                "File size exceeds 5 MB. Please upload a smaller file."
-              );
-
-              widgetsRef.current.close();
+              toast.error("File size exceeds 5 MB. Please upload a smaller file.");
             } else if (
               error?.status === "File format not allowed" &&
               error?.statusText?.includes("File format not allowed")
             ) {
               toast.error("File format not allowed");
-
-              widgetsRef.current.close();
             }
+  
+            widgetsRef.current.close();
             setIsLoading(false);
           }
         }
@@ -310,13 +300,14 @@ const DetailsFull = () => {
           <div className="space-y-6">
             <div className="form-group">
               <h3 style={{marginBottom:"10px"}}>Description</h3>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+              <TextareaAutosize
                 className="form-control"
+                value={description}
                 maxLength={500}
+                minRows={5}
                 placeholder="Enter the description"
-                style={{ height:"140px" }}
+                onChange={(e) => setDescription(e.target.value)}
+                style={{ width: "100%", fontFamily: "sans-serif" }}
               />
             </div>
 
@@ -517,11 +508,7 @@ const DetailsFull = () => {
                     </div>
 
                     <div style={{textAlign: "right", marginTop:"10px"}}>
-                      {files.length === 0 ? (
-                        <button onClick={initializeCloudinaryWidget}>Add Attachment</button>
-                      ) : (
-                        <button onClick={AttachmentUpload}>Save Attachment</button>
-                      )}
+                      <button onClick={initializeCloudinaryWidget}>Add Attachment</button>
                     </div>
                   </div>
                 </div>
