@@ -23,7 +23,13 @@ class AttachmentsController {
   static async deleteAttachment(req, res) {
     try {
       const attachmentId = await AttachmentsModel.deleteAttachment(req.params.id, req.params.attachment_id);
-      successResponse(res, { attachment_id: attachmentId }, 'Attachment deleted successfully', 200);
+      if (attachmentId.success) {
+        successResponse(res, { attachment_id: attachmentId }, 'Attachment deleted successfully', 200);
+      } else if (attachmentId.error === "not found") {
+        errorResponse(res, attachmentId.error, attachmentId.message, 404 );
+      } else {
+        errorResponse(res, attachmentId.error, attachmentId.message, 500 );
+      }
     } catch (error) {
       errorResponse(res, error.message);
     }

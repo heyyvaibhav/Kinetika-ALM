@@ -64,7 +64,6 @@ class AttachmentsModel {
   }
 
   static async deleteAttachment(attachmentId) {
-    try {
       const rows = await db.query(
         'SELECT issue_id, file_name, file_path, uploaded_by FROM attachments WHERE attachment_id = ?',
         [attachmentId]
@@ -104,14 +103,11 @@ class AttachmentsModel {
     
         await db.query(historyQuery, historyValues);
         return { success: true, message: 'Attachment deleted successfully' };
+      } else if (result.result == "not found") {
+        return { success: false, message: 'Attachment not found', error: result.result };
       } else {
-        return res.status(404).json({ message: result });
+        return { success: false, message: 'Error ocurred in Cloudinary', error: result.result };
       }
-      
-    } catch (error) {
-      console.error('Error deleting attachment:', error);
-      throw error;
-    }
   }
 }
 

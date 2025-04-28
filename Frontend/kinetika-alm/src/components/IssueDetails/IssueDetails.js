@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import "./IssueDetails.css"
-import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment, deleteAttachment } from "../../Service"
+import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment, deleteAttachment, deleteIssue } from "../../Service"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom";
 import { TbDownload } from "react-icons/tb";
@@ -122,7 +122,21 @@ const IssueDetails = ({ onClose, issue }) => {
       toast.success(response.message);
       fetchAttachments();
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error("Error deleting attachment:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleDeleteIssue = async () => {
+    setIsLoading(true);
+    try{
+      const response = await deleteIssue(`/issues/${issue.issue_id}`);
+      if (response.success) onClose()
+      
+      toast.success(response.message);
+    } catch (error) {
+      console.error("Error deleting issue:", error);
     } finally {
       setIsLoading(false);
     }
@@ -290,6 +304,11 @@ const IssueDetails = ({ onClose, issue }) => {
             <h2 className="modal-title">{issue.summary}</h2>
           </div>
           <div className="header-right">
+            <MdDelete
+              style={{ cursor: "pointer" }}
+              onClick={handleDeleteIssue}
+              color="#a6a4b2" size={20}
+            />
             <button className="icon-button" onClick={onClose}>
               <h3>X</h3>
             </button>

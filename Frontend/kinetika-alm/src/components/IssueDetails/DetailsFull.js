@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import './DetailsFull.css';
-import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment, deleteAttachment } from "../../Service"
+import { addComment, getComments, updateIssueStatus, getStatus, getUserList, getHistory, getAttachments, uploadAttachment, deleteAttachment, deleteIssue } from "../../Service"
 import { toast } from "react-toastify"
 import RichTextEditor from "../Templates/TextEditor.js"
 import Loading from "../Templates/Loading.js"
@@ -135,7 +135,21 @@ const DetailsFull = () => {
       toast.success(response.message);
       fetchAttachments();
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error("Error deleting attachment:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleDeleteIssue = async () => {
+    setIsLoading(true);
+    try{
+      const response = await deleteIssue(`/issues/${issue.issue_id}`);
+      if (response.success) window.close();
+      
+      toast.success(response.message);
+    } catch (error) {
+      console.error("Error deleting issue:", error);
     } finally {
       setIsLoading(false);
     }

@@ -1,4 +1,25 @@
-const db = require('../config/dbConfig'); // Assume this is your DB connection file
+const db = require('../config/dbConfig');
+require('dotenv').config();
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.cloudinary_cloudName,
+  api_key: process.env.cloudinary_api_key,
+  api_secret: process.env.cloudinary_secret_key,
+});
+
+const getPublicIdFromUrl = (url) => {
+  const parts = url.split("/");
+  let publicId = "";
+  const resourceType = parts[parts.indexOf("upload") - 1];
+  if (resourceType == "image" || resourceType == "video") {
+    publicId = parts[parts.length - 1].split(".")[0];
+  } else {
+    publicId = parts[parts.length - 1];
+  }
+
+  return { publicId, resourceType };
+};
 
 // Issues Model
 const IssuesModel = {
@@ -166,10 +187,32 @@ const IssuesModel = {
   },
 
   deleteIssue: async (issueId) => {
-    const query = `
-      DELETE FROM issues WHERE issue_id = ?
-    `;
-    return db.query(query, [issueId]);
+    try {
+      const issue = await db.query('SELECT file_path FROM attachments WHERE issue_id = ?', [issueId]);
+
+      if (issue.length > 0) {
+        for (let attachment of issue) {
+          const { publicId, resourceType } = getPublicIdFromUrl(attachment.file_path)
+          const result = await cloudinary.uploader.destroy(publicId, {
+            resource_type: resourceType,
+            invalidate: "true",
+          });
+          if (result.result == "ok" || result.result == "not found") {
+            await db.query('DELETE FROM attachments WHERE issue_id = ?', [issueId]);
+          }
+        }
+      }
+  
+      await db.query('DELETE FROM comments WHERE issue_id = ?', [issueId]);
+
+      await db.query('DELETE FROM issueHistory WHERE issue_id = ?', [issueId]);
+
+      const res = await db.query('DELETE FROM issues WHERE issue_id = ?', [issueId]);
+  
+      return res; 
+    } catch (error) {
+      throw error;
+    }
   },
 
   generateIssueKey: async (projectId, prefix) => {

@@ -385,3 +385,15 @@ export const deleteAttachment = async (endpoint) => {
     throw error;
   }
 };
+
+export const deleteIssue = async (endpoint) => {
+  try {
+    // getToken();
+    const response = await apiClient.delete(endpoint);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};
