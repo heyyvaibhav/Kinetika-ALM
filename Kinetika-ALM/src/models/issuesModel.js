@@ -205,7 +205,7 @@ const IssuesModel = {
   
       await db.query('DELETE FROM comments WHERE issue_id = ?', [issueId]);
 
-      await db.query('DELETE FROM issueHistory WHERE issue_id = ?', [issueId]);
+      await db.query('DELETE FROM issuehistory WHERE issue_id = ?', [issueId]);
 
       const res = await db.query('DELETE FROM issues WHERE issue_id = ?', [issueId]);
   
