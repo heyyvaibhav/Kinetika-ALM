@@ -513,11 +513,11 @@ const Profile = () => {
                       </div> 
                     </div>
 
-                    <div className="danger-zone">
+                    {/* <div className="danger-zone">
                       <h3 className="section-title">Danger Zone</h3>
                       <button className="btn btn-danger">Delete Account</button>
-                    </div>
-                  </div>
+                    </div> */}
+                  </div> 
                 )}
               </div>
             </div>
@@ -578,7 +578,7 @@ function EditableField({ label, name, value, onChange, className = "", isTextare
       {isTextarea ? (
         <textarea id={name} name={name} value={value} onChange={onChange} placeholder="Enter a bio" className="form-control textarea" rows="4" />
       ) : (name === "DOB" ? (
-          <input type="date" id={name} name={name} value={value} onChange={onChange} placeholder={"Enter " + label} className="form-control" />
+          <input type="date" id={name} name={name} value={value} onChange={onChange} placeholder={"Enter " + label} className="form-control" max={new Date().toISOString().split("T")[0]}/>
         ) : name === "MobileNumber" ? (
           <input type="tel" id={name} name={name} value={value} onChange={onChange} maxLength={maxlength} placeholder={"Enter " + label} className="form-control" />
         ) : (

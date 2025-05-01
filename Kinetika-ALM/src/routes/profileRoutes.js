@@ -188,10 +188,9 @@ router.delete("/delete/:id", async (req, res) => {
       invalidate: "true",
     });
 
-
-    if (result.result !== 'ok') {
-      return res.status(500).json({ message: 'Cloudinary deletion failed', result });
-    }
+    // if (result.result !== 'ok') {
+    //   return res.status(500).json({ message: 'Cloudinary deletion failed', result });
+    // }
 
     await db.query(
       'UPDATE web_user_info SET ProfileImage = NULL WHERE UserID = ?',

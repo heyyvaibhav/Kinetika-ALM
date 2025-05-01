@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { setToken, API_BASE_URL } from "../../Service.js";
 import { UserType } from "../DropdownOptions.js";
+import Loading from "../Templates/Loading.js";
 
 const server_url = API_BASE_URL;
 
@@ -15,6 +16,7 @@ const Login = () => {
   const [icon, setIcon] = useState(FiEyeOff);
   const [email, setEmail] = useState(""); // State for storing email
   const [password, setPassword] = useState(""); // State for storing password
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleToggle = () => {
     if (type === "password") {
@@ -28,7 +30,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true)
     try {
       const response = await fetch(server_url + "login", {
         method: "POST",
@@ -57,6 +59,8 @@ const Login = () => {
     } catch (error) {
       toast.error("An error occurred. Please try again.");
       console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -131,6 +135,8 @@ const Login = () => {
         </div>
       </div>
       {/* Toast Container to show toasts */}
+
+      {isLoading && <Loading show={isLoading} /> }
     </section>
   );
 };

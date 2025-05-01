@@ -193,8 +193,9 @@ function Board() {
     } catch (error) {
       console.error("Failed to fetch projects:", error)
       setProjectList([])
+    } finally { 
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   useEffect(() => {
