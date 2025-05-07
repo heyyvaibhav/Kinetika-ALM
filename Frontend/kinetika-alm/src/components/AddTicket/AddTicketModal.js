@@ -90,8 +90,8 @@ export function AddTicketModal({ onclose , statusList }) {
         {
           cloudName: NewRelicConfig.cloudName,
           uploadPreset: NewRelicConfig.uploadPreset,
-          multiple: true, // Single upload only
-          clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"], // Acceptable formats
+          multiple: true,
+          // clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"],
           maxFileSize: 5 * 1024 * 1024, // 5 MB
         },
         (error, result) => {

@@ -190,8 +190,8 @@ const IssueDetails = ({ onClose, issue }) => {
         {
           cloudName: NewRelicConfig.cloudName,
           uploadPreset: NewRelicConfig.uploadPreset,
-          multiple: true,
-          clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"],
+          multiple: false,
+          // clientAllowedFormats: ["jpeg", "jpg", "png", "pdf", "doc", "docx"],
           maxFileSize: 5 * 1024 * 1024,
         },
         async (error, result) => {
