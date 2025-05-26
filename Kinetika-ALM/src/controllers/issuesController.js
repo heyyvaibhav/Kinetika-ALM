@@ -1,10 +1,17 @@
 const IssuesModel = require('../models/issuesModel');
+const ProjectsModel = require('../models/projectsModel');
 
 const IssuesController = {
   createIssue: async (req, res) => {
     try {
       const { project_id, summary, description, flagged, issue_type_id, priority, status, reporter_id, assignee_id } = req.body;
-      const prefix = `PROJ${project_id}`; // Customize prefix logic as needed
+      const project = await ProjectsModel.getProjectById(project_id);
+
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      const prefix = project.project_key;
       const issue_key = await IssuesModel.generateIssueKey(project_id, prefix);
 
       const issueData = {
@@ -52,8 +59,6 @@ const IssuesController = {
         res.status(500).json({ success: false, message: "Failed to fetch issues" });
     }
   },
-
-  
 
   getIssueById: async (req, res) => {
     try {

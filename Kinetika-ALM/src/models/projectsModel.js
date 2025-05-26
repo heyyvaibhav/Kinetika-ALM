@@ -11,13 +11,19 @@ const ProjectsModel = {
     }
     const results = await db.query(query, queryParams);
     return results;
-},
+  },
 
   // Retrieve a project by ID
   getProjectById: async (projectId) => {
     const query = 'SELECT * FROM projects WHERE project_id = ?';
-    const [results] = await db.query(query, [projectId]);
+    const results = await db.query(query, [projectId]);
     return results[0]; // Return a single project
+  },
+
+  // Get IssueIDs by Project ID
+  getIssueIdsByProjectId: async (projectId) => {
+  const rows = await db.query('SELECT issue_id FROM issues WHERE project_id = ?', [projectId]);
+  return rows.map(row => row.issue_id);
   },
 
   // Create a new project
@@ -43,7 +49,7 @@ const ProjectsModel = {
     ]);
 
     return { exists: false, insertId: result.insertId }; // Return the new project ID
-},
+  },
 
   // Update an existing project
   updateProject: async (projectId, projectData) => {
@@ -64,8 +70,8 @@ const ProjectsModel = {
 
   // Delete a project
   deleteProject: async (projectId) => {
-    const query = 'DELETE FROM projects WHERE project_id = ?';
-    await db.query(query, [projectId]);
+    await db.query('DELETE FROM issuekeys WHERE project_id = ?', [projectId]);
+    await db.query('DELETE FROM projects WHERE project_id = ?', [projectId]);
     return true;
   },
 };

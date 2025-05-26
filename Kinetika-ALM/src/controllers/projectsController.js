@@ -1,4 +1,5 @@
 const ProjectsModel = require('../models/projectsModel');
+const IssuesModel = require('../models/issuesModel');
 
 const ProjectsController = {
   // Get all projects
@@ -102,12 +103,21 @@ const ProjectsController = {
         return res.status(404).json({ message: 'Project not found' });
       }
 
+      // Get all issue IDs linked to this project
+      const issueIds = await ProjectsModel.getIssueIdsByProjectId(id);
+
+      // Delete each issue using the existing deleteIssue logic
+      for (let issueId of issueIds) {
+        await IssuesModel.deleteIssue(issueId); // This already handles cleanup
+      }
+
+      // Now delete the project
       await ProjectsModel.deleteProject(id);
 
-      res.status(200).json({ message: 'Project deleted successfully' });
+      res.status(200).json({ message: 'Project and related issues deleted successfully' });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Failed to delete the project' });
+      res.status(500).json({ message: 'Failed to delete the project and its issues' });
     }
   },
 };

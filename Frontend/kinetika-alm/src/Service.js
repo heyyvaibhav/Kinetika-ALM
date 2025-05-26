@@ -397,3 +397,15 @@ export const deleteIssue = async (endpoint) => {
     throw error;
   }
 };
+
+export const deleteProject = async (endpoint) => {
+  try {
+    // getToken();
+    const response = await apiClient.delete(endpoint);
+    toast.success(response.message);
+    return response.data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+};

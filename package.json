@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "dnd-kit": "^0.0.2",
     "react-icons": "^5.5.0"
   }
 }

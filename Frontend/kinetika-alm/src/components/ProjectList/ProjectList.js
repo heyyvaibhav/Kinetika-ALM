@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { getProject, getUserList } from '../../Service';
+import { getProject, getUserList, deleteProject } from '../../Service';
 import './ProjectList.css';
 import Loading from '../Templates/Loading';
 import { useNavigate } from "react-router-dom";
 import SearchContainer from "../Search/Search";
 import Pagination from '../Templates/Pagination';
 import HeaderNav from '../Templates/HeaderNav';
+import { MdDelete } from "react-icons/md";
+import { toast } from 'react-toastify';
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -23,20 +25,21 @@ const ProjectList = () => {
   const itemsPerPage = 10;
   const maxPageButtons = 5;
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await getProject("/projects");
-        setProjects(response);
-        setFilteredProjects(response);
-        setIsLoading(false);
-      } catch (err) {
-        setError('Failed to fetch projects. Please try again later.');
-        setIsLoading(false);
-      }
-    };
+  useEffect(() => { 
     fetchProjects();
   }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await getProject("/projects");
+      setProjects(response);
+      setFilteredProjects(response);
+      setIsLoading(false);
+    } catch (err) {
+      setError('Failed to fetch projects. Please try again later.');
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     let updatedProjects = [...projects];
@@ -77,6 +80,16 @@ const ProjectList = () => {
     } catch (error) {
       setError(error.message)
       setIsLoading(false)
+    }
+  }
+
+  const removeProject = async (projectId) => {
+    try {
+      const response = await deleteProject(`/projects/${projectId}`);
+      toast.success(response.message);
+      fetchProjects()
+    } catch (error) {
+      console.error("Error deleting project:", error);
     }
   }
 
@@ -165,12 +178,13 @@ const ProjectList = () => {
               <th>Project Description</th>
               <th>Lead on Project</th>
               <th>Created at</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {duplicateArray.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center' }}>No data found</td>
+                <td colSpan="7" style={{ textAlign: 'center' }}>No data found</td>
               </tr>
             ) : (
               duplicateArray.map((project) => (
@@ -181,6 +195,14 @@ const ProjectList = () => {
                   <td>{project.project_description}</td>
                   <td>{project.lead_name}</td>
                   <td>{formatDate(project.created_at)}</td>
+                  <td>
+                    <MdDelete
+                      style={{ cursor: "pointer", marginTop:"6px" }}
+                      onClick={() => removeProject(project.project_id)}
+                      color="#a6a4b2"
+                      size={18}
+                    />
+                  </td>
                 </tr>
               ))
             )}
